@@ -12,9 +12,7 @@ def get_serial_ports():
 	else:
 		for p in pts :
 			print(p)
-			if (p[1].find('CP2102') == 6) :
-				var.imuPort = p[0] 
-			elif (p[1].find('RS232') == 5) :
+			if (p[1].find('CP2102') == 5) :
 				var.lidarPort = p[0] 
 			elif (p[1].find('ACM') == 3):
 				var.arduinoUnoPort = p[0]

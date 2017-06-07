@@ -1,4 +1,5 @@
 import sys
+import time
 import serial
 import lib.utility as utility
 import lib.variables as var
@@ -128,30 +129,36 @@ def horizonal_displacement(distance):
 
 #Function to test the motors with the prototyped car
 def test_motors(thruster,value1=0, value2=0):
-	ser = serial.Serial(var.arduinoPort)
-
 	if(value1 < 0 or value1 > 255 or value2 < 0 or value2 > 255):
 		print("Not a valid value")
 		return None
 	##Need to complete the functions
 	#Move Left Thrusters
 	if(thruster == 'l'):
-		val = 'T,' + thruster + ',' + str(value1)
-		data=val.encode()
-		ser.write(data)
-		ser.flush()
+		val = 't,' + thruster + ',' + str(value1)
+		var.ser.write(val.encode())
+		var.ser.flush()
 	#Move Right Thrusters
 	elif(thruster == 'r'):
-		val = 'T,' + thruster + ',' + str(value1)
-		data=val.encode()
-		ser.write(data)
-		ser.flush()
+		val = 't,' + thruster + ',' + str(value1)
+		var.ser.write(val.encode())
+		var.ser.flush()
 	#Move Back Trhusters
 	elif(thruster == 'b'):
-		val = 'T,' + thruster + ',' + str(value1) + ',' + str(value2)
-		data=val.encode()
-		ser.write(data)
-		ser.flush()
+		val = 't,' + thruster + ',' + str(value1) + ',' + str(value2)
+		var.ser.write(val.encode())
+		var.ser.flush()
+		readSize = len(val)
+		#print("Expecting Message of size " , len(val.encode()) , val.encode())
+		print(var.ser.read(readSize))
+		
+
+def send_value(val):
+	ser.write(val)
+	ser.flush()
+	arduinoData = ser.read(len(val))
+	return arduinoData
+
 
 def test_horizontal(direction):
 	#Turn Right
@@ -187,7 +194,7 @@ def get_max_acc(numBatteries=2):
 		print(var.threeBatTopForwardAcc)
 		print(var.threeBatTopBackwardAcc)	
 	elif(numBatteries == 4):
-		print(var.fourBatTopForwardAcc)
+		print(vlar.fourBatTopForwardAcc)
 		print(var.fourBatTopBackwardAcc)	
 
 def get_max_speed():
