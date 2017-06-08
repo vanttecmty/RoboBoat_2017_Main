@@ -14,7 +14,17 @@ def get_serial_ports():
 			print(p)
 			if (p[1].find('CP2102') == 5) :
 				var.lidarPort = p[0] 
-			elif (p[1].find('RS232') == 4) :
-				var.imuPort = p[0]
-			elif (p[1].find('ACM') == 2):
+			elif (p[1].find('ACM') == 3):
+				var.arduinoUnoPort = p[0]
+			elif (p[1].find('Serial') == 7):
 				var.arduinoPort = p[0]
+
+def print_serial_ports():
+	pts = list(ports.comports())
+	if not pts:
+		print ('Theres no connected sensors')
+	else:
+		for p in pts :
+			print(p)
+			print(p[1].find('Serial') == 7)
+	

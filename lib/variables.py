@@ -1,20 +1,26 @@
-import sys
 import os
+import sys
+import serial
+import serial.tools.list_ports as ports
+
+baudRateArduino = 9600
+baudRateIMU = 115200
+baudRateRPLidar = 115200
 
 lidarPort   = ''
 imuPort     = ''
 arduinoPort = ''
+arduinoUnoPort = ''
 
+servoLeft = 'l'
+servoRight = 'r'
+servoBoth = 'b'
 
-leftServo = 'l'
-rightServo = 'r'
-bothServos = 'b'
-
-leftThruster = 'l'
-rightThruster = 'r'
-backThrusters = 'b'
-frontThrusters = 'f'
-allThrusters = 'a'
+thrusterLeft = 'l'
+thrusterRight = 'r'
+thrustersBack = 'b'
+thrustersFront = 'f'
+thrustersAll = 'a'
 
 ##Motors Information
 numberOfMotors    = 2
@@ -41,7 +47,7 @@ thrusterWeightAir 	= 344 #g
 stFowardMaxThrust16V  = 5.1  #kgf
 stReverseMaxThrust16V = 4.1  #kgf
 
-stRowardMaxThrust12V  = 3.55 #kgf
+stForwardMaxThrust12V  = 3.55 #kgf
 stReverseMaxThrust12V = 3.0  #kgf
 
 thrusterBatteryVoltage = 14.8
@@ -71,3 +77,21 @@ threeBatForwardMaxThrust = (stForwardMaxThrust14V  * 2) + twoBatForwardMaxThrust
 threeBatBackwardMaxThrust= (stForwardMaxThrust14V * 2) + twoBatBackwardMaxThrust 	#kgf
 threeBatTopForwardAcc	 = (threeBatForwardMaxThrust  * 9.8 ) / boatWeight 		#m/s²
 threeBatTopBackwardAcc	 = (threeBatBackwardMaxThrust * 9.8 ) / boatWeight 		#m/s²
+
+pts = list(ports.comports())
+if not pts:
+	print ('Theres no connected sensors')
+else:
+	for p in pts :
+		print(p)
+		if (p[1].find('CP2102') == 6) :
+			imuPort = p[0] 
+		elif (p[1].find('RS232') == 5) :
+			lidarPort = p[0] 
+		elif (p[1].find('ACM') == 3):
+			arduinoUnoPort = p[0]
+		elif (p[1].find('Serial') == 7):
+			arduinoPort = p[0]
+			
+#Declared the communication variable of arduino serial
+ser = serial.Serial(arduinoPort, baudRateArduino)
