@@ -25,4 +25,3 @@ imu.init()
 #print(imu.get_delta_theta());
 #print(imu.get_delta_velocity());
 print(imu.get_degrees_to_north_orientation());
->>>>>>> dce04100366b624988f52b4f59e6ba8c5611ab0d

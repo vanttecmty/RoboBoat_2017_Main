@@ -88,16 +88,20 @@ def move_servos(servo,value1=90,value2=90):
 
 	if(servo == 'l'):
 		val = 'S,' + servo + ',' + str(value1)
-		var.ser.write(val.encode())
-		var.ser.flush()
+		var.ser.write(val.encode());
+		var.ser.flush();
 	elif(servo == 'r'):
 		val = 'S,' + servo + ',' + str(value1)
-		var.ser.write(val.encode())
-		var.ser.flush()
+		var.ser.write(val.encode());
+		var.ser.flush();
 	elif(servo == 'b'):
 		val = 'S,' + servo + ',' + str(value1) + ',' + str(value2)
-		var.ser.write(val.encode())
-		var.ser.flush()
+		var.ser.write(val.encode());
+		var.ser.flush();
+		#print(var.ser.read(len(val.encode())));
+		#print(var.ser.read(1));
+
+
 	else:
 		print("That isnt a recognize servo")
 		return None

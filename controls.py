@@ -82,11 +82,15 @@ while  x != chr(27) :
 		if(x == 'l'  or x == 'L'):
 			print("Left");
 			nav.move_left();
-		if(x == 'r'  or x == 'R'):
+		if(x == 'j'  or x == 'J'):
 			print("Right");
 			nav.move_right();
+		if(x == 'k'  or x == 'K'):
+			print("Init Pos");
+			nav.move_init_pos()
 		
 
+nav.move_init_pos()
 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)    
 
 

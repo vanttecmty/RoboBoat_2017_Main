@@ -11,6 +11,9 @@ def move_left():
 def move_right():
 	motors.move_servos(var.servoBoth, var.servoMoveRight, var.servoMoveRight)
 
+def move_init_pos():
+	motors.move_servos(var.servoBoth,var.servoMoveInitP,var.servoMoveInitP);
+
 def move_forward():
 	motors.move_servos(var.servoBoth, var.servoMoveInitP, var.servoMoveInitP)
 	motors.move_thrusters(var.thrustersAll, var.thrusterMoveFront, var.thrusterMoveFront)
