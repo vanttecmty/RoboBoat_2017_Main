@@ -78,6 +78,8 @@ threeBatBackwardMaxThrust= (stForwardMaxThrust14V * 2) + twoBatBackwardMaxThrust
 threeBatTopForwardAcc	 = (threeBatForwardMaxThrust  * 9.8 ) / boatWeight 		#m/s²
 threeBatTopBackwardAcc	 = (threeBatBackwardMaxThrust * 9.8 ) / boatWeight 		#m/s²
 
+
+'''
 pts = list(ports.comports())
 if not pts:
 	print ('Theres no connected sensors')
@@ -85,9 +87,9 @@ else:
 	for p in pts :
 		print(p)
 		if (p[1].find('CP2102') == 6) :
-			imuPort = p[0] 
+			lidarPort =p[0]
 		elif (p[1].find('RS232') == 5) :
-			lidarPort = p[0] 
+			imuPort = p[0] 
 		elif (p[1].find('ACM') == 3):
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):
@@ -95,3 +97,4 @@ else:
 			
 #Declared the communication variable of arduino serial
 ser = serial.Serial(arduinoPort, baudRateArduino)
+'''
