@@ -8,7 +8,7 @@ import lib.lidar as lidar
 import lib.variables as var
 import lib.utility as utility
 import lib.motors as motors
-import lib.navigation as navigation
+import lib.navigation as nav
 
 utility.get_serial_ports()
 #motors.open_communication()
