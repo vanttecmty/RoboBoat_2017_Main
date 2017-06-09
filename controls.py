@@ -13,7 +13,7 @@ import lib.navigation as nav
 A = 65
 W = 87
 S = 83
-D = 68
+D = 68 
 
 Up = 38
 Down = 40
