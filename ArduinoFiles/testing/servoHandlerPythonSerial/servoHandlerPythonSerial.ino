@@ -3,7 +3,7 @@
 
 char inData[256];
 int setPoint = 55;
-String readString;
+String inputString;
 Servo servoLeft;
 Servo servoRight;
 
@@ -29,24 +29,36 @@ void loop(){
     while (Serial.available()) {
       if (Serial.available() >0) {
         char c = Serial.read();
-        readString += c;  
+        inputString += c;  
       }
     }
-    
-    if (readString.length() == 11){
-       //Serial.print(readString);
-       //Serial.print(readString[0]);
-       if(readString[0] == 'S'){
-          if(readString[2] == 'b'){
-            String valLeft = readString.substring(4,7);
-            String valRight = readString.substring(8,11);
-            servoLeft.write(valLeft.toInt());
-            servoRight.write(valRight.toInt());        
-          }
-       }
-      Serial.flush();
-      //Delete Previous Message
-      readString = "";
-    }
 
+    //Send String received to confirm it was correctly received
+    Serial.print(inputString);
+    Serial.flush();
+    
+    if(inputString.length() == 1){
+      if(inputString[0] == 'S'){
+        //Serial.print("InS");
+        if(inputString[2] == 'b'){
+          //Serial.print("InB");
+          String valLeft = inputString.substring(4,7);
+          String valRight = inputString.substring(8,11);
+          //servoLeft.write(valLeft.toInt());
+          //servoRight.write(valRight.toInt());        
+        }
+        //else{
+          //Serial.print("ElB");
+        //}
+      }//else{
+        //Serial.print("ElS");
+      //}
+    }
+    //else{
+      //Serial.print("123"); 
+      //Serial.print("456");
+    //}
+    Serial.flush();
+    //Delete Previous Message
+    inputString = "";
 }

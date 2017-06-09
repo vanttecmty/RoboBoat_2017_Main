@@ -87,19 +87,32 @@ def move_servos(servo,value1=90,value2=90):
 		return None
 
 	if(servo == 'l'):
-		val = 'S,' + servo + ',' + str(value1)
+		v = str(value1);
+		v = utility.check_value_size(v);
+		val = 'S,' + servo + ',' + v ;
 		var.ser.write(val.encode());
 		var.ser.flush();
 	elif(servo == 'r'):
-		val = 'S,' + servo + ',' + str(value1)
+		v = str(value1);
+		v = utility.check_value_size(v);
+		val = 'S,' + servo + ',' + v
 		var.ser.write(val.encode());
 		var.ser.flush();
 	elif(servo == 'b'):
-		val = 'S,' + servo + ',' + str(value1) + ',' + str(value2)
+		v1 = str(value1);
+		v1 = utility.check_value_size(v1);
+		v2 = str(value2);
+		v2 = utility.check_value_size(v2);
+		val = 'S,' + servo + ',' + v1 + ',' + v2
+		print(val)
+		print(len(val.encode()))
+		print(len(val))
 		var.ser.write(val.encode());
 		var.ser.flush();
 		#print(var.ser.read(len(val.encode())));
-		#print(var.ser.read(1));
+		#print(var.ser.read(3));
+		#print(var.ser.read(3));
+		#print(var.ser.read(4));
 
 
 	else:

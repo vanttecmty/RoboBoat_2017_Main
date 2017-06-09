@@ -27,4 +27,13 @@ def print_serial_ports():
 		for p in pts :
 			print(p)
 			print(p[1].find('Serial') == 7)
+
+
+def check_value_size(val):
+	if(len(val) == 3):
+		return val
+	elif(len(val) == 2):
+		return '0'+val
+	elif(len(val) == 1):
+		return '00'+val
 	

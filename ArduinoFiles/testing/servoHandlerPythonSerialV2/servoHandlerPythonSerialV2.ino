@@ -2,7 +2,7 @@
 
 char inData[256];
 int setPoint = 55;
-String readString;
+String inString;
 Servo servoLeft;
 Servo servoRight;
 
@@ -27,35 +27,31 @@ void loop(){
     //digitalWrite(LED_BUILTIN, HIGH);
     // serial read section
     while (Serial.available()) {
-      if (Serial.available() >0) {
         char c = '\0';
-        if(c = Serial.read() == 'S'){
+        if(c = Serial.read() == 'S') {
           counter ++;
           while(counter <= 11){
-            readString += c;  
+            inString += c;  
             c = Serial.read();
             counter++;
           }
         }
-      }
     }
     
-    if (readString.length() == 12){
-       //Serial.print(readString);
-       //Serial.print(readString[0]);
-       //Serial.print(readString[0]);
-       if(readString[0] == 'S'){
-          if(readString[2] == 'b'){ 
-            String valLeft = readString.substring(4,7);
-            String valRight = readString.substring(8,11);
-            Serial.print(valLeft + valRight);
-            servoLeft.write(valLeft.toInt());
-            servoRight.write(valRight.toInt());        
+    Serial.print(inString);
+    /*
+    if (inString.length() >= 11){
+       if(inString[0] == 'S'){
+          if(inString[2] == 'b'){ 
+            String valLeft = inString.substring(4,7);
+            String valRight = inString.substring(8,11);
+            //Serial.print(valLeft + valRight);
+            //servoLeft.write(valLeft.toInt());
+            //servoRight.write(valRight.toInt());        
           }
        }
       Serial.flush();
       //Delete Previous Message
-      readString = "";
-    }
-
+      inString = "";
+    }*/
 }
