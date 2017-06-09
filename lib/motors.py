@@ -109,7 +109,7 @@ def move_servos(servo,value1=90,value2=90):
 		print(len(val))
 		var.ser.write(val.encode());
 		var.ser.flush();
-		#print(var.ser.read(len(val.encode())));
+		print(var.ser.read(len(val.encode())));
 		#print(var.ser.read(3));
 		#print(var.ser.read(3));
 		#print(var.ser.read(4));
