@@ -24,4 +24,5 @@ imu.init()
 #print(imu.get_acceleration());
 #print(imu.get_delta_theta());
 #print(imu.get_delta_velocity());
-print(imu.get_degrees_to_north_orientation());
+imu.get_degrees_to_north_orientation();
+print(imu.get_degrees_to_gps_coords(25.6500019, -100.2907928));
