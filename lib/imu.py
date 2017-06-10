@@ -123,7 +123,7 @@ vnSensor = None
 def init():
 	global vnSensor;
 	vnSensor = VnSensor();
-	vnSensor.connect(var.imuPort, 115200);
+	vnSensor.connect("/dev/ttyUSB0", 115200);
 
 def print_model():
 	return vnSensor.read_model_number();
