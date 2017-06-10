@@ -2,9 +2,6 @@ import lib.variables as var
 import lib.motors as motors
 
 #Navigation class
-
-
-
 def move_left():
 	motors.move_servos(var.servoBoth, var.servoMoveLeft, var.servoMoveLeft)
 
@@ -28,4 +25,3 @@ def move_horizonatl_left():
 def move_horizonatl_right():
 	motors.move_servos(var.servoBoth, var.servoMoveRight, var.servoMoveRight)
 	motors.move_thrusters(var.thrustersAll, var.thrusterMoveFront, var.thrusterMoveFront)
-
