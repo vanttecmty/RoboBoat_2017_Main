@@ -123,7 +123,7 @@ vnSensor = None
 def init():
 	global vnSensor;
 	vnSensor = VnSensor();
-	vnSensor.connect(var.imuPort, 115200);
+	vnSensor.connect("/dev/ttyUSB0", 115200);
 
 def print_model():
 	return vnSensor.read_model_number();
@@ -137,6 +137,7 @@ def get_gps_coords():
 	'gps_fix', 'lla', 'ned_acc', 'ned_vel', 'num_sats', 'speed_acc', 'this', 'time', 'time_acc', 'week'
 	'''
 	return {
+		#'lla': lla.lla,
 		'latitude': lla.lla.x,
 		'longitud': lla.lla.y
 	};

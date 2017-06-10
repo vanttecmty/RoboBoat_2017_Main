@@ -37,6 +37,7 @@ maxSpeed = 9.8
 boatWeight = 25 #Kg
 
 pts = list(ports.comports())
+
 if not pts:
 	print ('Theres no connected sensors')
 else:
