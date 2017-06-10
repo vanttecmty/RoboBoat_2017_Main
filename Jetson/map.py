@@ -54,7 +54,6 @@ boat_map=new_map(400,400)
 add_buoy(boat_map,100,150)
 add_buoy(boat_map,100,150)
 
-
 #Mostrar mapa
 plot_map(boat_map)
 
