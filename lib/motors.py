@@ -103,16 +103,19 @@ def move_servos(servo,value1=90,value2=90):
 		v1 = utility.check_value_size(v1);
 		v2 = str(value2);
 		v2 = utility.check_value_size(v2);
-		val = 'S,' + servo + ',' + v1 + ',' + v2
-		print(val)
-		print(len(val.encode()))
-		print(len(val))
+		val = 'S,' + servo + ',' + v1 + ',' + v2 + '%';
+		#print(val)
+		#print(len(val.encode()))
+		#print(len(val))
 		var.ser.write(val.encode());
-		var.ser.flush();
-		print(var.ser.read(len(val.encode())));
+		#hello = "hello";
+		#var.ser.write(hello.encode());
+		#var.ser.flush();
+		#print(var.ser.read(len("hello")));
+		#print(var.ser.read(len*(val.encode())));
 		#print(var.ser.read(3));
 		#print(var.ser.read(3));
-		#print(var.ser.read(4));
+		print(var.ser.read(var.ser.inWaiting()));
 
 
 	else:

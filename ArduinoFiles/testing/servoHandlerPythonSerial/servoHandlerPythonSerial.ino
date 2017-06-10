@@ -26,39 +26,44 @@ void loop(){
 
     //digitalWrite(LED_BUILTIN, HIGH);
     // serial read section
-    while (Serial.available()) {
-      if (Serial.available() >0) {
+    char c;
+    while (Serial.available() > 0) {
         char c = Serial.read();
         inputString += c;  
-      }
+        //wait for the next byte, if after this nothing has arrived it means 
+        //the text was not part of the same stream entered by the user
+        delay(1); 
+        //Serial.println(c);
     }
 
-    //Send String received to confirm it was correctly received
-    Serial.print(inputString);
-    Serial.flush();
     
-    if(inputString.length() == 1){
-      if(inputString[0] == 'S'){
+      //Send String received to confirm it was correctly received4
+      //Serial.println(inputString);
+      //Serial.flush();
+      //Serial.println(inputString.length());
+      //Serial.flush();
+      //inputString = "";
+     
+    
+    if(inputString.length() > 0 && inputString[inputString.length() - 1] == '%'){
+      //digitalWrite(LED_BUILTIN, HIGH);
+      if(inputString[0] == 'S') {
         //Serial.print("InS");
         if(inputString[2] == 'b'){
           //Serial.print("InB");
           String valLeft = inputString.substring(4,7);
           String valRight = inputString.substring(8,11);
-          //servoLeft.write(valLeft.toInt());
-          //servoRight.write(valRight.toInt());        
+          Serial.print(valLeft + valRight);
+          servoLeft.write(valLeft.toInt());
+          servoRight.write(valRight.toInt());        
         }
-        //else{
-          //Serial.print("ElB");
-        //}
-      }//else{
-        //Serial.print("ElS");
-      //}
+      }
+
+      //Delete Previous Message
+      inputString = "";
+      Serial.flush();
+    } else {
+      digitalWrite(LED_BUILTIN, HIGH);
+      //Serial.println(inputString.length());
     }
-    //else{
-      //Serial.print("123"); 
-      //Serial.print("456");
-    //}
-    Serial.flush();
-    //Delete Previous Message
-    inputString = "";
 }
