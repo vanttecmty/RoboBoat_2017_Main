@@ -15,11 +15,6 @@ def get_serial_ports():
 				var.lidarPort = p[0] 
 			elif (p[1].find('USB-RS232') == 0) :
 				var.imuPort = p[0] 
-			elif (p[1].find('ACM') == 3):
-				var.arduinoUnoPort = p[0]
-			elif (p[1].find('Serial') == 7):
-				var.arduinoPort = p[0]
-
 
 def print_serial_ports():
 	pts = list(ports.comports())

@@ -3,8 +3,8 @@ import sys
 import serial
 import serial.tools.list_ports as ports
 
-baudRateArduino = 9600
-baudRateIMU = 115200
+baudRateArduino = 115200
+baudRateIMU 	= 115200
 baudRateRPLidar = 115200
 
 lidarPort   = ''
@@ -42,14 +42,13 @@ if not pts:
 else:
 	for p in pts :
 		print(p)
-		#if (p[1].find('CP2102') == 6) :
-		#	imuPort = p[0] 
-		#elif (p[1].find('RS232') == 5) :
-		#	lidarPort = p[0] 
 		if (p[1].find('ACM') == 3):
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):
 			arduinoPort = p[0]
 			
-#Declared the communication variable of arduino serial
-ser = serial.Serial(arduinoUnoPort, baudRateArduino)
+if(arduinoPort != ''):
+	ser = serial.Serial(arduinoUnoPort, baudRateArduino)
+
+if(arduinoUnoPort != ''):
+	ser = serial.Serial(arduinoPort, baudRateArduino)	
