@@ -8,11 +8,11 @@ from rplidar import RPLidar
 lidar_measures = [];
 
 def open_communication():
-	lidar = RPLidar(var.lidarPort);
+	lidar = RPLidar("/dev/ttyUSB0");
 	lidar.connect();
 
 def close_communication():	
-	lidar = RPLidar(var.lidarPort);
+	lidar = RPLidar("/dev/ttyUSB0");
 	lidar.stop();
 	lidar.stop_motor();
 	lidar.disconnect();

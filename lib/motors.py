@@ -30,13 +30,13 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 	if(power < 1100 or power > 1900):
 		print("Thruster power must be between 1100 - 1900");
 	else:
-		if(thrusters = thrustersBack):
+		if(thrusters == thrustersBack):
 			p = str(power)
 			p = utility.check_value_size(p)
 			val = 'T,' + thrustersBack + ',' + p + '%' ;
 			var.ser.write(val.encode())
 			var.ser.flush()
-		elif(thrusters = thrustersFront):
+		elif(thrusters == thrustersFront):
 			p = str(power)
 			p = utility.check_value_size(p)
 			val = 'T,' + thrustersFront + ',' + p + '%' ;

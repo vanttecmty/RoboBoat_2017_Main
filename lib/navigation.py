@@ -5,6 +5,7 @@ from scipy import misc
 from scipy.ndimage import rotate
 import lib.variables as var
 import lib.motors as motors
+import lib.lidar as lidar
 #Navigation class
 '''
 def move_left():
