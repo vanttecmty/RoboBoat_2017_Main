@@ -6,26 +6,18 @@ import lib.motors as motors
 
 
 def move_left():
-	motors.move_servos(var.servoBoth, var.servoMoveLeft, var.servoMoveLeft)
+	motors.move_servos(var.servoMoveLeft - 90);
 
 def move_right():
-	motors.move_servos(var.servoBoth, var.servoMoveRight, var.servoMoveRight)
+	motors.move_servos(var.servoMoveRight - 90);
 
 def move_init_pos():
-	motors.move_servos(var.servoBoth,var.servoMoveInitP,var.servoMoveInitP);
+	motors.move_servos(var.servoMoveInitP - 90);
 
 def move_forward():
-	motors.move_servos(var.servoBoth, var.servoMoveInitP, var.servoMoveInitP)
-	motors.move_thrusters(var.thrustersAll, var.thrusterMoveFront, var.thrusterMoveFront)
-
+	motors.move_servos(var.servoMoveInitP - 90) ;
+	motors.move_thrusters(var.thrusterMoveBack - 1500) ;
+	
 def move_backward():
-	motors.move_thrusters(var.thrustersAll, var.thrusterMoveBack, var.thrusterMoveBack)
-
-def move_horizonatl_left():
-	motors.move_servos(var.servoBoth, var.servoMoveLeft, var.servoMoveLeft)
-	motors.move_thrusters(var.thrustersAll, var.thrusterMoveFront, var.thrusterMoveFront)
-
-def move_horizonatl_right():
-	motors.move_servos(var.servoBoth, var.servoMoveRight, var.servoMoveRight)
-	motors.move_thrusters(var.thrustersAll, var.thrusterMoveFront, var.thrusterMoveFront)
+	motors.move_thrusters(var.thrusterMoveBack - 1500 ) ;
 
