@@ -143,7 +143,6 @@ files=os.listdir(path)
 
 for image_file in files:
 	image=cv2.imread(path+image_file)
-	cv2.imshow("image",image)
 		
 	
 	azul=cv2.inRange(image,bl, bu)
@@ -189,11 +188,15 @@ for image_file in files:
 	for contorno in contours:
 		rect=cv2.boundingRect(contorno)
 		print rect
+		x=int(rect[0])
+		y=int(rect[1])
+		dx=int(rect[2])
+		dy=int(rect[3])
 		copia=image.copy()
-		cv2.drawContours(image,[box],0,(0,0,255),2)
+		cv2.rectangle(image,(x,y),(x+dx,y+dy),(0,0,255),2,8)
 
 
-
+	cv2.imshow("image",image)
 	tecla=cv2.waitKey(0)
 	
 	if tecla==1048689:

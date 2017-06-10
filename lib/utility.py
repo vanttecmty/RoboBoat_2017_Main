@@ -7,16 +7,15 @@ import serial.tools.list_ports as ports
 #Store them on the global variables file located on lib
 
 def get_serial_ports():
-	pts = list(ports.comports())
+	pts = list(ports.comports());
 	if not pts:
 		print ('Theres no connected sensors')
 	else:
 		for p in pts :
 			if (p[1].find('CP2102') == 6) :
-				var.lidarPort = p[0] 
+				var.lidarPort = p[0]; 
 			elif (p[1].find('USB-RS232') == 0) :
-				var.imuPort = p[0] 
-
+				var.imuPort = p[0] ;
 
 def print_serial_ports():
 	pts = list(ports.comports())
@@ -24,15 +23,15 @@ def print_serial_ports():
 		print ('Theres no connected sensors')
 	else:
 		for p in pts :
-			print(p)
-			print(p[1].find('Serial') == 7)
+			print(p);
+			print(p[1].find('Serial') == 7);
 
 
 def check_value_size(val):
 	if(len(val) == 3):
-		return val
+		return val ;
 	elif(len(val) == 2):
-		return '0'+val
+		return '0' + val ;
 	elif(len(val) == 1):
-		return '00'+val
+		return '00' + val ;
 	

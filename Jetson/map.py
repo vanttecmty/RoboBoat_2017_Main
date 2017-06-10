@@ -5,6 +5,9 @@ from scipy import misc
 from scipy.ndimage import rotate
 
 pixel_buoy=6
+alto=58
+ancho=34
+
 def new_map(x,y):
 	mapa=np.full((x,y,3),0,dtype=np.uint8)
 	return mapa
@@ -12,16 +15,17 @@ def new_map(x,y):
 def plot_map(mapa):
 	copia=mapa.copy()
 	h,w,c=mapa.shape
-	x1=int(h/2-56)
-	y1=int(w/2-34)
-	x2=int(h/2+56)
-	y2=int(w/2+34)
+	x1=int(h/2-(ancho/2))
+	y1=int(w/2-(alto/2))
+	x2=int(h/2+(ancho/2))
+	y2=int(w/2+(alto/2))
 
+	cx=int(h/2)
+	cy=int(w/2)
 	cv2.rectangle(copia,(x1,y1),(x2,y2),(0,255,0),1,8)
-	cv2.circle(copia,(300,300),30,(0,0,255),1,8)
-	cv2.line(copia,(300,270),(300,300),(0,0,255),1,8)
+	cv2.line(copia,(cx,cy),(cx,cy-25),(0,0,255),1,8)
 	cv2.imshow('mapa',copia)
-	cv2.waitKey(50)
+	cv2.waitKey(0)
 
 def rotate_map(mapa, angle):
 	#mapa=misc.imrotate(mapa,angle,interp='nearest')
@@ -36,14 +40,19 @@ def translate_map(mapa,dx,dy):
 
 def add_buoy(mapa,x,y):
 	cv2.circle(mapa,(x,y),pixel_buoy,255,-1,8)
-	
+
+def add_lidar(mapa,points):
+	for point in points:
+		mapa[point[0]][point[1]]=[0,255,0]
+	return mapa
+
+
 #Nuevo mapa
 boat_map=new_map(400,400)
 
 #Dibujar boya
 add_buoy(boat_map,100,150)
 add_buoy(boat_map,100,150)
-
 
 #Mostrar mapa
 plot_map(boat_map)
