@@ -21,8 +21,12 @@ def init_lidar():
 	open_communication();
 
 	for i in range(360):
-       lidar_measures.append(0);
+		lidar_measures.append(0);
 
+	for measurements in lidar.iter_measurments():
+		print measurements;
+
+'''
 def print_RPLidar():
 	if(var.lidarPort == ''):
 		print('Error : utility.get_serial_ports() must be called before this function');
@@ -57,3 +61,4 @@ def get_measurements():
 	lidar.stop()
 	lidar.stop_motor()
 	lidat.disconnect()
+'''
