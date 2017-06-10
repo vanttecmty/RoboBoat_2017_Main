@@ -137,6 +137,7 @@ def get_gps_coords():
 	'gps_fix', 'lla', 'ned_acc', 'ned_vel', 'num_sats', 'speed_acc', 'this', 'time', 'time_acc', 'week'
 	'''
 	return {
+		#'lla': lla.lla,
 		'latitude': lla.lla.x,
 		'longitud': lla.lla.y
 	};
