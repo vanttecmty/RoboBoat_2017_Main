@@ -1,7 +1,6 @@
 import sys
 import time
 import serial
-import lib.utility as utility
 import lib.variables as var
 
 ##############Motor Directions and Defaults #############
@@ -43,14 +42,12 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 			var.ser.write(val.encode())
 			var.ser.flush()
 			
-
 def thrusters_back(power=0):
 	if(power < -400 or power > 400):
 		print("The power is not on the correct range");
 	else:
 		realPowerValue = power + 1500;
 		move_thrusters(realPowerValue , thrustersBack);
-
 
 
 def thrusters_front(angle=0, power=0):
