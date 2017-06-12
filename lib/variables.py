@@ -47,7 +47,7 @@ else:
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):
 			arduinoPort = p[0]
-		elif (p[1].find('3-3') == 0 or p[1].find('3-4') == 0 or p[1].find('Silicon Labs CP2102 USB to UART') == 0):
+		elif (p[1].find('3-3') == 0 or p[1].find('3-4') == 0 or p[1].find('Silicon Labs CP2102 USB to UART') == 0 or p[1].find('CP2102') == 0 ):
 			lidarPort = p[0]; 
 		elif (p[1].find('USB-RS232') == 0) :
 			imuPort = p[0];
