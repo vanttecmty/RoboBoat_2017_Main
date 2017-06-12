@@ -184,17 +184,35 @@ for image_file in files:
 	cv2.imshow('obstacles',obstacles)
 	
 	contours,_=cv2.findContours(obstacles,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-	
+	print len(contours)
 	for contorno in contours:
 		rect=cv2.boundingRect(contorno)
-		print rect
+		#print rect
 		x=int(rect[0])
 		y=int(rect[1])
 		dx=int(rect[2])
 		dy=int(rect[3])
 		copia=image.copy()
 		cv2.rectangle(image,(x,y),(x+dx,y+dy),(0,0,255),2,8)
+		M1 = cv2.moments(contorno)
+		if (M1['m00']==0):
+			M1['m00']=1
+		cx1 = int(M1['m10']/M1['m00'])
+		cy1 = int(M1['m01']/M1['m00'])
+		print h,w		
+		dpp=float(69)/h
+		print('Degres Per Pixel: ',dpp)
+		print('Centroid: ',cx1,cy1)	
+		
+		if cx1>w/2:
+			pixels=cx1-w/2
+		else:
+			pixels=-(w/2-cx1)
 
+		degrees=dpp*pixels
+		print("Degrees: ",degrees)
+
+	cv2.line(image,(w/2,0),(w/2,h-1),(0,0,255),4,8)
 
 	cv2.imshow("image",image)
 	tecla=cv2.waitKey(0)
