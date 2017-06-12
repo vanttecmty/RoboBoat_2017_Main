@@ -8,6 +8,7 @@ pixel_buoy=6
 alto=58
 ancho=34
 
+
 def new_map(x,y):
 	mapa=np.full((x,y,3),0,dtype=np.uint8)
 	return mapa
