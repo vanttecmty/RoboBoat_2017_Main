@@ -5,6 +5,7 @@ import math
 import time
 tecla=-1
 
+buoy_diameter=20.32 #cm
 def DBSCAN(array, epsylon, minPts):
 	start_time = time.time()
 	contours,_=cv2.findContours(array,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -183,11 +184,11 @@ for image_file in files:
 	obstacles=np.bitwise_or(obstacles,red)
 	cv2.imshow('obstacles',obstacles)
 	
-	contours,_=cv2.findContours(obstacles,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	contours,_=cv2.findContours(obstacles,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	print len(contours)
 	for contorno in contours:
 		rect=cv2.boundingRect(contorno)
-		#print rect
+		print rect
 		x=int(rect[0])
 		y=int(rect[1])
 		dx=int(rect[2])
@@ -211,6 +212,14 @@ for image_file in files:
 
 		degrees=dpp*pixels
 		print("Degrees: ",degrees)
+
+		distance=109 	#Distance to buoy
+		pixel_width=dx	#Pixel
+		W=20.32 		#Real Width
+		F=697.34		#Focal length
+		distance=(W*F)/pixel_width
+		print ('Distance to buoy (cm): ',distance)
+		
 
 	cv2.line(image,(w/2,0),(w/2,h-1),(0,0,255),4,8)
 
