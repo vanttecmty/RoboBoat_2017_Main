@@ -42,7 +42,7 @@ if not pts:
 	print ('Theres no connected sensors')
 else:
 	for p in pts :
-		#print(p, p[1])
+		print(p, p[1])
 		if (p[1].find('ACM') == 3):
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):

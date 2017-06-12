@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/usr/local/lib/python3.4/site-packages/')
 import threading
 import time
 import math
@@ -9,6 +11,7 @@ from scipy.ndimage import rotate
 import lib.variables as var
 import lib.motors as motors
 import lib.lidar as lidar
+import lib.imu as imu
 
 #Navigation class
 MAP_WIDTH     = 400;
@@ -40,11 +43,11 @@ def add_lidar_obstacles(mapa):
    			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
    			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
 
-   	for i in range(270, 359):
-   		if medidas[i] != 0:
-   			coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
-   			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
-   			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
+	for i in range(270, 359):
+		if medidas[i] != 0:
+			coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
+			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
+			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
 
 def add_boat(mapa):
 	cv2.circle(mapa, (LIDAR_COORD_X, LIDAR_COORD_Y), LIDAR_RADIOUS, (255,255,255), -1, 8);
@@ -61,7 +64,7 @@ class lidarThread (threading.Thread):
       self.threadID = threadID;
       self.name = name;
    def run(self):
-   		lidar.init();
+   	lidar.init();
 
 class navigationThread (threading.Thread):
    def __init__(self, threadID, name):
@@ -69,26 +72,49 @@ class navigationThread (threading.Thread):
       self.threadID = threadID;
       self.name = name;
    def run(self):
-   		global exitFlag;
-		
-		init(); 
+      init(); 
 
-   		while cv2.waitKey(1) != 27:
-   			lidar_map = boat_map.copy();
-   			add_lidar_obstacles(lidar_map);
-   			cv2.imshow('mapa',lidar_map);
+      while cv2.waitKey(1) != 27:
+         lidar_map = boat_map.copy();
+         add_lidar_obstacles(lidar_map);
+         cv2.imshow('mapa',lidar_map);
+      
+      lidar.lidar.stop();
+      lidar.lidar.stop_motor();
+      lidar.lidar.disconnect();
 
-		lidar.lidar.stop();
-		lidar.lidar.stop_motor();
-		lidar.lidar.disconnect();
+class imuThread (threading.Thread):
+   def __init__(self, threadID, name):
+      threading.Thread.__init__(self);
+      self.threadID = threadID;
+      self.name = name;
+   def run(self):
+      imu.init();
+
+      while cv2.waitKey(1000) != 27:
+         #print(imu.get_yaw_orientation());
+         #print(imu.get_magnetic_and_gravity_reference().mag_ref);
+         #print(imu.get_magnetic_and_gravity_reference().acc_ref);
+         print(imu.get_magnetic_measurments());
+         #print(imu.vnSensor.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates().mag);
+         
+
+
+         #print(imu.get_delta_theta());
+         #degrees  = imu.get_degrees_to_gps_coords(25.649864, -100.290795);
+         #distance = imu.get_distance_to_gps_coords(25.649864, -100.290795);
+         #print(degrees, distance);
 
 # Create new threads
-thread1 = lidarThread(1, "lidarThread");
-thread2 = navigationThread(2, "navigationThread");
+#thread1 = lidarThread(1, "lidarThread");
+#thread2 = navigationThread(2, "navigationThread");
+thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
-thread1.start();
-thread2.start();
-thread1.join();
-thread2.join();
+#thread1.start();
+#thread2.start();
+thread3.start();
+#thread1.join();
+#thread2.join();
+thread3.join();
 print ("Exiting Main Thread");
