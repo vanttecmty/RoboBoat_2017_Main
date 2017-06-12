@@ -36,17 +36,21 @@ maxSpeed = 9.8
 
 boatWeight = 25 #Kg
 
-pts = list(ports.comports())
+pts = list(ports.comports());
 
 if not pts:
 	print ('Theres no connected sensors')
 else:
 	for p in pts :
-		print(p)
+		#print(p, p[1])
 		if (p[1].find('ACM') == 3):
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):
 			arduinoPort = p[0]
+		elif (p[1].find('3-3') == 0 or p[1].find('3-4') == 0 or p[1].find('Silicon Labs CP2102 USB to UART') == 0):
+			lidarPort = p[0]; 
+		elif (p[1].find('USB-RS232') == 0) :
+			imuPort = p[0];
 			
 if(arduinoPort != ''):
 	ser = serial.Serial(arduinoUnoPort, baudRateArduino)

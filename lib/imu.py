@@ -131,16 +131,32 @@ def print_model():
 def get_num_satellites():
 	return vnSensor.read_gps_solution_lla().num_sats;
 
+
+'''
+'gps_fix', 'lla', 'ned_acc', 'ned_vel', 'num_sats', 'speed_acc', 'this', 'time', 'time_acc', 'week'
+'''
+
 def get_gps_coords():
-	lla = vnSensor.read_gps_solution_lla();
-	'''
-	'gps_fix', 'lla', 'ned_acc', 'ned_vel', 'num_sats', 'speed_acc', 'this', 'time', 'time_acc', 'week'
-	'''
-	return {
+	coord_x = 0;
+	coord_y = 0;
+
+	for i in range(1):
+		lla = vnSensor.read_gps_solution_lla();
+		coord_x += lla.lla.x;
+		coord_y += lla.lla.y;
+	
+	#coord_x = coord_x / 50;
+	#coord_y = coord_y / 50;
+
+	coords = {
 		#'lla': lla.lla,
-		'latitude': lla.lla.x,
-		'longitud': lla.lla.y
-	};
+		'latitude': coord_x,
+		'longitud': coord_y,
+	}
+
+	#print("mis coords", coords);
+
+	return coords;
 
 def get_yaw_orientation():
 	return vnSensor.read_yaw_pitch_roll().x%360;
@@ -204,3 +220,18 @@ def get_degrees_to_gps_coords(latitude2, longitud2):
 		bearing = bearing - 360;
 
 	return bearing;
+
+def get_distance_to_gps_coords(latitude2, longitud2):
+
+	coords = get_gps_coords();
+	latitude1 = coords['latitude'];
+	longitud1 = coords['longitud'];
+	R = 6371000;
+	phi1 = math.radians(latitude1);
+	phi2 = math.radians(latitude2);
+	dphi = math.radians(latitude2 - latitude1);
+	dlam = math.radians(longitud2 - longitud1);
+	a = math.sin(dphi/2)*math.sin(dphi/2) + math.cos(phi1)*math.cos(phi2)* math.sin(dlam/2)*math.sin(dlam/2);
+	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a));
+	d = R * c;
+	return d;
