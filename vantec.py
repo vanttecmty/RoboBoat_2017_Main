@@ -35,16 +35,16 @@ def add_lidar_obstacles(mapa):
 	medidas = lidar.test();
 
 	for i in range(0, 90):
-   		if medidas[i] != 0:
-   			coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
-   			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
-   			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
+			if medidas[i] != 0:
+				coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
+				coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
+				cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
 
-   	for i in range(270, 359):
-   		if medidas[i] != 0:
-   			coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
-   			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
-   			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
+	for i in range(270, 359):
+		if medidas[i] != 0:
+			coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * medidas[i] / 25);
+			coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * medidas[i] / 25);
+			cv2.circle(mapa, (coord_x, coord_y), BOUY_RADIOUS, (255,255,255), -1, 8);
 
 def add_boat(mapa):
 	cv2.circle(mapa, (LIDAR_COORD_X, LIDAR_COORD_Y), LIDAR_RADIOUS, (255,255,255), -1, 8);
@@ -56,31 +56,36 @@ def init():
 	add_boat(boat_map);
 
 class lidarThread (threading.Thread):
-   def __init__(self, threadID, name):
-      threading.Thread.__init__(self);
-      self.threadID = threadID;
-      self.name = name;
-   def run(self):
-   		lidar.init();
+	def __init__(self, threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID = threadID;
+		self.name = name;
+	def run(self):
+		lidar.init();
 
 class navigationThread (threading.Thread):
-   def __init__(self, threadID, name):
-      threading.Thread.__init__(self);
-      self.threadID = threadID;
-      self.name = name;
-   def run(self):
-   		global exitFlag;
+	def __init__(self, threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID = threadID;
+		self.name = name;
+	def run(self):
+		global exitFlag;
 		
-		init(); 
+		errorHandler = init(); 
 
-   		while cv2.waitKey(1) != 27:
-   			lidar_map = boat_map.copy();
-   			add_lidar_obstacles(lidar_map);
-   			cv2.imshow('mapa',lidar_map);
+		if(errorHandler != 'Wrong body size'):
+			while cv2.waitKey(1) != 27:
+				lidar_map = boat_map.copy();
+				add_lidar_obstacles(lidar_map);
 
-		lidar.lidar.stop();
-		lidar.lidar.stop_motor();
-		lidar.lidar.disconnect();
+				cv2.imshow('mapa',lidar_map);
+		else:
+			lidar.lidar.lidar_stop()
+			run();
+
+		lidar.lidar.lidar_stop()
+
+
 
 # Create new threads
 thread1 = lidarThread(1, "lidarThread");
@@ -88,7 +93,7 @@ thread2 = navigationThread(2, "navigationThread");
 
 # Start new Threads
 thread1.start();
-thread2.start();
+#thread2.start();
 thread1.join();
-thread2.join();
+#thread2.join();
 print ("Exiting Main Thread");

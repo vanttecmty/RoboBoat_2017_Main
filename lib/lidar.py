@@ -27,10 +27,18 @@ def init():
 
     try:
         for measurment in lidar.iter_measurments():
-            measurments[int(measurment[2])%360] = measurment[3];
-            #print(measurments[int(measurment[2])%360]);
+            if(measurment != 'Wrong body size'):
+                measurments[int(measurment[2])%360] = measurment[3];
+                #print(measurments[int(measurment[2])%360]);
+            else:
+                return 'Wrong body size'
     except KeyboardInterrupt:
         print('Stoping...');
 
 def test():
     return measurments;
+
+def lidar_stop():
+    lidar.stop();
+    lidar.stop_motor();
+    lidar.disconnect();
