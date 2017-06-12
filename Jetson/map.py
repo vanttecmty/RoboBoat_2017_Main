@@ -8,6 +8,7 @@ pixel_buoy=6
 alto=58
 ancho=34
 
+
 def new_map(x,y):
 	mapa=np.full((x,y,3),0,dtype=np.uint8)
 	return mapa
@@ -15,11 +16,10 @@ def new_map(x,y):
 def plot_map(mapa):
 	copia=mapa.copy()
 	h,w,c=mapa.shape
-	x1=int(h/2-(ancho/2))
-	y1=int(w/2-(alto/2))
-	x2=int(h/2+(ancho/2))
-	y2=int(w/2+(alto/2))
-
+	x1=int(h/2-(ancho/2));
+	y1=int(w/2-(alto/2));
+	x2=int(h/2+(ancho/2));
+	y2=int(w/2+(alto/2));
 	cx=int(h/2)
 	cy=int(w/2)
 	cv2.rectangle(copia,(x1,y1),(x2,y2),(0,255,0),1,8)
