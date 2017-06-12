@@ -1,0 +1,13 @@
+base_lr: 2.49999993684e-05
+display: 70
+max_iter: 112800
+lr_policy: "exp"
+gamma: 0.999991118908
+momentum: 0.899999976158
+weight_decay: 2.49999999369e-07
+snapshot: 564
+snapshot_prefix: "snapshot"
+solver_mode: GPU
+net: "train_val.prototxt"
+solver_type: ADAM
+iter_size: 10
