@@ -1,4 +1,5 @@
 import math
+import time
 import sys
 import os
 sys.path.append('/usr/local/lib/python3.4/dist-packages/vnpy')
@@ -119,7 +120,7 @@ import lib.variables as var
 ####################
 NORTH_YAW = 37;
 EARTH_RADIUOS = 6371000;
-vnSensor = None
+vnSensor = None;
 
 def init():
 	global vnSensor;
@@ -243,4 +244,73 @@ def get_distance_to_gps_coords(latitude2, longitud2):
 	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a));
 	distance = EARTH_RADIUOS * c;
 
-	return distance;
+	return distance
+
+def compass():
+	last_magnetic_x = vnSensor.read_magnetic_measurements().x;
+	direction = 0;
+	
+	while True:
+		magnetics = vnSensor.read_magnetic_measurements();
+		
+		#print(magnetics);
+		
+		if(magnetics.y > 0):
+			direction = 90 - math.atan(magnetics.x/magnetics.y)*180 / math.pi
+		elif(magnetics.y < 0):
+			direction = 270 - math.atan(magnetics.x/magnetics.y)*180 / math.pi
+		else:
+			if(magnetics < 0):
+				direction = 180;
+			else:
+				direction = 0;
+		
+		if(direction > 180):
+			direction -= 360;
+			
+		
+		print(direction + 30);
+
+		'''
+		if(magnetics.x - last_magnetic_x > 0):
+
+			print("bien");
+		else:
+			print("mal");
+
+		last_magnetic_x = magnetics.x;
+		time.sleep(.100);
+
+def compass2():
+	last_magnetic_x = vnSensor.read_magnetic_measurements().x;
+	direction = 1;
+	while True:
+		magnetics = vnSensor.read_magnetic_measurements();
+		
+		#print(magnetics);
+		
+		if(magnetics.y > 0):
+			direction = 90 - math.atan(magnetics.x/magnetics.y)*180 / math.pi
+		elif(magnetics.y < 0):
+			direction = 270 - math.atan(magnetics.x/magnetics.y)*180 / math.pi
+		else:
+			if(magnetics < 0):
+				direction = 180;
+			else:
+				direction = 0;
+		
+		if(direction > 180):
+			direction -= 360;
+			
+		
+		print(direction + 30);
+
+		if(magnetics.x - last_magnetic_x > 0):
+
+			print("bien");
+		else:
+			print("mal");
+
+		last_magnetic_x = magnetics.x;
+		time.sleep(.100);	
+		'''

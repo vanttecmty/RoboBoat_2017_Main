@@ -19,26 +19,18 @@ def open_communication():
 
 def init():
     global measurments;
-    global mapa;
-    global sensor_coord_x;
-    global sensor_coord_y;
 
-    open_communication();
+    #open_communication();
 
     try:
-        for measurment in lidar.iter_measurments():
-            if(measurment != 'Wrong body size'):
-                measurments[int(measurment[2])%360] = measurment[3];
-                #print(measurments[int(measurment[2])%360]);
-            else:
-                return 'Wrong body size'
+        for measurment in lidar.iter_measurments(max_buf_meas=500):
+            measurments[int(measurment[2])%360] = measurment[3];
+            #print(measurments[int(measurment[2])%360]);
     except KeyboardInterrupt:
         print('Stoping...');
 
 def test():
     return measurments;
 
-def lidar_stop():
-    lidar.stop();
-    lidar.stop_motor();
-    lidar.disconnect();
+def clear():
+    lidar.clear_input()
