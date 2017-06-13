@@ -103,7 +103,7 @@ class MapThread (threading.Thread):
 		lidar.lidar.stop_motor();
 		lidar.lidar.disconnect();
 
-class NavigationThread (threading.Thread):
+class PathFindingThread (threading.Thread):
 	def __init__(self, threadID, name):
 		threading.Thread.__init__(self);
 		self.threadID = threadID;
@@ -123,22 +123,32 @@ class NavigationThread (threading.Thread):
 			add_boat(mapa);	
 			cv2.imshow('Route', mapa);
 
+class NavigationThread (threading.Thread):
+	def __init__(self, threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID = threadID;
+		self.name = name;
+	def run(self):
+		imu.get_magnetic_measurments();
+
 init();
 lidar.open_communication();
+#imu.get_magnetic_measurments();
 # Create new threads
-thread0 = LidarThread(1, "LidarThread");
-thread1 = MapThread(2, "MapThread");
-#thread2 = NavigationThread(3, "NavigationThread");
+thread0 = LidarThread(0, "LidarThread");
+thread1 = MapThread(1, "MapThread");
+thread2 = NavigationThread(2, "NavigationThread");
+#thread9 = PathFindingThread(9, "PathFindingThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
 thread0.start();
 thread1.start();
-#thread2.start();
+thread2.start();
 #thread3.start();
 thread0.join();
 thread1.join();
-#thread2.join();
+thread2.join();
 #thread3.join();
 
 print ("Exiting Main Thread");
