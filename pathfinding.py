@@ -8,10 +8,12 @@ def euclidean(nodeA,nodeB):
 	distance=math.sqrt(pow(abs(nodeA[0]-nodeB[0]),2)+pow(abs(nodeA[1]-nodeB[1]),2))
 	return distance
 
-def Astar(start, goal, boat_map):
+def a_star(start, goal, boat_map):
 	
 	mapa=cv2.cvtColor(boat_map, cv2.COLOR_BGR2GRAY)
 
+
+	path_start=time.time()
 	#Create open and closed nodes.
 	closedNodes=[]
 	openNodes=[start]
@@ -26,7 +28,7 @@ def Astar(start, goal, boat_map):
 	#cv2.circle(mapa,(start[1],start[0]),15,0,-1,8)
 	#cv2.circle(mapa,(goal[1],goal[0]),15,0,-1,8)
 	nombre=str(goal[0])+','+str(goal[1])
-	cv2.imshow(nombre,mapa)
+#	cv2.imshow(nombre,mapa)
 	#cv2.waitKey(0)
 	#cost for going from start to node
 	nodes=[start]
@@ -63,7 +65,7 @@ def Astar(start, goal, boat_map):
 
 		#time.sleep(0.5)
 		if currentNode == goal:
-			print ("Found path");
+			#print ("Found path");
 			break
 
 		succesors=[]
@@ -115,21 +117,17 @@ def Astar(start, goal, boat_map):
 		
 		closedNodes.append(currentNode)	
 		openNodes.remove(currentNode)	
-
+	
 
 	
-	try:
-		last=path[-1]
-	except IndexError: 
-			print(path)
-			cv2.circle(boat_map,(int(h/2),int(w/2)),5,(0,255,0),-1,8)
-			cv2.imshow('map',boat_map)
-			cv2.waitKey(0)
+
+	last = path[-1];
+	
 	myparentparent=None
 	result=[last]
 	while(last!=start):
 		boat_map[last[0]][last[1]]=[0,0,255]
-		#cv2.imshow('boat_map',boat_map)
+		##cv2.imshow('boat_map',boat_map)
 		parent_index=nodes.index(last)
 		parent=parentNode[parent_index]
 		#print ''
@@ -137,7 +135,9 @@ def Astar(start, goal, boat_map):
 		#print 'Parent:',parent
 		last=parent
 		result.append(last)
-	return(result) 
+
+	print ('Path found in ',time.time()-path_start)
+	return(result);
 '''
 x=400
 y=400
