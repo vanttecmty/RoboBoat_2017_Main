@@ -19,7 +19,7 @@ def move_servos(angle=servoInitPosition):
 	else:
 		an = str(angle)
 		an = utility.check_value_size(an)
-		val = 'S,x,' + an + '%' ;
+		val = 'S,' + an + '%' ;
 		var.ser.write(val.encode())
 		var.ser.flush();
 		print( var.ser.read( var.ser.inWaiting() ) );

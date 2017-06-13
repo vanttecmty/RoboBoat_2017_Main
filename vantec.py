@@ -129,25 +129,40 @@ class NavigationThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		imu.get_magnetic_measurments();
+		imu.init();
+		imu.get_delta_theta();
+		imu.get_delta_theta();
+		turn_degrees_accum = 0;
+		while True:
+			#print(imu.compass());
+			turn_degrees_accum += imu.get_delta_theta().z;
+
+			left_turn_degrees = 45 - turn_degrees_accum;
+
+			motors.move_servo(left_turn_degrees);
+			motors.move_thrusters_back();
+			motors.move_thrusters_front();
+
+			pass;
 
 init();
-lidar.open_communication();
+degrees_to_turn = 45;
+#lidar.open_communication();
 #imu.get_magnetic_measurments();
 # Create new threads
-thread0 = LidarThread(0, "LidarThread");
-thread1 = MapThread(1, "MapThread");
+#thread0 = LidarThread(0, "LidarThread");
+#thread1 = MapThread(1, "MapThread");
 thread2 = NavigationThread(2, "NavigationThread");
 #thread9 = PathFindingThread(9, "PathFindingThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
-thread0.start();
-thread1.start();
+#thread0.start();
+#thread1.start();
 thread2.start();
 #thread3.start();
-thread0.join();
-thread1.join();
+#thread0.join();
+#thread1.join();
 thread2.join();
 #thread3.join();
 print ("Exiting Main Thread");

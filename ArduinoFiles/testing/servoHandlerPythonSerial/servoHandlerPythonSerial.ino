@@ -41,12 +41,16 @@ void loop(){
       Serial.println(inputString);
       //digitalWrite(LED_BUILTIN, HIGH);
       if(inputString[0] == 'S') {
-        if(inputString[2] == 'x'){
-          String valLeft = inputString.substring(4,8);
-          int angle = valLeft.toInt();
-          servoLeft.write(angle);
-          servoRight.write(angle);        
-        }
+        String valLeft = inputString.substring(2,6);
+        int angle = valLeft.toInt();
+        servoLeft.write(angle);
+        servoRight.write(angle);        
+      }
+      else if(inputString[0] == 'T') {
+        String valLeft = inputString.substring(2,6);
+        int angle = valLeft.toInt();
+        servoLeft.write(angle);
+        servoRight.write(angle);        
       }
 
       //Delete Previous Message

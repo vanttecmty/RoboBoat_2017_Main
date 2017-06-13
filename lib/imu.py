@@ -118,7 +118,7 @@ import lib.variables as var
 ####################
 #	CONSTANTES     #
 ####################
-NORTH_YAW = 37;
+NORTH_YAW = 29;
 EARTH_RADIUOS = 6371000;
 vnSensor = None;
 
@@ -270,15 +270,14 @@ def compass():
 			
 		
 		print(direction + 30);
-
-		'''
-		if(magnetics.x - last_magnetic_x > 0):
+		print(magnetics.x);
+		'''		if(magnetics.x - last_magnetic_x > 0):
 
 			print("bien");
 		else:
 			print("mal");
 
-		last_magnetic_x = magnetics.x;
+		last_magnetic_x = magnetics.x;'''
 		time.sleep(.100);
 
 def compass2():
@@ -313,4 +312,3 @@ def compass2():
 
 		last_magnetic_x = magnetics.x;
 		time.sleep(.100);	
-		'''

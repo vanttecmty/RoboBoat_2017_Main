@@ -56,9 +56,8 @@ else:
 			ardionoMega = p[0];
 		
 
-ser = serial.Serial('/dev/ttyUSB1', baudRateArduino);
+#ser = serial.Serial('/dev/ttyUSB1', baudRateArduino);
 
-'''			
 if(arduinoMega != ''):
 	ser = serial.Serial(arduinoMega, baudRateArduino)	
 
@@ -67,5 +66,3 @@ elif(arduinoPort != ''):
 
 elif(arduinoUnoPort != ''):
 	ser = serial.Serial(arduinoPort, baudRateArduino)
-'''
-
