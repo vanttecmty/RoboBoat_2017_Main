@@ -22,7 +22,7 @@ def move_servos(angle=servoInitPosition):
 		val = 'S,' + an + '%' ;
 		var.ser.write(val.encode())
 		var.ser.flush();
-		print( var.ser.read( var.ser.inWaiting() ) );
+		print( var.ser.read( var.ser.inWaiting().decode()) );
 
 #Possible thruster values b = back , f = front
 def move_thrusters(power=thrusterInitPosition, thrusters='b'):
@@ -35,6 +35,7 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 			val = 'T,' + thrustersBack + ',' + p + '%' ;
 			var.ser.write(val.encode())
 			var.ser.flush()
+			print( var.ser.read( var.ser.inWaiting().decode()) );
 		elif(thrusters == thrustersFront):
 			p = str(power)
 			p = utility.check_value_size(p)
@@ -42,6 +43,7 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 			var.ser.write(val.encode())
 			var.ser.flush()
 			var.ser.read(var.ser.inWaiting())
+			print( var.ser.read( var.ser.inWaiting().decode()) );
 			
 def thrusters_back(power=0):
 	if(power < -400 or power > 400):
