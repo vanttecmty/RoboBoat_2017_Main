@@ -71,7 +71,10 @@ class MapThread (threading.Thread):
 		global routeMap;
 
 		while cv2.waitKey(1) != 27:
-			lidarMeasures = lidar.test();
+			#lidarMeasures = lidar.test();
+			f=open('/home/naoITESM/RoboBoat_2017_Main/lidar_measures.txt','r',os.O_NONBLOCK)
+			lidarMeasures.read()			
+			print lidarMeasures			
 			routeMap = emptyMap.copy();
 
 			for i in range(0, 90):
@@ -150,19 +153,18 @@ degrees_to_turn = 45;
 #lidar.open_communication();
 #imu.get_magnetic_measurments();
 # Create new threads
-#thread0 = LidarThread(0, "LidarThread");
-#thread1 = MapThread(1, "MapThread");
-thread2 = NavigationThread(2, "NavigationThread");
-#thread9 = PathFindingThread(9, "PathFindingThread");
+#thread0 = LidarThread(1, "LidarThread");
+thread1 = MapThread(2, "MapThread");
+#thread2 = NavigationThread(3, "NavigationThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
 #thread0.start();
-#thread1.start();
-thread2.start();
+thread1.start();
+#thread2.start();
 #thread3.start();
 #thread0.join();
-#thread1.join();
-thread2.join();
+thread1.join();
+#thread2.join();
 #thread3.join();
 print ("Exiting Main Thread");
