@@ -13,6 +13,7 @@ import lib.variables as var
 import lib.motors as motors
 import lib.lidar as lidar
 import lib.imu as imu
+import Jetson.dbscan_contours as dbscan
 
 #Navigation class
 MAP_WIDTH       = 400;
@@ -72,9 +73,9 @@ class MapThread (threading.Thread):
 
 		while cv2.waitKey(1) != 27:
 			#lidarMeasures = lidar.test();
-			f=open('/home/naoITESM/RoboBoat_2017_Main/lidar_measures.txt','r',os.O_NONBLOCK)
-			lidarMeasures.read()			
-			print lidarMeasures			
+			f=open('/home/naoITESM/RoboBoat_2017_Main/lidar_measures.txt','r',os.O_NONBLOCK);
+			lidarMeasures.read();			
+			print (lidarMeasures);			
 			routeMap = emptyMap.copy();
 
 			for i in range(0, 90):
@@ -136,15 +137,29 @@ class NavigationThread (threading.Thread):
 		imu.get_delta_theta();
 		imu.get_delta_theta();
 		turn_degrees_accum = 0;
+		capture=cv2.VideoCapture(4)
 		while True:
 			#print(imu.compass());
-			turn_degrees_accum += imu.get_delta_theta().z;
+			frame = capture.read()
+			#print (frame)
+			cv2.imshow('cam',frame[1])
+			cv2.waitKey(0)
+			values=dbscan.get_obstacles(frame[1])
+			print (values)
+			#cv2.imshow('Obsta',values[0])
+			#print (values[1])
+			turn_degrees_accum += imu.get_delta_theta()['z'];
 
-			left_turn_degrees = 45 - turn_degrees_accum;
+			left_turn_degrees = degrees_to_turn - turn_degrees_accum;
 
-			motors.move_servo(left_turn_degrees);
-			motors.move_thrusters_back();
-			motors.move_thrusters_front();
+			if(left_turn_degrees < 10):
+				motors.turn_right();
+			elif(left_turn_degrees > 10):
+				motors.turn_left();
+
+			#motors.move_servo(left_turn_degrees);
+			#motors.move_thrusters_back();
+			#motors.move_thrusters_front();
 
 			pass;
 
@@ -154,17 +169,17 @@ degrees_to_turn = 45;
 #imu.get_magnetic_measurments();
 # Create new threads
 #thread0 = LidarThread(1, "LidarThread");
-thread1 = MapThread(2, "MapThread");
-#thread2 = NavigationThread(3, "NavigationThread");
+#thread1 = MapThread(2, "MapThread");
+thread2 = NavigationThread(3, "NavigationThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
 #thread0.start();
-thread1.start();
-#thread2.start();
+#thread1.start();
+thread2.start();
 #thread3.start();
 #thread0.join();
-thread1.join();
-#thread2.join();
+#thread1.join();
+thread2.join();
 #thread3.join();
 print ("Exiting Main Thread");
