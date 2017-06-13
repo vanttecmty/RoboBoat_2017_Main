@@ -72,7 +72,7 @@ class MapThread (threading.Thread):
 
 		while cv2.waitKey(1) != 27:
 			#lidarMeasures = lidar.test();
-			f=open('lidar_measures.txt','r',os.O_NONBLOCK)
+			f=open('/home/naoITESM/RoboBoat_2017_Main/lidar_measures.txt','r',os.O_NONBLOCK)
 			lidarMeasures.read()			
 			print lidarMeasures			
 			routeMap = emptyMap.copy();
