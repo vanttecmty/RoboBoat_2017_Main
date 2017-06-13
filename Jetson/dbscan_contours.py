@@ -303,4 +303,4 @@ def get_obstacles(image):
 
 		found_obstacles.append([distance,degrees])
 	
-	return found_obstacles	
+	return obstacles,found_obstacles	
