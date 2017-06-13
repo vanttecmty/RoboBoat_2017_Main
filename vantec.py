@@ -105,16 +105,27 @@ class imuThread (threading.Thread):
          #distance = imu.get_distance_to_gps_coords(25.649864, -100.290795);
          #print(degrees, distance);
 
+class controlThread(threading.Thread):
+	def __init__(self,threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID.Thread.__init__(self);
+		self.name = name;
+	def run(self):
+		imu.init();
+
 # Create new threads
 #thread1 = lidarThread(1, "lidarThread");
 #thread2 = navigationThread(2, "navigationThread");
 thread3 = imuThread(3, "imuThread");
+#thread4 = controlThread(4, "controlThread");
 
 # Start new Threads
 #thread1.start();
 #thread2.start();
 thread3.start();
+#thread4.start();
 #thread1.join();
 #thread2.join();
 thread3.join();
+#thread4.join();
 print ("Exiting Main Thread");

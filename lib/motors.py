@@ -2,7 +2,7 @@ import sys
 import time
 import serial
 import lib.variables as var
-
+import lib.utility as utility
 ##############Motor Directions and Defaults #############
 ######## Turn Servos 0 - 180 __ Middle pos = 90  ########
 ######## Thrusters   1100 to 1900 Stopped = 1500 ########
@@ -21,8 +21,8 @@ def move_servos(angle=servoInitPosition):
 		an = utility.check_value_size(an)
 		val = 'S,x,' + an + '%' ;
 		var.ser.write(val.encode())
-		var.ser.flush()
-
+		var.ser.flush();
+		print( var.ser.read( var.ser.inWaiting() ) );
 
 #Possible thruster values b = back , f = front
 def move_thrusters(power=thrusterInitPosition, thrusters='b'):
@@ -41,6 +41,7 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 			val = 'T,' + thrustersFront + ',' + p + '%' ;
 			var.ser.write(val.encode())
 			var.ser.flush()
+			var.ser.read(var.ser.inWaiting())
 			
 def thrusters_back(power=0):
 	if(power < -400 or power > 400):

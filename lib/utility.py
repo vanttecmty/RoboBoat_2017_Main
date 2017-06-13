@@ -28,10 +28,12 @@ def print_serial_ports():
 
 
 def check_value_size(val):
-	if(len(val) == 3):
+	if(len(val) == 4):
 		return val ;
-	elif(len(val) == 2):
+	elif(len(val) == 3):
 		return '0' + val ;
-	elif(len(val) == 1):
+	elif(len(val) == 2):
 		return '00' + val ;
+	elif(len(val) == 1):
+		return '000' + val ;
 	
