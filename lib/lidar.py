@@ -25,6 +25,9 @@ def init():
     try:
         for measurment in lidar.iter_measurments(max_buf_meas=500):
             measurments[int(measurment[2])%360] = measurment[3];
+			f=open('lidar_measures.txt','a',os.O_NONBLOCK)
+			f.write(measurements)
+			f.flush()
             #print(measurments[int(measurment[2])%360]);
     except KeyboardInterrupt:
         print('Stoping...');

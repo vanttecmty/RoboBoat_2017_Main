@@ -71,7 +71,10 @@ class MapThread (threading.Thread):
 		global routeMap;
 
 		while cv2.waitKey(1) != 27:
-			lidarMeasures = lidar.test();
+			#lidarMeasures = lidar.test();
+			f=open('lidar_measures.txt','r',os.O_NONBLOCK)
+			lidarMeasures.read()			
+			print lidarMeasures			
 			routeMap = emptyMap.copy();
 
 			for i in range(0, 90):
@@ -126,17 +129,17 @@ class NavigationThread (threading.Thread):
 init();
 lidar.open_communication();
 # Create new threads
-thread0 = LidarThread(1, "LidarThread");
+#thread0 = LidarThread(1, "LidarThread");
 thread1 = MapThread(2, "MapThread");
 #thread2 = NavigationThread(3, "NavigationThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
-thread0.start();
+#thread0.start();
 thread1.start();
 #thread2.start();
 #thread3.start();
-thread0.join();
+#thread0.join();
 thread1.join();
 #thread2.join();
 #thread3.join();
