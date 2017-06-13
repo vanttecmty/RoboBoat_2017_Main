@@ -150,7 +150,7 @@ for a in range(0,50):
 	x1=random.randint(0,x-1)
 	y1=random.randint(0,y-1)
 	cv2.circle(mapa,(x1,y1),15,(255,255,255),-1,8)
-#cv2.line(mapa,(0,40),(60,40),(255,255,255),1,8)
+cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
 start_time=time.time()
 ruta=Astar(start,goal,mapa)
 #print ruta

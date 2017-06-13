@@ -6,8 +6,6 @@ import termios
 import lib.variables as var
 import lib.utility as utility
 import lib.motors as motors
-import lib.navigation as nav
-
 
 '''
 A = 65
@@ -28,6 +26,7 @@ endProgram = False
 manualMode = False
 autonomousMode = False
 testServosMode = False
+testServosMode2 = False
 
 while  x != chr(27) :
 	x = sys.stdin.read(1)#[0]
@@ -36,16 +35,24 @@ while  x != chr(27) :
 		autonomousMode = False;
 		manualMode = True;
 		testServosMode = False;
+		testServosMode2 = False;
 	if(x == 'x' or x == 'X'):
 		print("Autonomous Mode");
 		autonomousMode = True;
 		manualMode = False;
 		testServosMode = False;
+		testServosMode2 = False;
 	if(x == 'v' or x == 'V'):
 		print("Test Servo Mode");
 		autonomousMode = False;
 		manualMode = False;
 		testServosMode = True;
+		testServosMode2 = False;
+	if(x == 'z' or x == 'Z'):
+		autonomousMode = False;
+		manualMode = False;
+		testServosMode = False;
+		testServosMode2 = True;
 
 	if(manualMode):
 		# 0 Izquierda 
@@ -80,16 +87,18 @@ while  x != chr(27) :
 	elif(testServosMode):
 		if(x == 'l'  or x == 'L'):
 			print("Left");
-			nav.move_left();
+			motors.move_servos(0);
 		if(x == 'j'  or x == 'J'):
 			print("Right");
-			nav.move_right();
+			motors.move_servos(180);
 		if(x == 'k'  or x == 'K'):
 			print("Init Pos");
-			nav.move_init_pos()
-		
+			motors.move_servos(90);
 
-nav.move_init_pos()
+	elif(testServosMode2):
+		#motors.move_servos(90);		
+		motors.move_servos(30);
+
 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)    
 
 

@@ -11,6 +11,7 @@ lidarPort   = ''
 imuPort     = ''
 arduinoPort = ''
 arduinoUnoPort = ''
+arduinoMega = ''
 
 servoLeft = 'l'
 servoRight = 'r'
@@ -51,9 +52,20 @@ else:
 			lidarPort = p[0]; 
 		elif (p[1].find('USB-RS232') == 0) :
 			imuPort = p[0];
-			
-if(arduinoPort != ''):
+		elif (p[1].find('USB2.0-Serial') == 0) :
+			ardionoMega = p[0];
+		
+
+ser = serial.Serial('/dev/ttyUSB1', baudRateArduino);
+
+'''			
+if(arduinoMega != ''):
+	ser = serial.Serial(arduinoMega, baudRateArduino)	
+
+elif(arduinoPort != ''):
 	ser = serial.Serial(arduinoUnoPort, baudRateArduino)
 
-if(arduinoUnoPort != ''):
-	ser = serial.Serial(arduinoPort, baudRateArduino)	
+elif(arduinoUnoPort != ''):
+	ser = serial.Serial(arduinoPort, baudRateArduino)
+'''
+

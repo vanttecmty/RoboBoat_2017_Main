@@ -150,5 +150,4 @@ thread0.join();
 thread1.join();
 thread2.join();
 #thread3.join();
-
 print ("Exiting Main Thread");
