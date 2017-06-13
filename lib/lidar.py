@@ -23,9 +23,17 @@ def init():
     #open_communication();
 
     try:
-        for measurment in lidar.iter_measurments(max_buf_meas=500):
-            measurments[int(measurment[2])%360] = measurment[3];
-            #print(measurments[int(measurment[2])%360]);
+        for scan in lidar.iter_scans(max_buf_meas = 500):
+            f = open('lidar_measures.txt','w', os.O_NONBLOCK);
+
+            for quality, degree, distance in scan:
+                measurment = str(int(degree) % 360);
+                measurment += "," + str(distance) + "\n";
+                f.write(measurment);
+                f.flush();
+
+            f.close();
+            #lidar.clear_input();
     except KeyboardInterrupt:
         print('Stoping...');
 

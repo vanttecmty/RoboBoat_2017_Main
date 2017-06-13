@@ -7,6 +7,54 @@ tecla=-1
 
 minRadius=30
 buoy_diameter=20.32 #cm
+global_image=[]
+def draw_rectangle(event,x,y,flags,param):
+	global x1,x2,y1,y2,primera
+	if event==cv2.EVENT_LBUTTONDOWN:
+		if primera:		
+			#print 'Primer Click'
+			primera=False
+			x1=x
+			y1=y
+		else:
+			#print 'Segundo Click'
+			x2=x
+			y2=y
+			#imagen2=image.copy()
+			#cv2.rectangle(imagen2, (x1,y1),(x2,y2),(0,0,255),2)
+			primera=True
+			H,HS,S,SS,L,LS =area_stats(global_image)
+			print(area_stats(hsv))
+			
+			HL=max([H-HS,0])
+			SL=max([S-SS,0])
+			LL=max([L-LS,0])
+			HH=max([H+HS,0])
+			SH=max([S+SS,0])
+			LH=max([L+LS,0])
+						
+			lower=numpy.array([HL, SL, LL])
+			upper=numpy.array([HH ,SH,LH])
+			#print lower
+			#print upper
+			filtrada=cv2.inRange(hsv,lower, upper)
+			cv2.imshow('filtrada',filtrada)
+			#print x1,y1,x2,y2
+
+def area_stats(sourceImage):
+	area=abs(x2-x1)*abs(y2-y1)	
+	promedio=np.zeros((3, area),dtype=np.int)
+	i=0
+	for x in range(x1,x2):
+		for y in range(y1,y2):
+			promedio[0][i]=sourceImage[y][x][0]
+			promedio[1][i]=sourceImage[y][x][1]
+			promedio[2][i]=sourceImage[y][x][2]
+			i+=1
+
+	return np.mean(promedio[0]),np.std(promedio[0]),np.mean(promedio[1]),np.std(promedio[1]),np.mean(promedio[2]),np.std(promedio[2])
+	
+	
 def DBSCAN(array, epsylon, minPts,blu=False):
 	start_time = time.time()
 	todos_contornos=cv2.findContours(array,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -136,11 +184,15 @@ def DBSCAN(array, epsylon, minPts,blu=False):
 	return obstacles
 	
 
-'''
+
+cv2.namedWindow('get rectangle')
+cv2.setMouseCallback('get rectangle',draw_rectangle)
+
+
 gl=np.array([  69.02530498,  180.55271054,   91.40301005]) #color anexo
 gu=np.array([  72.76151673,  200.26382693,  130.08665403])
-yl=np.array([  22.73504443,  212.11690445,  131.97380311])
-yu=np.array([  24.51509933,  235.90264702,  175.83413249])
+yl=np.array([   3.45339855,  141.33709727,  182.12802959])
+yu=np.array([  18.82309915,  168.04539121,  207.25906718])
 
 '''
 gl=np.array([  71.49535277,  150.41099537,    2.82631499])
@@ -148,7 +200,7 @@ gu=np.array([ 144.98700017,  229.38312228,   86.85799873])
 
 yl=np.array([   0,          185.84549612,  214.80200567])
 yu=np.array([  40.74302368,  247.40295108,  259.97206265])
-
+'''
 bl=np.array([ 78.12765314,  26.00777318,   0.        ])
 bu=np.array([ 148.10418077,   80.51817838,   53.99514731])
 
@@ -160,14 +212,19 @@ ru=np.array([  43.71792393,   47.60779081,  239.44837916])
 hsblue=np.array([ 107.19552311,  184.64772921,  102.44292567])
 hsblue=np.array([ 109.66161975,  218.94410753,  164.98564576])
 
-
+primera=True
 #path='/home/ubuntu/RoboBoat_2017_Main/Jetson/fotos/'
 #files=os.listdir(path)
 
 
+
+	
+	
 def get_obstacles(image):
 	#image=cv2.imread(path+image_file)
-		
+	
+	#image=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)	
+	global_image=image
 	
 	azul=cv2.inRange(image,bl, bu)
 	rojo=cv2.inRange(image,rl, ru)
@@ -177,6 +234,7 @@ def get_obstacles(image):
 	
 	epsy=30
 	size=20
+	cv2.imshow('get rectangle',image)
 	cv2.imshow('amarillo',amarillo)
 	cv2.imshow('verde',verde)
 	#cv2.imshow('azul',azul)
