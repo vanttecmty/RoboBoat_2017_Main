@@ -19,10 +19,11 @@ def move_servos(angle=servoInitPosition):
 	else:
 		an = str(angle)
 		an = utility.check_value_size(an)
-		val = 'S,' + an + '%' ;
+		val = 'S,x,' + an + '%' ;
 		var.ser.write(val.encode())
 		var.ser.flush();
-		print( var.ser.read( var.ser.inWaiting() ) );
+		#print( var.ser.read( var.ser.inWaiting() ) );
+		print( var.ser.read( var.ser.inWaiting()).decode() );
 
 #Possible thruster values b = back , f = front
 def move_thrusters(power=thrusterInitPosition, thrusters='b'):
@@ -42,7 +43,39 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 			var.ser.write(val.encode())
 			var.ser.flush()
 			var.ser.read(var.ser.inWaiting())
-			
+	
+def move_thusters_2(power=thrusterInitPosition, thruster='b'):
+	if(power < 1100 or power > 1900):
+		print("Thruster power must be between 1100 - 1900");
+	else:
+		if(thruster == 'b'):
+			p = str(power)
+			p = utility.check_value_size(p)
+			val = 'T,' + thruster + ',' + thrustersBack + ',' + p + '%' ;
+			var.ser.write(val.encode())
+			var.ser.flush()
+		elif(thruster == 'r'):
+			p = str(power)
+			p = utility.check_value_size(p)
+			val = 'T,' + thruster + ',' + thrustersBack + ',' + p + '%' ;
+			var.ser.write(val.encode())
+			var.ser.flush()
+		elif(thruster == 'l'):
+			p = str(power)
+			p = utility.check_value_size(p)
+			val = 'T,' + thruster + ',' + thrustersBack + ',' + p + '%' ;
+			var.ser.write(val.encode())
+			var.ser.flush()
+
+
+def turn_right():
+	move_thusters_2(1600,'r');
+	move_thusters_2(1400,'l');
+
+def turn_left():
+	move_thusters_2(1600,'l');
+	move_thusters_2(1400,'r');
+
 def thrusters_back(power=0):
 	if(power < -400 or power > 400):
 		print("The power is not on the correct range");
