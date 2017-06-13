@@ -11,6 +11,7 @@ lidarPort   = ''
 imuPort     = ''
 arduinoPort = ''
 arduinoUnoPort = ''
+arduinoMega = ''
 
 servoLeft = 'l'
 servoRight = 'r'
@@ -47,13 +48,24 @@ else:
 			arduinoUnoPort = p[0]
 		elif (p[1].find('Serial') == 7):
 			arduinoPort = p[0]
-		elif (p[1].find('3-3') == 0 or p[1].find('3-4') == 0 or p[1].find('Silicon Labs CP2102 USB to UART') == 0):
+		elif (p[1].find('3-3') == 0 or p[1].find('3-4') == 0 or p[1].find('Silicon Labs CP2102 USB to UART') == 0 or p[1].find('CP2102') == 0 ):
 			lidarPort = p[0]; 
 		elif (p[1].find('USB-RS232') == 0) :
 			imuPort = p[0];
-			
-if(arduinoPort != ''):
+		elif (p[1].find('USB2.0-Serial') == 0) :
+			ardionoMega = p[0];
+		
+
+ser = serial.Serial('/dev/ttyUSB1', baudRateArduino);
+
+'''			
+if(arduinoMega != ''):
+	ser = serial.Serial(arduinoMega, baudRateArduino)	
+
+elif(arduinoPort != ''):
 	ser = serial.Serial(arduinoUnoPort, baudRateArduino)
 
-if(arduinoUnoPort != ''):
-	ser = serial.Serial(arduinoPort, baudRateArduino)	
+elif(arduinoUnoPort != ''):
+	ser = serial.Serial(arduinoPort, baudRateArduino)
+'''
+

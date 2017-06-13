@@ -7,8 +7,10 @@ String inputString;
 Servo servoLeft;
 Servo servoRight;
 
-int pinServoLeft = 10;
-int pinServoRight = 11;
+int pinServoLeft = 7;
+int pinServoRight = 6;
+
+//'S,b,0180%'
 
 void setup()
 {
@@ -33,37 +35,21 @@ void loop(){
         //wait for the next byte, if after this nothing has arrived it means 
         //the text was not part of the same stream entered by the user
         delay(1); 
-        //Serial.println(c);
     }
 
-    
-      //Send String received to confirm it was correctly received4
-      //Serial.println(inputString);
-      //Serial.flush();
-      //Serial.println(inputString.length());
-      //Serial.flush();
-      //inputString = "";
-     
-    
     if(inputString.length() > 0 && inputString[inputString.length() - 1] == '%'){
+      Serial.println(inputString);
       //digitalWrite(LED_BUILTIN, HIGH);
       if(inputString[0] == 'S') {
-        //Serial.print("InS");
-        if(inputString[2] == 'b'){
-          //Serial.print("InB");
-          String valLeft = inputString.substring(4,7);
-          String valRight = inputString.substring(8,11);
-          Serial.print(valLeft + valRight);
-          servoLeft.write(valLeft.toInt());
-          servoRight.write(valRight.toInt());        
+        if(inputString[2] == 'x'){
+          String valLeft = inputString.substring(4,8);
+          int angle = valLeft.toInt();
+          servoLeft.write(angle);
+          servoRight.write(angle);        
         }
       }
 
       //Delete Previous Message
       inputString = "";
-      Serial.flush();
-    } else {
-      digitalWrite(LED_BUILTIN, HIGH);
-      //Serial.println(inputString.length());
     }
 }
