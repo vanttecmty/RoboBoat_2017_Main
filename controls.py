@@ -66,11 +66,11 @@ while  x != chr(27) :
 		# 1900 Adelante
 		if(x == 'w' or x == 'W'):
 			print("Forward");
-			motors.move_thrusters(1600,'b')
+			motors.move_thrusters_2(1600,'b')
 		# 1100 Reversa
 		if(x == 's' or x == 'S'):
 			print("Backward");
-			motors.move_thrusters(1400,'b');
+			motors.move_thrusters_2(1400,'b');
 
 	elif(autonomousMode):
 		if(x == 'P'):
