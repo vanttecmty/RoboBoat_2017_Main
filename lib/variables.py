@@ -56,6 +56,8 @@ else:
 			ardionoMega = p[0];
 		
 ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
+
+#ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 '''
 if(arduinoMega != ''):
 	ser = serial.Serial(arduinoMega, baudRateArduino)	

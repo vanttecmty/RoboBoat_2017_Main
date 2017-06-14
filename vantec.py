@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append('/usr/local/lib/python3.4/site-packages/')
 import threading
@@ -13,6 +14,7 @@ import lib.variables as var
 import lib.motors as motors
 import lib.lidar as lidar
 import lib.imu as imu
+import Jetson.dbscan_contours as dbscan
 
 #Navigation class
 MAP_WIDTH       = 400;
@@ -72,33 +74,26 @@ class MapThread (threading.Thread):
 
 		while cv2.waitKey(1) != 27:
 			#lidarMeasures = lidar.test();
-			f=open('/home/naoITESM/RoboBoat_2017_Main/lidar_measures.txt','r',os.O_NONBLOCK)
-			lidarMeasures.read()			
-			print lidarMeasures			
+			f = open('lidar_measures.txt','r', os.O_NONBLOCK);
+			lidarMeasures = f.readlines();			
+			#print (lidarMeasures);
 			routeMap = emptyMap.copy();
 
-			for i in range(0, 90):
-				if lidarMeasures[i] != 0:
-					#print(i, lidarMeasures[i]);
-					coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * lidarMeasures[i] / 25);
-					coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * lidarMeasures[i] / 25);
-					cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
-					cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);		
-
-			for i in range(270, 359):
-				if lidarMeasures[i] != 0:
-					#print(i -360, lidarMeasures[i]);
-					coord_x = LIDAR_COORD_X + int (math.cos(math.radians(i - 90)) * lidarMeasures[i] / 25);
-					coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(i - 90)) * lidarMeasures[i] / 25);
+			for measure in lidarMeasures:
+				data = measure.split(",");
+				degree = int(data[0]);
+				if( (degree > 0 and degree < 90) or degree > 270 and degree < 360):
+					coord_x = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(data[1]) / 25);
+					coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(data[1]) / 25);
 					cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
 					cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 
-			'''lidar.lidar.stop();
+			f.close();
 			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],[10, 10], routeMap);
 
 			for point in routePoints:
 				routeMap[point[0]][point[1]] = [0, 0, 255];
-			'''
+			
 			add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
 			#lidar.lidar.start();
@@ -136,34 +131,48 @@ class NavigationThread (threading.Thread):
 		imu.get_delta_theta();
 		imu.get_delta_theta();
 		turn_degrees_accum = 0;
+		capture=cv2.VideoCapture(4)
 		while True:
 			#print(imu.compass());
-			turn_degrees_accum += imu.get_delta_theta().z;
+			frame = capture.read()
+			#print (frame)
+			cv2.imshow('cam',frame[1])
+			cv2.waitKey(0)
+			values=dbscan.get_obstacles(frame[1])
+			print (values)
+			#cv2.imshow('Obsta',values[0])
+			#print (values[1])
+			turn_degrees_accum += imu.get_delta_theta()['z'];
 
-			left_turn_degrees = 45 - turn_degrees_accum;
+			left_turn_degrees = degrees_to_turn - turn_degrees_accum;
 
-			motors.move_servo(left_turn_degrees);
-			motors.move_thrusters_back();
-			motors.move_thrusters_front();
+			if(left_turn_degrees < 10):
+				motors.turn_right();
+			elif(left_turn_degrees > 10):
+				motors.turn_left();
+
+			#motors.move_servo(left_turn_degrees);
+			#motors.move_thrusters_back();
+			#motors.move_thrusters_front();
 
 			pass;
 
 init();
-degrees_to_turn = 45;
-#lidar.open_communication();
+#degrees_to_turn = 45;
+lidar.open_communication();
 #imu.get_magnetic_measurments();
 # Create new threads
-#thread0 = LidarThread(1, "LidarThread");
+thread0 = LidarThread(1, "LidarThread");
 thread1 = MapThread(2, "MapThread");
 #thread2 = NavigationThread(3, "NavigationThread");
 #thread3 = imuThread(3, "imuThread");
 
 # Start new Threads
-#thread0.start();
+thread0.start();
 thread1.start();
 #thread2.start();
 #thread3.start();
-#thread0.join();
+thread0.join();
 thread1.join();
 #thread2.join();
 #thread3.join();
