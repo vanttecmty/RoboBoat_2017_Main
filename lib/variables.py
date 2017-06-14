@@ -55,6 +55,7 @@ else:
 		elif (p[1].find('USB2.0-Serial') == 0) :
 			ardionoMega = p[0];
 		
+ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
 
 #ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 '''

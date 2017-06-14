@@ -58,27 +58,19 @@ while  x != chr(27) :
 		# 0 Izquierda 
 		if(x == 'a' or x == 'A'):
 			print("Turn Left");
-			nav.move_left();
+			motors.turn_left();
 		# 180 Derecha
 		if(x == 'd' or x == 'D'):
 			print("Turn Right");
-			nav.move_right();
+			motors.turn_right();
 		# 1900 Adelante
 		if(x == 'w' or x == 'W'):
 			print("Forward");
-			nav.move_forward();
+			motors.move_thrusters_2(1600,'b')
 		# 1100 Reversa
 		if(x == 's' or x == 'S'):
 			print("Backward");
-			nav.move_backward();
-		#
-		if(x == 'q' or x == 'Q'):
-			print("Horizontal Movement Left");
-			nav.move_horizontal_left();
-		if(x == 'e' or x == 'E'):
-			print("Horizontal Movement Right");
-			nav.move_horizontal_right();
-
+			motors.move_thrusters_2(1400,'b');
 
 	elif(autonomousMode):
 		if(x == 'P'):

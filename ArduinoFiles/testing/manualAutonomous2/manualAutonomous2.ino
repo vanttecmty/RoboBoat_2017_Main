@@ -55,12 +55,15 @@ void select(){
   //Use channel 5 to select current mode
   if (channel5 > 1600){
     move_2();
+    Serial.print("m");
   }
   else if (channel5 < 1400){
     power_Difference();
+    Serial.print("pd");
   }
   else{
     autonomous_Mode();
+    Serial.print("a");
   }
 }
 
@@ -137,7 +140,8 @@ void power_Difference(){
 }
 
 void autonomous_Mode(){
-    Serial.println("Autonomous");
+// put your main code here, to run repeatedly:
+      //Serial.println("Autonomous");
     while(!Serial.available()) {}
 
     //digitalWrite(LED_BUILTIN, HIGH);
@@ -156,27 +160,53 @@ void autonomous_Mode(){
       //digitalWrite(LED_BUILTIN, HIGH);
       if(inputString[0] == 'S') {
         if(inputString[2] == 'x') {
-        String valLeft = inputString.substring(2,6);
-        Serial.println(valLeft);
+        String valLeft = inputString.substring(4,8);
+        //Serial.println(valLeft);
         int angle = valLeft.toInt();
         servo.write(angle);
         //servoRight.write(angle); 
         }       
       }
       else if(inputString[0] == 'T') {
-        if(inputString[2] == 'b') {
+        //All thrusters 
+        if(inputString[2] == 'a') {
           String valLeft = inputString.substring(4,8);
-          Serial.println(valLeft);
+          //Serial.println(valLeft);
           int power = valLeft.toInt();
           thrusterRear.writeMicroseconds(power);
-          //servoRight.write(angle); 
-        }else if(inputString[2] == 'f') {
+        }
+        //Front Thrusters
+        else if(inputString[2] == 'f') {
           String valLeft = inputString.substring(4,8);
-          Serial.println(valLeft);
+          //Serial.println(valLeft);
+          int power = valLeft.toInt();
+          thrusterFront.writeMicroseconds(power);  
+        }
+        //back Thrusters
+        else if(inputString[2] == 'b') {
+          String valLeft = inputString.substring(4,8);
+          //Serial.println(valLeft);
           int power = valLeft.toInt();
           thrusterFront.writeMicroseconds(power);
           //servoRight.write(angle); 
         }
+        //Left thrusters
+        else if(inputString[2] == 'l') {
+          String valLeft = inputString.substring(4,8);
+          //Serial.println(valLeft);
+          int power = valLeft.toInt();
+          thrusterFront.writeMicroseconds(power);
+          //servoRight.write(angle); 
+        }
+        //Right thrusters
+        else if(inputString[2] == 'r') {
+          String valLeft = inputString.substring(4,8);
+          //Serial.println(valLeft);
+          int power = valLeft.toInt();
+          thrusterFront.writeMicroseconds(power);
+          //servoRight.write(angle); 
+        }
+        
         
       }
 
