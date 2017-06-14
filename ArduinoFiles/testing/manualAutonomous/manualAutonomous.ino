@@ -1,5 +1,6 @@
 #include <Servo.h>
 
+String inputString = "";
 //Receiver arduino pins
 const int pin4 = 4;
 const int pin2 = 2;
@@ -183,19 +184,29 @@ void autonomous_Mode(){
     }
 
     if(inputString.length() > 0 && inputString[inputString.length() - 1] == '%'){
-      Serial.println(inputString);
+      //Serial.println(inputString);
       //digitalWrite(LED_BUILTIN, HIGH);
       if(inputString[0] == 'S') {
-        String valLeft = inputString.substring(2,6);
+        if(inputString[2] == 'x') {
+        String valLeft = inputString.substring(4,8);
+        Serial.println(valLeft);
         int angle = valLeft.toInt();
         servoLeft.write(angle);
-        servoRight.write(angle);        
+        servoRight.write(angle);
+        }       
       }
       else if(inputString[0] == 'T') {
-        String valLeft = inputString.substring(2,6);
-        int angle = valLeft.toInt();
-        servoLeft.write(angle);
-        servoRight.write(angle);        
+        if(inputString[2] == 'b') {
+          String valLeft = inputString.substring(4,8);
+          Serial.println(valLeft);
+          int power = valLeft.toInt();
+          thrusterRear.writeMicroseconds(power);
+        }else if(inputString[2] == 'f') {
+          String valLeft = inputString.substring(4,8);
+          Serial.println(valLeft);
+          int power = valLeft.toInt();
+          thrusterFront.writeMicroseconds(power);
+        }
       }
 
       //Delete Previous Message
