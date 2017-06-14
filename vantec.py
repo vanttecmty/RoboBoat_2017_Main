@@ -64,7 +64,7 @@ class LidarSocketThread (threading.Thread):
 		s.listen(1);
 		sc, addr = s.accept();
 		  
-		while True:
+		while cv2.waitKey(1) != 27:
 		    message = sc.recv(2000);
 
 		    if message == "quit":  
@@ -120,7 +120,6 @@ class PathFindingThread (threading.Thread):
 		while cv2.waitKey(1) != 27:
 			#print("hola");
 			mapa = routeMap.copy();
-
 			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],[10, 10], mapa);
 
 			for point in routePoints:
@@ -137,50 +136,67 @@ class NavigationThread (threading.Thread):
 	def run(self):
 		imu.init();
 		imu.get_delta_theta();
-		imu.get_delta_theta();
 		turn_degrees_accum = 0;
-		capture=cv2.VideoCapture(4)
-		while True:
+		capture=cv2.VideoCapture(0);
+
+		while cv2.waitKey(1) != 27:
 			#print(imu.compass());
 			frame = capture.read()
 			#print (frame)
 			cv2.imshow('cam',frame[1])
+			#cv2.waitKey(0)
+			#values=dbscan.get_obstacles(frame[1])
+			#print (values)
+			#cv2.imshow('Obsta',values[0])
+			#print (values[1])
+			imu_angle = imu.get_delta_theta()['z']%360;
+
+			if (imu_angle > 180):
+				imu_angle = imu_angle -360;
+
+			print("Desire: ", degrees_to_turn);
+			print("Imu: ", imu_angle);
+			turn_degrees_accum += imu_angle;
+			left_turn_degrees = degrees_to_turn + turn_degrees_accum;
+			print("Left: ", left_turn_degrees);
+			#motors.thrusters_front(left_turn_degrees, 0);
+			#motors.thrusters_back(0);
+			pass;
+
+class TestThread (threading.Thread):
+	def __init__(self, threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID = threadID;
+		self.name = name;
+	def run(self):
+		capture=cv2.VideoCapture(0);
+
+		while cv2.waitKey(1) != 27:
+			frame = capture.read()
+			print (frame)
+			cv2.imshow('cam',frame[1])
 			cv2.waitKey(0)
 			values=dbscan.get_obstacles(frame[1])
 			print (values)
-			#cv2.imshow('Obsta',values[0])
-			#print (values[1])
-			turn_degrees_accum += imu.get_delta_theta()['z'];
-
-			left_turn_degrees = degrees_to_turn - turn_degrees_accum;
-
-			if(left_turn_degrees < 10):
-				motors.turn_right();
-			elif(left_turn_degrees > 10):
-				motors.turn_left();
-
-			#motors.move_servo(left_turn_degrees);
-			#motors.move_thrusters_back();
-			#motors.move_thrusters_front();
-
+			cv2.imshow('Obsta',values[0])
+			print (values[1])
 			pass;
-
 init();
-#degrees_to_turn = 45;
+degrees_to_turn = 45;
 #imu.get_magnetic_measurments();
 # Create new threads
-thread0 = LidarSocketThread(1, "LidarSocketThread");
-thread1 = MapThread(2, "MapThread");
+#thread0 = LidarSocketThread(1, "LidarSocketThread");
+#thread1 = MapThread(2, "MapThread");
 #thread2 = NavigationThread(3, "NavigationThread");
-#thread3 = imuThread(3, "imuThread");
+thread3 = TestThread(3, "TestThread");
 
 # Start new Threads
-thread0.start();
-thread1.start();
+#thread0.start();
+#thread1.start();
 #thread2.start();
-#thread3.start();
-thread0.join();
-thread1.join();
+thread3.start();
+#thread0.join();
+#thread1.join();
 #thread2.join();
-#thread3.join();
+thread3.join();
 print ("Exiting Main Thread");
