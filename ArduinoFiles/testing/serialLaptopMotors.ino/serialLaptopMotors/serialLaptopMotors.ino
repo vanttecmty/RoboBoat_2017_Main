@@ -62,7 +62,7 @@ void loop() {
     }
 
     if(inputString.length() > 0 && inputString[inputString.length() - 1] == '%'){
-      //Serial.println(inputString);
+      Serial.println(inputString);
       //digitalWrite(LED_BUILTIN, HIGH);
       if(inputString[0] == 'S') {
         if(inputString[2] == 'x') {
