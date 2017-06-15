@@ -38,6 +38,7 @@ start_time     = time.time();
 routePoints    = [];
 lidarObstacles = [];
 orientationDegree = 0;
+coordsGoal     = [0,0];
 
 def new_map(rows, cols):
 	mapa = np.full((rows, cols, 3),0, dtype = np.uint8);
@@ -119,7 +120,7 @@ class MapThread (threading.Thread):
 			cv2.imshow('cam', frame[1]);
 			values = dbscan.get_obstacles(frame[1],'yg', False);
 			camObstacles = values[1];
-			#cv2.imshow('Obsta', values[0]);
+
 			for obstacle in camObstacles:
 				coord_x = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
 				coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
@@ -127,7 +128,7 @@ class MapThread (threading.Thread):
 				cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 				pass;
 
-			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],[10, 10], routeMap);
+			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],coordsGoal, routeMap);
 			routeLenght = len(routePoints);
 
 			for point in routePoints:
