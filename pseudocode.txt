@@ -1,0 +1,69 @@
+Aquí código de navegación autónoma.
+
+#Una vez que termina y pasa por las puertas, empezar lo siguiente.
+
+
+lista_retos=[coordenadas gps de los retos]
+reto=1
+while reto<5:
+
+	1.- Encontrar ubicación del GPS para comparar destino (coordenada de reto) con la ubicación.
+
+		Si llegó al reto indicado:
+
+			switch 
+					reto1: #speed challenge
+							-Pararse completamente.
+							-sacar centroide de boyas verde y rojas
+							-avanzar hasta quedar cerca del centro sin pasar.
+							-sacar distancia y grados a la boya azul.
+							-mientras la distancia>10m
+								fijar meta local
+								avanzar distancia fija
+								sacar distancia y grados a la boya
+
+							-Fijar meta a la derecha de la boya.
+								repetir hasta que falen X metros y empezar a dar la vuelta 
+							-Dar la vuelta predefinida.
+
+							-sacar centroide de boyas verde y rojas.
+								digirse a la 
+					reto2: #find the path
+
+					reto3: #automated docking
+							-utilizar dbscan('rg',False) para encontrar el muelle. (la distancia entre rojo y verde es de 12-14ft)
+
+							-mandar drone.
+
+							-Tomar foto y obtener la ubicación de los números
+
+							-esperar a que el drone mande foto.
+
+							-procesar la foto del dron con la red neuronal para obtener número de display
+
+							-ir al muelle hasta que el lidar detecte obstáculos a N cm
+
+							
+					reto4: #follow the leader
+							-rotar para ver la base (que es negra y no debe haber mucho problema en identificar)
+							-cargar circle.npy (archivo que contiene el contorno de un circulo) y comparar ese contorno con los de la imagen.
+							-una vez ubicados los circulos, se toma foto cuando haya uno para identificar número.
+							-realizar varias veces y guardar el tiempo para determinar velocidad de giro de los números.
+							-igual se puede identificar la velocidad de giro comparando cuantos pixeles se desplazó un circulo de una imagen 									a otra.
+			
+
+	3.- Obtener diferencia de grados entre dirección a la que apunta el barco y grados de donde está el destino.
+
+	4.- Poner meta local a X distancia, que depende de que tan lejos se esté del destino, a theta grados(obtenidos en el paso anterior).
+
+	5.- Buscar la ruta para llegar a la meta local.
+
+	6.- Girar hacia el siguiente punto de la trayectoria.
+
+	7.- Avanzar M metros en la misma dirección (idealmente con un controlador pid para que no cambie su curso).
+
+	8.- Repetir 
+
+
+
+

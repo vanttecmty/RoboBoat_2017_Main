@@ -4,7 +4,7 @@
 const int pin4 = 6;
 const int pin2 = 3;
 //const int pin3 = 3;
-const int pin5 = 5;
+const int pin5 = 2;
 String inputString;
 
 //Receiver channels
