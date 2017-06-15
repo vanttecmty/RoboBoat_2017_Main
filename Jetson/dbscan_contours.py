@@ -399,17 +399,4 @@ def get_obstacles(image,colors='rgby',return_centroid=False):
 		centroid_values=[distance/size,degrees/size]
 		return obstacles,centroid_values 
 	else:	
-		return obstacles,found_obstacles	
-
-
-capture=cv2.VideoCapture(0)
-key=-1
-while(key==-1):
-	ret,global_image=capture.read()
-
-	image,buoy_list=get_obstacles(global_image,'gy',True)
-
-	cv2.imshow('imagen',image)
-	key=cv2.waitKey(10)
-	if len(buoy_list)>=1:
-		print (buoy_list)	
+		return obstacles,found_obstacles;
