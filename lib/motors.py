@@ -19,7 +19,7 @@ def move_servos(angle=servoInitPosition):
 	else:
 		an = str(angle)
 		an = utility.check_value_size(an)
-		val = 'S,x,' + an + '%' ;
+		val = "S,x," + an + "%" ;
 		var.ser.write(val.encode())
 		var.ser.flush();
 		#print( var.ser.read( var.ser.inWaiting()).decode() );
@@ -32,14 +32,14 @@ def move_thrusters(power=thrusterInitPosition, thrusters='b'):
 		if(thrusters == thrustersBack):
 			p = str(power)
 			p = utility.check_value_size(p)
-			val = 'T,' + thrustersBack + ',' + p + '%' ;
+			val = ""T,"" + thrustersBack + "," + p + "%" ;
 			var.ser.write(val.encode())
 			var.ser.flush()
 			#print( var.ser.read( var.ser.inWaiting()).decode() );
 		elif(thrusters == thrustersFront):
 			p = str(power)
 			p = utility.check_value_size(p)
-			val = 'T,' + thrustersFront + ',' + p + '%' ;
+			val = "T," + thrustersFront + "," + p + "%" ;
 			var.ser.write(val.encode())
 			var.ser.flush()
 			var.ser.read(var.ser.inWaiting())
