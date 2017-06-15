@@ -7,8 +7,8 @@ String inputString;
 Servo servoLeft;
 Servo servoRight;
 
-int pinServoLeft = 7;
-int pinServoRight = 6;
+int pinServoLeft = 9;
+int pinServoRight = 9;
 
 //'S,b,0180%'
 

@@ -67,7 +67,7 @@ void loop() {
       if(inputString[0] == 'S') {
         if(inputString[2] == 'x') {
         String valLeft = inputString.substring(4,8);
-        //Serial.println(valLeft);
+        Serial.println(valLeft);
         int angle = valLeft.toInt();
         servo.write(angle);
         //servoRight.write(angle); 

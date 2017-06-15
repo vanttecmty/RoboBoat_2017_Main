@@ -15,14 +15,16 @@ servoInitPosition = 90
 
 def move_servos(angle=servoInitPosition):
 	if(angle < 0 or angle > 180):
-		print("Not a correct angle")
+		print("Not a correct angle");
 	else:
-		an = str(angle)
-		an = utility.check_value_size(an)
-		val = "S,x," + an + "%" ;
+
+		an = str(angle);
+		an = utility.check_value_size(an);
+		val = "S,x," + an + "%";
+		print("Servo angle = ", val);
 		var.ser.write(val.encode())
 		var.ser.flush();
-		#print( var.ser.read( var.ser.inWaiting()).decode() );
+		print( var.ser.read( var.ser.inWaiting()).decode() );
 
 #Possible thruster values b = back , f = front
 def move_thrusters(power=thrusterInitPosition, thrusters='b'):
@@ -95,7 +97,7 @@ def thrusters_front(angle=0, power=0):
 	elif(angle < -90 or angle > 90):
 		print("The angle is not on the correct range");
 	else:
-		realServoValue = 90 + angle ;
-		realPowerValue = power + 1500;
+		realServoValue = 90 + round(angle)
+		realPowerValue = round(power) + 1500;
 		move_servos(realServoValue);
 		move_thrusters(realPowerValue , thrustersBack);
