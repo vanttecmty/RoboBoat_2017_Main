@@ -36,7 +36,8 @@ boatMap        = None;
 lidar_ready    = False;
 start_time     = time.time();
 routePoints    = [];
-lidarMeasures  = []; 
+lidarObstacles = [];
+orientationDegree = 0;
 
 def new_map(rows, cols):
 	mapa = np.full((rows, cols, 3),0, dtype = np.uint8);
@@ -58,7 +59,7 @@ class LidarSocketThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		global lidarMeasures;
+		global lidarObstacles;
 		s = socket.socket();
 		s.bind(("localhost", 8893));
 		s.listen(1);
@@ -74,8 +75,8 @@ class LidarSocketThread (threading.Thread):
 		    arrMeasures = strMeasures.split(";");
 
 		    if(len(arrMeasures) > 0):
-		    	lidarMeasures = arrMeasures;
-		    	lidarMeasures.pop();
+		    	lidarObstacles = arrMeasures;
+		    	lidarObstacles.pop();
 
 		print("adios");  
 		sc.close();  
@@ -87,12 +88,22 @@ class MapThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		global routeMap;
+		global routeMap, orientationDegree;
+		capture = cv2.VideoCapture(0);
+
+		if(capture.isOpened() == False):
+			print("No hay cámara");
+			return -1;
+		else:
+			print("cámara encendida");
 
 		while cv2.waitKey(1) != 27:			
 			routeMap = emptyMap.copy();
-			print(lidarMeasures);
-			for measure in lidarMeasures:
+
+			'''
+			'Set lidar obstacles in the map 
+			''' 
+			for measure in lidarObstacles:
 				data = measure.split(",");
 				degree = int(data[0]);
 				if( (degree > 0 and degree < 90) or degree > 270 and degree < 360):
@@ -101,13 +112,39 @@ class MapThread (threading.Thread):
 					cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
 					cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 
+			'''
+			'Set camera obstacles in the map 
+			'''
+			frame = capture.read();
+			cv2.imshow('cam', frame[1]);
+			values = dbscan.get_obstacles(frame[1],'yg', False);
+			camObstacles = values[1];
+			#cv2.imshow('Obsta', values[0]);
+			for obstacle in camObstacles:
+				coord_x = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
+				coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
+				cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
+				cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
+				pass;
+
 			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],[10, 10], routeMap);
+			routeLenght = len(routePoints);
 
 			for point in routePoints:
 				routeMap[point[0]][point[1]] = [0, 0, 255];
+				pass;
 			
 			add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
+
+
+			if(routeLength > 40):
+				coord_x = routePoints[-40][0];
+				coord_y = routePoints[-40][1];
+				orientation = math.atan2(MAP_HEIGHT / 2 - coord_y, MAP_WIDTH / 2 - coord_x);
+				orientationDegree = math.degree(orientation);
+			else: 
+				orientationDegree = 0;
 
 class PathFindingThread (threading.Thread):
 	def __init__(self, threadID, name):
@@ -137,29 +174,20 @@ class NavigationThread (threading.Thread):
 		imu.init();
 		imu.get_delta_theta();
 		turn_degrees_accum = 0;
-		capture=cv2.VideoCapture(0);
 
 		while cv2.waitKey(1) != 27:
 			#print(imu.compass());
-			frame = capture.read()
-			#print (frame)
-			cv2.imshow('cam',frame[1])
-			#cv2.waitKey(0)
-			#values=dbscan.get_obstacles(frame[1])
-			#print (values)
-			#cv2.imshow('Obsta',values[0])
-			#print (values[1])
 			imu_angle = imu.get_delta_theta()['z']%360;
 
 			if (imu_angle > 180):
-				imu_angle = imu_angle -360;
+				imu_angle = imu_angle - 360;
 
-			print("Desire: ", degrees_to_turn);
+			print("Desire: ", orientationDegree);
 			print("Imu: ", imu_angle);
 			turn_degrees_accum += imu_angle;
-			left_turn_degrees = degrees_to_turn + turn_degrees_accum;
+			left_turn_degrees = orientationDegree + turn_degrees_accum;
 			print("Left: ", left_turn_degrees);
-			#motors.thrusters_front(left_turn_degrees, 0);
+			motors.thrusters_front(left_turn_degrees, 0);
 			#motors.thrusters_back(0);
 			pass;
 
@@ -169,34 +197,37 @@ class TestThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		capture=cv2.VideoCapture(0);
+		capture = cv2.VideoCapture(0);
+
+		if(capture.isOpened() == False):
+			print("No hay cámara");
+			return -1;
+		else:
+			print("cámara encendida");
 
 		while cv2.waitKey(1) != 27:
-			frame = capture.read()
-			print (frame)
-			cv2.imshow('cam',frame[1])
-			cv2.waitKey(0)
-			values=dbscan.get_obstacles(frame[1])
-			print (values)
-			cv2.imshow('Obsta',values[0])
-			print (values[1])
+			frame = capture.read();
+			cv2.imshow('cam', frame[1]);
+			cv2.waitKey(0);
+			values = dbscan.get_obstacles(frame[1],'yg', True);
+			print (values[1]);
+			cv2.imshow('Obsta', values[0]);
 			pass;
 init();
-degrees_to_turn = 45;
 #imu.get_magnetic_measurments();
 # Create new threads
-#thread0 = LidarSocketThread(1, "LidarSocketThread");
-#thread1 = MapThread(2, "MapThread");
+thread0 = LidarSocketThread(1, "LidarSocketThread");
+thread1 = MapThread(2, "MapThread");
 #thread2 = NavigationThread(3, "NavigationThread");
-thread3 = TestThread(3, "TestThread");
+#thread3 = TestThread(3, "TestThread");
 
 # Start new Threads
-#thread0.start();
-#thread1.start();
+thread0.start();
+thread1.start();
 #thread2.start();
-thread3.start();
-#thread0.join();
-#thread1.join();
+#thread3.start();
+thread0.join();
+thread1.join();
 #thread2.join();
-thread3.join();
+#thread3.join();
 print ("Exiting Main Thread");
