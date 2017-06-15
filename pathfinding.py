@@ -27,8 +27,8 @@ def a_star(start, goal, boat_map):
 
 	#cv2.circle(mapa,(start[1],start[0]),15,0,-1,8)
 	#cv2.circle(mapa,(goal[1],goal[0]),15,0,-1,8)
-	nombre=str(goal[0])+','+str(goal[1])
-#	cv2.imshow(nombre,mapa)
+	#nombre=str(goal[0])+','+str(goal[1])
+	#cv2.imshow(nombre,mapa)
 	#cv2.waitKey(0)
 	#cost for going from start to node
 	nodes=[start]
@@ -144,7 +144,7 @@ y=400
 start=[x/2,y/2]
 a=random.randint(1,x-1)
 b=random.randint(1,y-1)
-goal=[a,b]
+goal=[10,10]
 mapa=np.full((x,y,3),0,dtype=np.uint8)
 for a in range(0,50):
 	x1=random.randint(0,x-1)
@@ -152,7 +152,7 @@ for a in range(0,50):
 	cv2.circle(mapa,(x1,y1),15,(255,255,255),-1,8)
 cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
 start_time=time.time()
-ruta=Astar(start,goal,mapa)
+ruta=a_star(start,goal,mapa)
 #print ruta
 print start, goal
 print time.time() - start_time
@@ -164,6 +164,4 @@ for punto in ruta:
 	mapa[punto[0]][punto[1]]=[0,0,255]
 cv2.imshow('mapa',mapa)
 cv2.waitKey(0)
-
 '''
-
