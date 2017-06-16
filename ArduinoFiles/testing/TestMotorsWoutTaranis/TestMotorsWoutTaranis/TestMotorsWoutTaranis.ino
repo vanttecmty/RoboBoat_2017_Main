@@ -1,10 +1,5 @@
 #include <Servo.h>
 
-//Receiver arduino pins
-const int PIN_X8R_4 = 6;
-const int PIN_X8R_2 = 3;
-const int PIN_X8R_5 = 9;
-
 String inputString;
 
 //Receiver channels
@@ -21,11 +16,6 @@ String valLeft;
 boolean autMode = false;
 
 void setup() {
-  //Pin modes
-  pinMode(PIN_X8R_4, INPUT);
-  pinMode(PIN_X8R_2, INPUT);
-  pinMode(PIN_X8R_5, INPUT);
-
   //PIN Thrusters
   thrusterRight.attach(10);
   thrusterLeft.attach(11);
@@ -37,69 +27,6 @@ void setup() {
   //Driver setup
   delay(1000);
   Serial.begin(115200);
-}
-
-void read_values () {
-  //Read channel frequecies
-  channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
-  channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
-  channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
-}
-
-void select() {
-  //Use channel 5 to select current mode
-  if (channel5 < 1200) {
-      
-      power_Difference();
-      autMode = false;
-  } else if ( channel5 > 1300) {
-      autMode = true;
-      autonomous_Mode();
-      //Serial.println("a");
-  }else {
-      thrusterRight.writeMicroseconds(1500);
-      thrusterLeft.writeMicroseconds(1500);
-  }
-}
-
-void power_Difference() {
-  float Y;
-  float R;
-  float L;
-
-
-  if ((channel4 > 1450 & channel4 < 1550) & (channel2 > 1450 & channel2 < 1550)){
-    R=1500;
-    L=1500;
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);
-  }
-  else if ((channel4 > 1450 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {
-    R=map(channel2, 988, 2012, 1100, 1900);
-    L=map(channel2, 988, 2012, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);
-  }
-  else if ((channel4 < 1450 || channel4 > 1550) & (channel2 > 1450 & channel2 < 1550)) {
-    R = map(channel4, 975, 2025, 1900, 1100);
-    L = map(channel4, 975, 2025, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);
-  }
-  else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {
-    Y = (channel2-(channel2-1500)*(1500-channel4)/525);
-    R = map(channel2, 975, 2025, 1100, 1900);
-    L = map(Y, 975, 2025, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);
-  }
-  else if ((channel4 > 1550) & (channel2 < 1450 || channel2 > 1550)) {
-    Y = (channel2-(channel2-1500)*(channel4-1500)/525);
-    R = map(Y, 975, 2025, 1100, 1900);
-    L = map(channel2, 975, 2025, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);
-  }
 }
 
 void autonomous_Mode() {
@@ -152,9 +79,8 @@ void autonomous_Mode() {
     }  
     //Delete Previous Message
      inputString = "";
-}
 
+}
 void loop() {
-  read_values();
-  select();
+  autonomous_Mode();
 }
