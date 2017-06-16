@@ -17,7 +17,7 @@ def a_star(start, goal, boat_map):
 
 	mapa2=boat_map.copy()
 	path_start=time.time()
-	p=0.5
+	p=1
 
 	if (mapa[goal[0]][goal[1]]==255):
 		print('Finding new goal')

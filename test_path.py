@@ -23,18 +23,18 @@ for a in range(30):
 
 cv2.circle(mapa,(start[0],start[1]),15,(0,0,0),-1,8)
 '''
-
-
-'''
+mapa=cv2.imread('obstacles.jpeg')
+mapa1=mapa.copy()
+mapa2=mapa.copy()
 ruta1=path.a_star(start,goal,mapa1)
 for punto in ruta1:
 	mapa1[punto[0]][punto[1]]=[0,0,255]
 cv2.imshow('Pathfinding v1',mapa1)
-'''
-mapa=cv2.imread('obstacles.jpeg')
+
+
 ruta2=pathv2.a_star(start,goal,mapa)
 
 for punto in ruta2:
-	mapa[punto[0]][punto[1]]=[0,0,255]
-cv2.imshow('Pathfinding v2',mapa)
+	mapa2[punto[0]][punto[1]]=[0,0,255]
+cv2.imshow('Pathfinding v2',mapa2)
 cv2.waitKey(0)
