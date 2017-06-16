@@ -52,6 +52,8 @@ def a_star(start, goal, boat_map):
 	currentNode=start
 	
 	parentNode=[start]
+
+	mapa2=mapa.copy()
 	while len(openNodes)>0:
 		
 		
@@ -67,6 +69,9 @@ def a_star(start, goal, boat_map):
 				minimum=f_eval
 				currentNode=node
 				path.append(currentNode)
+				mapa2[currentNode[0]][currentNode[0]]=255
+				cv2.imshow('search',mapa2)
+				cv2.waitKey(10)
 		
 	
 		#print 'Open:', openNodes
@@ -86,29 +91,30 @@ def a_star(start, goal, boat_map):
 		succesors=[]
 		#Add neighbors of current node.
 		print
-		if (currentNode[0]-1>0 and mapa[currentNode[0]-1][currentNode[1]]==0):	
+		if (currentNode[0]-1>=0 and mapa[currentNode[0]-1][currentNode[1]]==0):	
 			succesors.append([currentNode[0]-1,currentNode[1]])
-		if (currentNode[1]-1>0 and mapa[currentNode[0]][currentNode[1]-1]==0):	
+		if (currentNode[1]-1>=0 and mapa[currentNode[0]][currentNode[1]-1]==0):	
 			succesors.append([currentNode[0],currentNode[1]-1])
-		if (currentNode[0]+1<h-1 and mapa[currentNode[0]+1][currentNode[1]]==0):	
+		if (currentNode[0]+1<=h-1 and mapa[currentNode[0]+1][currentNode[1]]==0):	
 			succesors.append([currentNode[0]+1,currentNode[1]])
-		if (currentNode[1]+1<w-1 and mapa[currentNode[0]][currentNode[1]+1]==0):	
+		if (currentNode[1]+1<=w-1 and mapa[currentNode[0]][currentNode[1]+1]==0):	
 			succesors.append([currentNode[0],currentNode[1]+1])
 	
 
-		if (currentNode[0]-1>0 and currentNode[1]-1>0 and mapa[currentNode[0]-1][currentNode[1]-1]==0):	
+		if (currentNode[0]-1>=0 and currentNode[1]-1>=0 and mapa[currentNode[0]-1][currentNode[1]-1]==0):	
 				succesors.append([currentNode[0]-1,currentNode[1]-1])
-		if (currentNode[0]+1<h-1 and currentNode[1]+1<w-1 and mapa[currentNode[0]+1][currentNode[1]+1]==0):	
+		if (currentNode[0]+1<=h-1 and currentNode[1]+1<=w-1 and mapa[currentNode[0]+1][currentNode[1]+1]==0):	
 				succesors.append([currentNode[0]+1,currentNode[1]+1])
-		if (currentNode[0]+1<h-1 and currentNode[1]-1>0 and mapa[currentNode[0]+1][currentNode[1]-1]==0):	
+		if (currentNode[0]+1<=h-1 and currentNode[1]-1>=0 and mapa[currentNode[0]+1][currentNode[1]-1]==0):	
 				succesors.append([currentNode[0]+1,currentNode[1]-1])
-		if (currentNode[0]-1>0 and currentNode[1]+1<w-1 and mapa[currentNode[0]-1][currentNode[1]+1]==0):	
+		if (currentNode[0]-1>=0 and currentNode[1]+1<=w-1 and mapa[currentNode[0]-1][currentNode[1]+1]==0):	
 				succesors.append([currentNode[0]-1,currentNode[1]+1])
 
 		#print(succesors)
 		if (len(succesors)>=1):
-			for node_succesor in succesors:
-				current_succesor_cost=g_evaluations[0]+euclidean(currentNode,node_succesor)
+			for node_succesor in succesors:	
+				currentNode_cost=g_evaluations[nodes.index(currentNode)]
+				current_succesor_cost=currentNode_cost+euclidean(currentNode,node_succesor)
 				
 				if (node_succesor in openNodes):
 					if (g_evaluations[nodes.index(node_succesor)]<=current_succesor_cost): 
@@ -154,23 +160,18 @@ def a_star(start, goal, boat_map):
 
 	print ('Path found in ',time.time()-path_start)
 	return(result);
-'''
+
 x=400
 y=400
 start=[int(x/2),int(y/2)]
 a=random.randint(1,x-1)
 b=random.randint(1,y-1)
-goal=[327,60]
+goal=[0,100]
 mapa=np.full((x,y,3),0,dtype=np.uint8)
 
-for a in range(0,50):
-	x1=random.randint(0,x-1)
-	y1=random.randint(0,y-1)
-	cv2.circle(mapa,(x1,y1),15,(255,255,255),-1,8)
 #cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
 
 start_time=time.time()
-cv2.circle(mapa,(goal[1],goal[0]),15,(255,255,255),-1,8)
 ruta=a_star(start,goal,mapa)
 print (ruta)
 print(start, goal)
@@ -181,4 +182,4 @@ for punto in ruta:
 	mapa[punto[0]][punto[1]]=[0,0,255]
 cv2.imshow('mapa',mapa)
 cv2.waitKey(0)
-'''
+

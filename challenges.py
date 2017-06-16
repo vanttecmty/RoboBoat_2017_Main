@@ -29,15 +29,11 @@ class Speed_Challenge():
 
 class Find_The_Path():
 
-	def __init__(self):
-		a
-
 	#Ask the jetson to use frcnn.
-	def ask_image(self):
-		b
+	def send_image(self):
+		a
+		#Send image to the jetson.
 
 	def return_path(self,):
 		return 0
-
-
 
