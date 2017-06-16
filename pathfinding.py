@@ -70,8 +70,8 @@ def a_star(start, goal, boat_map):
 				currentNode=node
 				path.append(currentNode)
 				mapa2[currentNode[0]][currentNode[0]]=255
-				cv2.imshow('search',mapa2)
-				cv2.waitKey(10)
+				#cv2.imshow('search',mapa2)
+				#cv2.waitKey(10)
 		
 	
 		#print 'Open:', openNodes
@@ -158,28 +158,6 @@ def a_star(start, goal, boat_map):
 		last=parent
 		result.append(last)
 
-	print ('Path found in ',time.time()-path_start)
+	print ('Pathv1 found in ',time.time()-path_start)
 	return(result);
-
-x=400
-y=400
-start=[int(x/2),int(y/2)]
-a=random.randint(1,x-1)
-b=random.randint(1,y-1)
-goal=[0,100]
-mapa=np.full((x,y,3),0,dtype=np.uint8)
-
-#cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
-
-start_time=time.time()
-ruta=a_star(start,goal,mapa)
-print (ruta)
-print(start, goal)
-print (time.time() - start_time)
-#cv2.circle(mapa,(start[0],start[1]),15,(0,255,0),-1,8)
-mapa[30][60]=[0,0,255]
-for punto in ruta:
-	mapa[punto[0]][punto[1]]=[0,0,255]
-cv2.imshow('mapa',mapa)
-cv2.waitKey(0)
 
