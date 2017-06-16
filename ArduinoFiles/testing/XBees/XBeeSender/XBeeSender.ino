@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
-#define pinRX 0
-#define pinTX 1
+#define pinRX 2
+#define pinTX 3
 SoftwareSerial XBee(pinRX,pinTX);
 
 void setup() {
