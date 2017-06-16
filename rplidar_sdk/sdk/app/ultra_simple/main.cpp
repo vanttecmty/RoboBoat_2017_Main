@@ -162,7 +162,7 @@ int main(int argc, const char * argv[]) {
     int sock;
     struct sockaddr_in server;
     char message[2000];
-    char measure[15];
+    char measure[50];
     int measures[360];
     memset(measures, 0, 360);
      
@@ -198,7 +198,7 @@ int main(int argc, const char * argv[]) {
             for (int pos = 0; pos < (int)count ; ++pos) { 
                 //Has scan been completed?
                 if(nodes[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT) {
-                    strcpy(message,"");
+                    memset(message, 0, sizeof(message));
 
                     for (int i = 0; i < 360; ++i) {
                         if(measures[i] > 0) {
@@ -218,7 +218,7 @@ int main(int argc, const char * argv[]) {
                         puts("Send failed");
                         return 1;
                     } else {
-                        printf("Mandado: %s\n", message);
+                        //printf("Mandado: %s\n", message);
                     }
                 }
 
