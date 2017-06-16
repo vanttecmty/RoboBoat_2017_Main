@@ -212,16 +212,19 @@ def get_degrees_to_north_orientation():
 
 	return degree;
 
-def get_degrees_to_gps_coords(latitude2, longitud2):
+def get_degrees_and_distance_to_gps_coords(latitude2, longitud2):
 	north = (get_yaw_orientation()%360) - NORTH_YAW;
 
 	if (north > 180):
 		north = north - 360;
 
 	coords = get_gps_coords();
-	longitud_distance = (coords['longitud'] - longitud2);
+	latitude1 = coords['latitude'];
+	longitud1 = coords['longitud'];
+
+	longitud_distance = (longitud1 - longitud2);
 	y_distance = math.sin(longitud_distance) * math.cos(latitude2);
-	x_distance = math.cos(coords['latitude']) * math.sin(latitude2) - math.sin(coords['latitude']) * math.cos(latitude2) * math.cos(longitud_distance);
+	x_distance = math.cos(latitude1) * math.sin(latitude2) - math.sin(latitude1) * math.cos(latitude2) * math.cos(longitud_distance);
 	bearing = math.atan2(y_distance, x_distance);
 	bearing = math.degrees(bearing) + north;
 	bearing = (bearing + 360) % 360;
@@ -229,13 +232,6 @@ def get_degrees_to_gps_coords(latitude2, longitud2):
 	if (bearing > 180):
 		bearing = bearing - 360;
 
-	return bearing;
-
-def get_distance_to_gps_coords(latitude2, longitud2):
-	global EARTH_RADIUOS;
-	coords = get_gps_coords();
-	latitude1 = coords['latitude'];
-	longitud1 = coords['longitud'];
 	phi1 = math.radians(latitude1);
 	phi2 = math.radians(latitude2);
 	dphi = math.radians(latitude2 - latitude1);
@@ -244,7 +240,10 @@ def get_distance_to_gps_coords(latitude2, longitud2):
 	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a));
 	distance = EARTH_RADIUOS * c;
 
-	return distance
+	return {
+		'distance': int(distance),
+		'degree': int(bearing)
+	}
 
 def compass():
 	last_magnetic_x = vnSensor.read_magnetic_measurements().x;

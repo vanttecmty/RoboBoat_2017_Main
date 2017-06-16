@@ -14,7 +14,7 @@ while True:
 
     strMeasures = message.decode('utf-8');
     arrMeasures = strMeasures.split(";");
-    print(arrMeasures);
+    #print(arrMeasures);
 
 print("adios");  
 sc.close();  

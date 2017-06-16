@@ -42,15 +42,17 @@ void read_values () {
   channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
   channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
   channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
+  delay(2000);
 }
+
 void select() {
   //Use channel 5 to select current mode
   if (channel5 < 1400) {
       power_Difference();
-      Serial.print("pd");
+      Serial.println("pd");
   } else if ( channel5 > 1600) {
       autonomous_Mode();
-      Serial.print("a");
+      Serial.println("a");
   }else {
       thrusterRight.writeMicroseconds(1500);
       thrusterLeft.writeMicroseconds(1500);
@@ -64,36 +66,61 @@ void power_Difference() {
 
 
   if ((channel4 > 1450 & channel4 < 1550) & (channel2 > 1450 & channel2 < 1550)){
-    thrusterRight.writeMicroseconds(1500);
-    thrusterLeft.writeMicroseconds(1500);
+    R=1500;
+    L=1500;
+    thrusterRight.writeMicroseconds(R);
+    thrusterLeft.writeMicroseconds(L);
+    Serial.print("R ");
+    Serial.println(R);
+    Serial.print("L ");
+    Serial.println(L);
   }
-  else if ((channel4 > 14550 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {
-    thrusterRight.writeMicroseconds(map(channel2, 988, 2012, 1100, 1900));
-    thrusterLeft.writeMicroseconds(map(channel2, 988, 2012, 1100, 1900));
+  else if ((channel4 > 1450 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {
+    R=map(channel2, 988, 2012, 1100, 1900);
+    L=map(channel2, 988, 2012, 1100, 1900);
+    thrusterRight.writeMicroseconds(R);
+    thrusterLeft.writeMicroseconds(L);
+    Serial.print("R ");
+    Serial.println(R);
+    Serial.print("L ");
+    Serial.println(L);
   }
   else if ((channel4 < 1450 || channel4 > 1550) & (channel2 > 1450 & channel2 < 1550)) {
     R = map(channel4, 975, 2025, 1900, 1100);
     L = map(channel4, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(R);
+    thrusterLeft.writeMicroseconds(L);
+    Serial.print("R ");
+    Serial.println(R);
+    Serial.print("L ");
+    Serial.println(L);
   }
   else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {
     Y = (channel2-(channel2-1500)*(1500-channel4)/525);
     R = map(channel2, 975, 2025, 1100, 1900);
     L = map(Y, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(R);
+    thrusterLeft.writeMicroseconds(L);
+    Serial.print("R ");
+    Serial.println(R);
+    Serial.print("L ");
+    Serial.println(L);
   }
   else if ((channel4 > 1550) & (channel2 < 1450 || channel2 > 1550)) {
     Y = (channel2-(channel2-1500)*(channel4-1500)/525);
     R = map(Y, 975, 2025, 1100, 1900);
     L = map(channel2, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(R);
+    thrusterLeft.writeMicroseconds(L);
+    Serial.print("R ");
+    Serial.println(R);
+    Serial.print("L ");
+    Serial.println(L);
   }
 }
 
 void autonomous_Mode() {
+  // put your main code here, to run repeatedly:
   while(!Serial.available()) {}
     // serial read section
     char c;
@@ -129,11 +156,11 @@ void autonomous_Mode() {
           int power = valLeft.toInt();
           thrusterRight.writeMicroseconds(power);
           //servoRight.write(angle); 
-        }     
-        //Delete Previous Message
-        inputString = ""; 
+        }
       }
-}
+      //Delete Previous Message
+      inputString = "";
+    }
 
 void loop() {
   read_values();

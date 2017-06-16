@@ -8,6 +8,13 @@ def euclidean(nodeA,nodeB):
 	distance=math.sqrt(pow(abs(nodeA[0]-nodeB[0]),2)+pow(abs(nodeA[1]-nodeB[1]),2))
 	return distance
 
+def closest_node(node, nodes):
+    nodes = np.asarray(nodes)
+    deltas = nodes - node
+    dist_2 = np.einsum('ij,ij->i', deltas, deltas)
+    return np.argmin(dist_2)
+
+
 def a_star(start, goal, boat_map):
 	
 	mapa=cv2.cvtColor(boat_map, cv2.COLOR_BGR2GRAY)
@@ -24,11 +31,19 @@ def a_star(start, goal, boat_map):
 
 	#obtain shape of map
 	h,w=mapa.shape
+	
+	if (mapa[goal[0]][goal[1]]==255):
+		print('Finding new goal')
+		free=np.argwhere(mapa==0)
+		destino=closest_node(goal,free)
+		print(free[destino])
+		goal[0]=free[destino][0]
+		goal[1]=free[destino][1]
 
 	#cv2.circle(mapa,(start[1],start[0]),15,0,-1,8)
-	#cv2.circle(mapa,(goal[1],goal[0]),15,0,-1,8)
-	nombre=str(goal[0])+','+str(goal[1])
-#	cv2.imshow(nombre,mapa)
+	
+	#nombre=str(goal[0])+','+str(goal[1])
+	#cv2.imshow(nombre,mapa)
 	#cv2.waitKey(0)
 	#cost for going from start to node
 	nodes=[start]
@@ -37,6 +52,8 @@ def a_star(start, goal, boat_map):
 	currentNode=start
 	
 	parentNode=[start]
+
+	mapa2=mapa.copy()
 	while len(openNodes)>0:
 		
 		
@@ -52,6 +69,9 @@ def a_star(start, goal, boat_map):
 				minimum=f_eval
 				currentNode=node
 				path.append(currentNode)
+				mapa2[currentNode[0]][currentNode[0]]=255
+				cv2.imshow('search',mapa2)
+				cv2.waitKey(10)
 		
 	
 		#print 'Open:', openNodes
@@ -70,29 +90,31 @@ def a_star(start, goal, boat_map):
 
 		succesors=[]
 		#Add neighbors of current node.
-		if (currentNode[0]-1>0 and mapa[currentNode[0]-1][currentNode[1]]==0):	
+		print
+		if (currentNode[0]-1>=0 and mapa[currentNode[0]-1][currentNode[1]]==0):	
 			succesors.append([currentNode[0]-1,currentNode[1]])
-		if (currentNode[1]-1>0 and mapa[currentNode[0]][currentNode[1]-1]==0):	
+		if (currentNode[1]-1>=0 and mapa[currentNode[0]][currentNode[1]-1]==0):	
 			succesors.append([currentNode[0],currentNode[1]-1])
-		if (currentNode[0]+1<h-1 and mapa[currentNode[0]+1][currentNode[1]]==0):	
+		if (currentNode[0]+1<=h-1 and mapa[currentNode[0]+1][currentNode[1]]==0):	
 			succesors.append([currentNode[0]+1,currentNode[1]])
-		if (currentNode[1]+1<w-1 and mapa[currentNode[0]][currentNode[1]+1]==0):	
+		if (currentNode[1]+1<=w-1 and mapa[currentNode[0]][currentNode[1]+1]==0):	
 			succesors.append([currentNode[0],currentNode[1]+1])
 	
 
-		if (currentNode[0]-1>0 and currentNode[1]-1>0 and mapa[currentNode[0]-1][currentNode[1]-1]==0):	
+		if (currentNode[0]-1>=0 and currentNode[1]-1>=0 and mapa[currentNode[0]-1][currentNode[1]-1]==0):	
 				succesors.append([currentNode[0]-1,currentNode[1]-1])
-		if (currentNode[0]+1<h-1 and currentNode[1]+1<w-1 and mapa[currentNode[0]+1][currentNode[1]+1]==0):	
+		if (currentNode[0]+1<=h-1 and currentNode[1]+1<=w-1 and mapa[currentNode[0]+1][currentNode[1]+1]==0):	
 				succesors.append([currentNode[0]+1,currentNode[1]+1])
-		if (currentNode[0]+1<h-1 and currentNode[1]-1>0 and mapa[currentNode[0]+1][currentNode[1]-1]==0):	
+		if (currentNode[0]+1<=h-1 and currentNode[1]-1>=0 and mapa[currentNode[0]+1][currentNode[1]-1]==0):	
 				succesors.append([currentNode[0]+1,currentNode[1]-1])
-		if (currentNode[0]-1>0 and currentNode[1]+1<w-1 and mapa[currentNode[0]-1][currentNode[1]+1]==0):	
+		if (currentNode[0]-1>=0 and currentNode[1]+1<=w-1 and mapa[currentNode[0]-1][currentNode[1]+1]==0):	
 				succesors.append([currentNode[0]-1,currentNode[1]+1])
 
 		#print(succesors)
 		if (len(succesors)>=1):
-			for node_succesor in succesors:
-				current_succesor_cost=g_evaluations[0]+euclidean(currentNode,node_succesor)
+			for node_succesor in succesors:	
+				currentNode_cost=g_evaluations[nodes.index(currentNode)]
+				current_succesor_cost=currentNode_cost+euclidean(currentNode,node_succesor)
 				
 				if (node_succesor in openNodes):
 					if (g_evaluations[nodes.index(node_succesor)]<=current_succesor_cost): 
@@ -138,32 +160,26 @@ def a_star(start, goal, boat_map):
 
 	print ('Path found in ',time.time()-path_start)
 	return(result);
-'''
+
 x=400
 y=400
-start=[x/2,y/2]
+start=[int(x/2),int(y/2)]
 a=random.randint(1,x-1)
 b=random.randint(1,y-1)
-goal=[a,b]
+goal=[0,100]
 mapa=np.full((x,y,3),0,dtype=np.uint8)
-for a in range(0,50):
-	x1=random.randint(0,x-1)
-	y1=random.randint(0,y-1)
-	cv2.circle(mapa,(x1,y1),15,(255,255,255),-1,8)
-cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
+
+#cv2.line(mapa,(100,150),(300,150),(255,255,255),1,8)
+
 start_time=time.time()
-ruta=Astar(start,goal,mapa)
-#print ruta
-print start, goal
-print time.time() - start_time
-mapa[start[0]][start[1]]=[255,255,255]
-mapa[goal[0]][goal[1]]=[255,255,255]
-cv2.circle(mapa,(start[0],start[1]),15,(0,255,0),-1,8)
-cv2.circle(mapa,(goal[1],goal[0]),15,(0,255,255),-1,8)
+ruta=a_star(start,goal,mapa)
+print (ruta)
+print(start, goal)
+print (time.time() - start_time)
+#cv2.circle(mapa,(start[0],start[1]),15,(0,255,0),-1,8)
+mapa[30][60]=[0,0,255]
 for punto in ruta:
 	mapa[punto[0]][punto[1]]=[0,0,255]
 cv2.imshow('mapa',mapa)
 cv2.waitKey(0)
-
-'''
 
