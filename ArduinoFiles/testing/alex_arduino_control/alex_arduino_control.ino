@@ -114,7 +114,7 @@ void autonomous_Mode() {
         //the text was not part of the same stream entered by the user
         delay(1); 
     }
-    
+    Serial.println("aqui");
     if(inputString[0] == '%' && inputString.length() > 0 && inputString.length() < 9 && inputString[inputString.length() - 1] == '%' && inputString != ""){
       Serial.println(inputString);
       if(inputString[1] == 'B') {

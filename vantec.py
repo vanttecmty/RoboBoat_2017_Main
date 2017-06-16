@@ -196,8 +196,8 @@ class NavigationThread (threading.Thread):
 		self.name = name;
 	def run(self):
 		global orientationDegree, destinyCoords;
-		destinyCoords = [25.653371, -100.291131];
-		self.go_to_destiny(25.653371, -100.291131);
+		destinyCoords = [25.649529, -100.290430];
+		self.go_to_destiny(25.649529, -100.290430);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny;
@@ -208,11 +208,11 @@ class NavigationThread (threading.Thread):
 		turn_degrees_accum    = 0;
 		#clean angle;
 		imu.get_delta_theta();
-		#print("destiny degrees", destiny['degree']);
-		#print("destiny distance", destiny['distance']);
+		print("destiny degrees", destiny['degree']);
+		print("destiny distance", destiny['distance']);
 
-		#Condition distance more than 2 meters (200 cm). 
-		while destiny['distance'] > 200:
+		#Condition distance more than 2 meters. 
+		while destiny['distance'] > 2:
 			#print("orientation degrees", orientationDegree);
 			if(lastOrientationDegree != orientationDegree):
 				turn_degrees_needed = orientationDegree;
@@ -228,11 +228,13 @@ class NavigationThread (threading.Thread):
 
 			if(imu_angle > 180):
 				imu_angle = imu_angle -360;
-			#print("grados imu: ", imu_angle);
+			print("grados imu: ", imu_angle);
 			turn_degrees_accum += imu_angle;
-			#print("grados acc: ", turn_degrees_accum);
-			turn_degrees_needed = orientationDegree + turn_degrees_accum;
+			print("grados acc: ", turn_degrees_accum);
+			turn_degrees_needed = (orientationDegree + turn_degrees_accum)%360;
 
+			if(turn_degrees_needed > 180): 
+				turn_degrees_needed = turn_degrees_needed - 360;
 
 			print("grados a voltear: ", turn_degrees_needed);
 
@@ -242,9 +244,11 @@ class NavigationThread (threading.Thread):
 				#girar
 				if(turn_degrees_needed > 0):
 					motors.move_left(100);
+					motors.move_right(0);
 					print("moviendo izq");
 				else: 
 					motors.move_right(100);
+					motors.move_left(0);
 					print("moviendo derecha");
 			#ir derecho;
 			#recorrer 2 metros
