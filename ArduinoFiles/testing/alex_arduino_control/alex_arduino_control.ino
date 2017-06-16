@@ -48,10 +48,11 @@ void read_values () {
 
 void select() {
   //Use channel 5 to select current mode
-  if (channel5 < 1400) {
+  if (channel5 < 1200) {
+      
       power_Difference();
       autMode = false;
-  } else if ( channel5 > 1600) {
+  } else if ( channel5 > 1300) {
       autMode = true;
       autonomous_Mode();
       //Serial.println("a");
