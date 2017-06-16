@@ -19,9 +19,10 @@ def move_thrusters_both(power=1500):
 	else:
 		p = str(power);
 		p = utility.check_value_size(p);
-		val = 'B,' + p + '%';
+		val = '%' + 'B,' + p + '%';
 		var.ser.write(val.encode())
 		var.ser.flush()
+		print(var.ser.read(var.ser.inWaiting()).decode())
 
 def move_thrusters_right(power=1500):
 	if(power < 1100 or power > 1900):
@@ -29,9 +30,10 @@ def move_thrusters_right(power=1500):
 	else:
 		p = str(power);
 		p = utility.check_value_size(p);
-		val = 'R,' + p + '%';
+		val = '%' + 'R,' + p + '%';
 		var.ser.write(val.encode())
 		var.ser.flush()
+		print(var.ser.read(var.ser.inWaiting()).decode())
 		
 def move_thrusters_left(power=1500):
 	if(power < 1100 or power > 1900):
@@ -39,9 +41,10 @@ def move_thrusters_left(power=1500):
 	else:
 		p = str(power);
 		p = utility.check_value_size(p);
-		val = 'L,' + p + '%';
+		val = '%' + 'L,' + p + '%';
 		var.ser.write(val.encode())
 		var.ser.flush()
+		print(var.ser.read(var.ser.inWaiting()).decode())
 
 def move_left(power=0):
 	if(power < -400 or power > 400):

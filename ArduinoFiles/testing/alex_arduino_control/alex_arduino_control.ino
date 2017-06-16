@@ -18,6 +18,8 @@ Servo thrusterLeft;
  
 String valLeft;
 
+boolean autMode = false;
+
 void setup() {
   //Pin modes
   pinMode(PIN_X8R_4, INPUT);
@@ -42,17 +44,18 @@ void read_values () {
   channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
   channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
   channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
-  delay(2000);
 }
 
 void select() {
   //Use channel 5 to select current mode
-  if (channel5 < 1400) {
+  if (channel5 < 1200) {
+      
       power_Difference();
-      Serial.println("pd");
-  } else if ( channel5 > 1600) {
+      autMode = false;
+  } else if ( channel5 > 1300) {
+      autMode = true;
       autonomous_Mode();
-      Serial.println("a");
+      //Serial.println("a");
   }else {
       thrusterRight.writeMicroseconds(1500);
       thrusterLeft.writeMicroseconds(1500);
@@ -70,30 +73,18 @@ void power_Difference() {
     L=1500;
     thrusterRight.writeMicroseconds(R);
     thrusterLeft.writeMicroseconds(L);
-    Serial.print("R ");
-    Serial.println(R);
-    Serial.print("L ");
-    Serial.println(L);
   }
   else if ((channel4 > 1450 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {
     R=map(channel2, 988, 2012, 1100, 1900);
     L=map(channel2, 988, 2012, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
     thrusterLeft.writeMicroseconds(L);
-    Serial.print("R ");
-    Serial.println(R);
-    Serial.print("L ");
-    Serial.println(L);
   }
   else if ((channel4 < 1450 || channel4 > 1550) & (channel2 > 1450 & channel2 < 1550)) {
     R = map(channel4, 975, 2025, 1900, 1100);
     L = map(channel4, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
     thrusterLeft.writeMicroseconds(L);
-    Serial.print("R ");
-    Serial.println(R);
-    Serial.print("L ");
-    Serial.println(L);
   }
   else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {
     Y = (channel2-(channel2-1500)*(1500-channel4)/525);
@@ -101,10 +92,6 @@ void power_Difference() {
     L = map(Y, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
     thrusterLeft.writeMicroseconds(L);
-    Serial.print("R ");
-    Serial.println(R);
-    Serial.print("L ");
-    Serial.println(L);
   }
   else if ((channel4 > 1550) & (channel2 < 1450 || channel2 > 1550)) {
     Y = (channel2-(channel2-1500)*(channel4-1500)/525);
@@ -112,10 +99,6 @@ void power_Difference() {
     L = map(channel2, 975, 2025, 1100, 1900);
     thrusterRight.writeMicroseconds(R);
     thrusterLeft.writeMicroseconds(L);
-    Serial.print("R ");
-    Serial.println(R);
-    Serial.print("L ");
-    Serial.println(L);
   }
 }
 
@@ -132,35 +115,39 @@ void autonomous_Mode() {
         //the text was not part of the same stream entered by the user
         delay(1); 
     }
-
-    if(inputString.length() > 0 && inputString[inputString.length() - 1] == '%'){
-      //Serial.println(inputString);
-      if(inputString[0] == 'B') {
-          String valLeft = inputString.substring(1,5);
+    Serial.println("aqui");
+    if(inputString[0] == '%' && inputString.length() > 0 && inputString.length() < 9 && inputString[inputString.length() - 1] == '%' && inputString != ""){
+      Serial.println(inputString);
+      if(inputString[1] == 'B') {
+          String valLeft = inputString.substring(3,7);
           //Serial.println(valLeft);
           int power = valLeft.toInt();
           thrusterRight.writeMicroseconds(power);
+          Serial.print(power);
           thrusterLeft.writeMicroseconds(power);
+          Serial.print(power);
         }
         //Left thrusters
-        else if(inputString[0] == 'L') {
-          String valLeft = inputString.substring(1,5);
+        else if(inputString[1] == 'L') {
+          String valLeft = inputString.substring(3,7);
           //Serial.println(valLeft);
           int power = valLeft.toInt();
-          thrusterLeft.writeMicroseconds(power);
+          thrusterLeft.writeMicroseconds(power); 
+          Serial.print(power);
         }
         //Right thrusters
-        else if(inputString[0] == 'R') {
-          String valRight = inputString.substring(1,5);
-          //Serial.println(valLeft);
-          int power = valLeft.toInt();
+        else if(inputString[1] == 'R') {
+          String valRight = inputString.substring(3,7);
+          //Serial.println(valRight);
+          int power = valRight.toInt();
           thrusterRight.writeMicroseconds(power);
+          Serial.print(power);
           //servoRight.write(angle); 
         }
-      }
-      //Delete Previous Message
-      inputString = "";
-    }
+    }  
+    //Delete Previous Message
+     inputString = "";
+}
 
 void loop() {
   read_values();
