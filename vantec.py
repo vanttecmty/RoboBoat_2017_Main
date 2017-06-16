@@ -238,17 +238,19 @@ class NavigationThread (threading.Thread):
 
 			print("grados a voltear: ", turn_degrees_needed);
 
-			if(math.fabs(turn_degrees_needed) < 10): 
-				print("Tengo un margen menor a 10 grados");
+			if(math.fabs(turn_degrees_needed) < 5): 
+				print("Tengo un margen menor a 5 grados");
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
-					motors.move_left(100);
-					motors.move_right(0);
-					print("moviendo izq");
-				else: 
+					print("Going to move left")
 					motors.move_right(100);
 					motors.move_left(0);
+					print("moviendo izq");
+				else: 
+					print("Going to move right")
+					motors.move_left(100);
+					motors.move_right(0);
 					print("moviendo derecha");
 			#ir derecho;
 			#recorrer 2 metros
