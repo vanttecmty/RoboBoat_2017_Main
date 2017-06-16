@@ -13,16 +13,19 @@ thrustersBack  = 'b'
 thrustersFront = 'f'
 servoInitPosition = 90
 
-def move_thrusters_both(power=1500):
-	if(power < 1100 or power > 1900):
+def move_thrusters(powerR=1500,powerL=1500):
+	if(powerR < 1100 or powerR > 1900 or powerL < 1100 or powerL > 1900):
 		print("Thruster power must be between 1100 - 1900");
 	else:
-		p = str(power);
-		p = utility.check_value_size(p);
-		val = '%' + 'B,' + p + '%';
+		pR = str(powerR);
+		pR = utility.check_value_size(pR);
+		pL = str(powerL);
+		pL = utility.check_value_size(pL);
+		val = '%' + 'B,' + pR + ',' + pL + '%';
 		var.ser.write(val.encode())
 		var.ser.flush()
 		print(var.ser.read(var.ser.inWaiting()).decode())
+
 
 def move_thrusters_right(power=1500):
 	if(power < 1100 or power > 1900):
@@ -60,12 +63,13 @@ def move_right(power=0):
 		realPowerValue = round(power + 1500);
 		move_thrusters_right(realPowerValue);
 
-def move_both(power=0):
-	if(power < -400 or power > 400):
+def move(powerR=0,powerL=0):
+	if(powerR < -400 or powerR > 400 or powerL < -400 or powerL > 400):
 		print("The power is not on the correct range");
 	else:
-		realPowerValue = round(power + 1500);
-		move_thrusters_both(realPowerValue);
+		realPowerValueR = round(powerR + 1500);
+		realPowerValueL = round(powerL + 1500);
+		move_thrusters(realPowerValueR, realPowerValueL);
 
 
 #All these functions if side = 1 left if side = 0 right
