@@ -139,7 +139,7 @@ def a_star(start, goal, boat_map):
 		openNodes.remove(currentNode)
 	
 	#print(parentNode)
-	print('Elapsed time in Pathv2: ',time.time()-path_start)
+	print('Pathv2 found in:',time.time()-path_start)
 	route=[]
 	last=parentNode[-1]
 	while last!=start:

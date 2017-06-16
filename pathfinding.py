@@ -71,7 +71,7 @@ def a_star(start, goal, boat_map):
 				path.append(currentNode)
 				mapa2[currentNode[0]][currentNode[0]]=255
 				#cv2.imshow('search',mapa2)
-				#cv2.waitKey(10)
+				#cv2.waitKey(1)
 		
 	
 		#print 'Open:', openNodes
@@ -119,22 +119,25 @@ def a_star(start, goal, boat_map):
 				if (node_succesor in openNodes):
 					if (g_evaluations[nodes.index(node_succesor)]<=current_succesor_cost): 
 						continue
+
+						index=nodes.index(node_succesor)
+						g_evaluations[index]=current_succesor_cost
 				elif node_succesor in closedNodes:
 					if (g_evaluations[nodes.index(node_succesor)]<=current_succesor_cost):
 						continue
 					openNodes.append(node_succesor)
 					closedNodes.remove(node_succesor)
+					index=nodes.index(node_succesor)
+					g_evaluations[index]=current_succesor_cost
 				else:
 					openNodes.append(node_succesor)
 					nodes.append(node_succesor)
 					parentNode.append(currentNode)
 					g_evaluations.append(current_succesor_cost)
 
-				index=nodes.index(node_succesor)
 				#print index
 				#print 'len:',len(parentNode)
 				#print 'len g:',len(g_evaluations)
-				g_evaluations[index]=current_succesor_cost
 				#parentNode[index]=currentNode
 		
 		closedNodes.append(currentNode)	
