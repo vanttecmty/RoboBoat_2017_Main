@@ -2,7 +2,7 @@ import Jetson.dbscan_contours
 import math
 
 
-class autonomous_navigation():
+class Autonomous_Navigation():
 
 	def __init__(self):
 		self.set_camera()
@@ -13,7 +13,7 @@ class autonomous_navigation():
 		y=int(centroid[0]*math.sin(centroid[1]))
 		return [centroid[0],centroid[1],(x,y)] #return distance, degrees and pixels for map image
  
-class speed_challenge():
+class Speed_Challenge():
 
 	def get_entrance(self,image):
 		centroid=dbscan_contours.get_obstacles(image,'rg',True) #Get a centroid of all red and green obstacles	
@@ -27,7 +27,7 @@ class speed_challenge():
 		y=int(centroid[0]*math.sin(centroid[1]))
 		return [centroid[0],centroid[1],(x,y)] #return distance, degrees and pixels for map image
 
-class find_the_path():
+class Find_The_Path():
 
 	def __init__(self):
 		a
