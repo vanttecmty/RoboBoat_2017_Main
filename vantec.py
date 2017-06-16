@@ -30,29 +30,18 @@ BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
 LIDAR_COORD_X   = 200;
 LIDAR_COORD_Y   = int(200 - BOAT_HEIGHT / 2);
 
-emptyMap       = None;
-routeMap       = None;
-boatMap        = None;
-lidar_ready    = False;
-start_time     = time.time();
-routePoints    = [];
-lidarObstacles = [];
+capture           = None;
+emptyMap          = None;
+routeMap          = None;
+boatMap           = None;
+lidar_ready       = False;
+start_time        = time.time();
+destiny           = {'degree': 0, 'distance': 0};
+destinyCoords     = [0,0];
+routePoints       = [];
+lidarObstacles    = [];
 orientationDegree = 0;
-coordsGoal     = [0,0];
-
-def new_map(rows, cols):
-	mapa = np.full((rows, cols, 3),0, dtype = np.uint8);
-	return mapa;
-
-def add_boat(mapa):
-	cv2.circle(mapa, (LIDAR_COORD_X, LIDAR_COORD_Y), LIDAR_RADIOUS, (255,255,255), -1, 8);
-	cv2.rectangle(mapa,(BOAT_X1, BOAT_Y1),(BOAT_X2, BOAT_Y2), (0,255,0), 1, 8);	
-
-def init():
-	global emptyMap
-	global routeMap;
-	emptyMap = new_map(MAP_WIDTH, MAP_HEIGHT);
-	routeMap = emptyMap.copy();
+pixelsGoal        = [0,0];
 
 class LidarSocketThread (threading.Thread):
 	def __init__(self, threadID, name):
@@ -89,29 +78,26 @@ class MapThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		global routeMap, orientationDegree;
-		capture = cv2.VideoCapture(0);
+		global routeMap, orientationDegree, destiny;
 
-		if(capture.isOpened() == False):
-			print("No hay cámara");
-			return -1;
-		else:
-			print("cámara encendida");
+		emptyMap = self.new_map(MAP_WIDTH, MAP_HEIGHT);
+		routeMap = emptyMap.copy();
 
-		while cv2.waitKey(1) != 27:			
+		while cv2.waitKey(1) != 27:
 			routeMap = emptyMap.copy();
 
 			'''
 			'Set lidar obstacles in the map 
 			''' 
 			for measure in lidarObstacles:
+				print("lidar obstacles");
 				data = measure.split(",");
 				degree = int(data[0]);
 				if( (degree > 0 and degree < 90) or degree > 270 and degree < 360):
-					coord_x = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(data[1]) / 25);
-					coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(data[1]) / 25);
-					cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
-					cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
+					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(data[1]) / 25);
+					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(data[1]) / 25);
+					cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
+					cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 
 			'''
 			'Set camera obstacles in the map 
@@ -122,49 +108,82 @@ class MapThread (threading.Thread):
 			camObstacles = values[1];
 
 			for obstacle in camObstacles:
-				coord_x = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
-				coord_y = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
-				cv2.circle(routeMap, (coord_x, coord_y), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
-				cv2.circle(routeMap, (coord_x, coord_y), BOUY_RADIOUS, (0, 0, 255), -1, 8);
+				print("cam obstacles");
+				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
+				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
+				cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.7), (255, 255 , 255), -1, 8);
+				cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 				pass;
 
-			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],coordsGoal, routeMap);
-			routeLenght = len(routePoints);
+
+			#locate destiny pixels if is less than 10 meters.
+			if(destiny['distance'] > 10):
+				destinyPixelX = LIDAR_COORD_X + int (math.cos(math.radians(destiny['degree'] - 90)) * float(destiny['distance']) / 25);
+				destinyPixelY = LIDAR_COORD_Y + int (math.sin(math.radians(destiny['degree'] - 90)) * float(destiny['distance']) / 25);
+				destinyPixel = [destinyPixelX, destinyPixelY];
+			#locate destiny by orientation.
+			else:
+				#locate destiny in top border.
+				if(math.fabs(destiny['degree']) < 45):
+					destinyDistanceY = 200;
+					destinyPixelY    = 0;
+					destinyDistanceX = destinyDistanceY / math.tan(destiny['degree'] + 90);
+					print("destinyDistanceX ", destinyDistanceX);
+					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
+					print("destinyPixelX ", destinyPixelX);
+					destinyPixel     = [destinyPixelX, destinyPixelY];
+				#locate destiny in right border
+				elif(destiny['degree'] < -45 and  destiny['degree'] > -135):
+					destinyDistanceX = 200;
+					destinyPixelX    = 399;
+					destinyDistanceY = math.tan(destiny['degree'] + 90) * destinyDistanceX;
+					destinyPixelY    = int(MAP_WIDTH/2 - destinyDistanceY);
+					destinyPixel     = [destinyPixelX, destinyPixelY];
+				#locate destiny in left border
+				elif(destiny['degree'] > 45 and  destiny['degree'] < 135):
+					destinyDistanceX = 200;
+					destinyPixelX    = 0;
+					destinyDistanceY = math.tan(destiny['degree'] + 90) * destinyDistanceX;
+				
+					destinyPixelY    = int(MAP_WIDTH/2 + destinyDistanceY);
+					destinyPixel     = [destinyPixelX, destinyPixelY];
+				#locate destiny in bottom border
+				elif(math.fabs(destiny['degree']) > 135):
+					destinyDistanceY = 200;
+					destinyPixelY    = 399;
+					destinyDistanceX = destinyDistanceY / math.tan(destiny['degree'] + 90);
+					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
+					destinyPixel     = [destinyPixelX, destinyPixelY];
+
+			print("destiny pixel: ", destinyPixel);
+			#Todo: check if destiny is inside obstacle;
+			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)], destinyPixel, routeMap);
+			routeLength = len(routePoints);
 
 			for point in routePoints:
 				routeMap[point[0]][point[1]] = [0, 0, 255];
 				pass;
-			
-			add_boat(routeMap);	
-			cv2.imshow('Route', routeMap);
-
 
 			if(routeLength > 40):
-				coord_x = routePoints[-40][0];
-				coord_y = routePoints[-40][1];
-				orientation = math.atan2(MAP_HEIGHT / 2 - coord_y, MAP_WIDTH / 2 - coord_x);
+				pixelX = routePoints[-40][0];
+				pixelY = routePoints[-40][1];
+				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, MAP_WIDTH / 2 - pixelX);
 				orientationDegree = math.degree(orientation);
 			else: 
 				orientationDegree = 0;
 
-class PathFindingThread (threading.Thread):
-	def __init__(self, threadID, name):
-		threading.Thread.__init__(self);
-		self.threadID = threadID;
-		self.name = name;
-	def run(self):
-		#global routePoints;
-		print("hola");
-		while cv2.waitKey(1) != 27:
-			#print("hola");
-			mapa = routeMap.copy();
-			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)],[10, 10], mapa);
+			print("orientation degree mapa: ", orientationDegree);
 
-			for point in routePoints:
-				routeMap[point[0]][point[1]] = [0, 0, 255];
+			self.add_boat(routeMap);	
+			cv2.imshow('Route', routeMap);
 
-			add_boat(mapa);	
-			cv2.imshow('Route', mapa);
+	def new_map(self, rows, cols):
+		mapa = np.full((rows, cols, 3),0, dtype = np.uint8);
+		return mapa;
+
+	def add_boat(self, mapa):
+		cv2.circle(mapa, (LIDAR_COORD_X, LIDAR_COORD_Y), LIDAR_RADIOUS, (255,255,255), -1, 8);
+		cv2.rectangle(mapa,(BOAT_X1, BOAT_Y1),(BOAT_X2, BOAT_Y2), (0,255,0), 1, 8);	
 
 class NavigationThread (threading.Thread):
 	def __init__(self, threadID, name):
@@ -172,25 +191,43 @@ class NavigationThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		imu.init();
+		global orientationDegree, destinyCoords;
+		destinyCoords = [25.653371, -100.291131];
+		self.go_to_destiny(25.653371, -100.291131);
+
+	def go_to_destiny(self, latitude2, longitud2):
+		destiny               = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
+		orientationDegree     = destiny['degree'];
+		lastOrientationDegree = orientationDegree;
+		turn_degrees_needed   = orientationDegree;
+		turn_degrees_accum    = 0;
+		#clean angle;
 		imu.get_delta_theta();
-		turn_degrees_accum = 0;
+		print("destiny degrees", destiny['degree']);
+		print("destiny distance", destiny['distance']);
 
-		while cv2.waitKey(1) != 27:
-			#print(imu.compass());
-			imu_angle = imu.get_delta_theta()['z']%360;
+		#Condition distance more than 2 meters (200 cm). 
+		while destiny['distance'] > 200:
+			#print("orientation degrees", orientationDegree);
+			if(lastOrientationDegree != orientationDegree):
+				turn_degrees_needed = orientationDegree;
+				turn_degrees_accum  = 0;
 
-			if (imu_angle > 180):
-				imu_angle = imu_angle - 360;
+				#clean angle;
+				imu.get_delta_theta();
+				lastOrientationDegree = orientationDegree;
 
-			print("Desire: ", orientationDegree);
-			print("Imu: ", imu_angle);
-			turn_degrees_accum += imu_angle;
-			left_turn_degrees = orientationDegree + turn_degrees_accum;
-			print("Left: ", left_turn_degrees);
-			motors.thrusters_front(left_turn_degrees, 0);
-			#motors.thrusters_back(0);
-			pass;
+			#If same direction, keep route
+			while math.fabs(turn_degrees_needed) > 10:
+				imu_angle = imu.get_delta_theta()['z']%360;
+				turn_degrees_accum += imu_angle;
+				turn_degrees_needed = orientationDegree + turn_degrees_accum;
+				#print("grados a voltear: ", turn_degrees_needed);
+				pass
+
+			#ir derecho;
+			#recorrer 2 metros
+			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
 
 class TestThread (threading.Thread):
 	def __init__(self, threadID, name):
@@ -198,37 +235,39 @@ class TestThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		capture = cv2.VideoCapture(0);
-
-		if(capture.isOpened() == False):
-			print("No hay cámara");
-			return -1;
-		else:
-			print("cámara encendida");
-
+		
 		while cv2.waitKey(1) != 27:
-			frame = capture.read();
-			cv2.imshow('cam', frame[1]);
-			cv2.waitKey(0);
-			values = dbscan.get_obstacles(frame[1],'yg', True);
-			print (values[1]);
-			cv2.imshow('Obsta', values[0]);
+			imu.get_magnetic_measurments();
+			imu.get_yaw_orientation();
 			pass;
+
+def init():
+	global capture;
+
+	imu.init();
+	capture = cv2.VideoCapture(0);
+
+	if(capture.isOpened() == False):
+		print("No hay cámara");
+		return -1;
+	else:
+		print("cámara encendida");
+
+'''
+' Inicio del programa
+'''
 init();
-#imu.get_magnetic_measurments();
 # Create new threads
-thread0 = LidarSocketThread(1, "LidarSocketThread");
-thread1 = MapThread(2, "MapThread");
-#thread2 = NavigationThread(3, "NavigationThread");
-#thread3 = TestThread(3, "TestThread");
+thread1 = LidarSocketThread(1, "LidarSocketThread");
+thread2 = MapThread(2, "MapThread");
+thread3 = NavigationThread(2, "NavigationThread");
 
 # Start new Threads
-thread0.start();
 thread1.start();
-#thread2.start();
-#thread3.start();
-thread0.join();
+thread2.start();
+thread3.start();
 thread1.join();
-#thread2.join();
-#thread3.join();
+thread2.join();
+thread3.join();
+
 print ("Exiting Main Thread");
