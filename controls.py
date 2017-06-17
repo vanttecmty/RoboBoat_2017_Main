@@ -58,19 +58,19 @@ while  x != chr(27) :
 		# 0 Izquierda 
 		if(x == 'a' or x == 'A'):
 			#print("Turn Left");
-			motors.move(0,50);
+			motors.move(-100,100);
 		# 180 Derecha
 		if(x == 'd' or x == 'D'):
 			#print("Turn Right");
-			motors.move(50,0);
+			motors.move(100,-100);
 		# 1900 Adelante
 		if(x == 'w' or x == 'W'):
 			#print("Forward");
-			motors.move(50,50)
+			motors.move(100,100)
 		# 1100 Reversa
 		if(x == 's' or x == 'S'):
 			#print("Backward");
-			motors.move(-50,-50);
+			motors.move(-100,-100);
 		if(x == 'q' or x == 'Q'):
 			#print("Stop Motors")
 			motors.move(0,0);

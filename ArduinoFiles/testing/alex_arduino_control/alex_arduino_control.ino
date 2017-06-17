@@ -41,9 +41,9 @@ void setup() {
 
 void read_values () {
   //Read channel frequecies
-  channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
-  channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
-  channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
+  channel4 = pulseIn(PIN_X8R_4, HIGH);//map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
+  channel2 = pulseIn(PIN_X8R_2, HIGH);//map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
+  channel5 = pulseIn(PIN_X8R_5, HIGH);//map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
 }
 
 void select() {
@@ -52,7 +52,7 @@ void select() {
       
       power_Difference();
       autMode = false;
-  } else if ( channel5 > 1300) {
+  } else if ( channel5 > 1600) {
       autMode = true;
       autonomous_Mode();
       //Serial.println("a");
@@ -122,7 +122,7 @@ void autonomous_Mode() {
       Serial.println(inputString);
       if(inputString[1] == 'B') {
           String valRight = inputString.substring(3,7);
-          String valLeft = inputString.substring(8,11);
+          String valLeft = inputString.substring(8,12);
           //Serial.println(valLeft);
           int powerL = valLeft.toInt();
           int powerR = valRight.toInt();

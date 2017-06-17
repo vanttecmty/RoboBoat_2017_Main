@@ -17,15 +17,15 @@ void setup(){
 }
 
 void loop(){
-  channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
+  //channel4 = map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 900,2025);
   Serial.print("Palanca Izquierda ");
-  Serial.println(channel4);
-  channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
+  Serial.println(pulseIn(PIN_X8R_4, HIGH));
+  //channel2 = map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 900,2025);
   Serial.print("Palanca Derecha ");
-  Serial.println(channel2);
-  channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
+  Serial.println(pulseIn(PIN_X8R_2, HIGH));
+  //channel5 = map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 900,2025);
   Serial.print("Palanca Arriba ");
-  Serial.println(channel5);
+  Serial.println(pulseIn(PIN_X8R_5, HIGH));
   delay(2000);
   }
 

@@ -3,6 +3,9 @@ import sys
 import serial
 import serial.tools.list_ports as ports
 
+previousRightMotorValue = 0;
+previousLeftMotorValue = 0;
+
 baudRateArduino = 115200
 baudRateIMU 	= 115200
 baudRateRPLidar = 115200
@@ -55,9 +58,11 @@ else:
 		elif (p[1].find('USB2.0-Serial') == 0) :
 			ardionoMega = p[0];
 		
+ser = serial.Serial('/dev/ttyUSB0', baudRateArduino);
+
 #ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 
-ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
+#ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 '''
 if(arduinoMega != ''):
 	ser = serial.Serial(arduinoMega, baudRateArduino)	

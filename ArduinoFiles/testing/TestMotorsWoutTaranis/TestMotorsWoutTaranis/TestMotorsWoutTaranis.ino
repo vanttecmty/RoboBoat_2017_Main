@@ -46,18 +46,18 @@ void autonomous_Mode() {
   //0123456789012
   //%B,1500,1500%
     if(inputString[0] == '%' && inputString.length() > 0 && inputString.length() < 14 && inputString[inputString.length() - 1] == '%' && inputString != ""){
-      Serial.println(inputString);
+      //Serial.println(inputString);
       if(inputString[1] == 'B') {
           String valRight = inputString.substring(3,7);
-          String valLeft = inputString.substring(8,11);
+          String valLeft = inputString.substring(8,12);
           //Serial.println(valLeft);
           int powerL = valLeft.toInt();
           int powerR = valRight.toInt();
           
           thrusterRight.writeMicroseconds(powerR);
-          Serial.print(powerR);
+          //Serial.print(powerR);
           thrusterLeft.writeMicroseconds(powerL);
-          Serial.print(powerL);
+          //Serial.println(powerL);
         }
         //Left thrusters
         else if(inputString[1] == 'L') {
