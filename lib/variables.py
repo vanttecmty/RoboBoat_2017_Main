@@ -57,12 +57,12 @@ else:
 			imuPort = p[0];
 		elif (p[1].find('USB2.0-Serial') == 0) :
 			ardionoMega = p[0];
-		
-ser = serial.Serial('/dev/ttyUSB0', baudRateArduino);
+
 
 #ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 
-#ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
+ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
+
 '''
 if(arduinoMega != ''):
 	ser = serial.Serial(arduinoMega, baudRateArduino)	

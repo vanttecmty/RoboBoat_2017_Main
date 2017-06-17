@@ -17,17 +17,18 @@ import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
 
 #Navigation class
-MAP_WIDTH       = 200;#400
-MAP_HEIGHT      = 200;
-BOUY_RADIOUS    = 3;#6
-BOAT_HEIGHT     = 58/2;#58
-BOAT_WIDTH      = 34/2;#34
+MAP_WIDTH       = 400;
+MAP_HEIGHT      = 400;
+BOUY_RADIOUS    = 6;
+LIDAR_RADIOUS   = 1;
+BOAT_HEIGHT     = 58;
+BOAT_WIDTH      = 34;
 BOAT_X1         = int(MAP_WIDTH/2 - BOAT_WIDTH/2);
 BOAT_Y1         = int(MAP_HEIGHT/2 - BOAT_HEIGHT/2);
 BOAT_X2         = int(MAP_WIDTH/2 + BOAT_WIDTH/2);
 BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
-LIDAR_COORD_X   = 100;#200
-LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
+LIDAR_COORD_X   = 200;
+LIDAR_COORD_Y   = int(200 - BOAT_HEIGHT / 2);
 
 runProgram        = True;
 capture           = None;
@@ -92,13 +93,10 @@ class MapThread (threading.Thread):
 			''' 
 			for measure in lidarObstacles:
 				data = measure.split(",");
-				#print(measure);
 				degree = int(data[0]);
-				distance = int(data[1]);
-
-				if( (degree > 0 and degree < 90) or (degree > 270 and degree < 360) and distance > 1000):
-					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(distance) / 25);
-					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(distance) / 25);
+				if( (degree > 0 and degree < 90) or degree > 270 and degree < 360):
+					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(data[1]) / 25);
+					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(data[1]) / 25);
 					#print(pixelX, pixelY);
 					cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
 					cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
@@ -113,7 +111,6 @@ class MapThread (threading.Thread):
 			camObstacles = values[1];
 
 			for obstacle in camObstacles:
-				#obstacle is [distance, degree]
 				#print("cam obstacles");
 				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
 				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
@@ -162,7 +159,7 @@ class MapThread (threading.Thread):
 					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 
-			#print("destiny pixel: ", destinyPixel);
+			print("destiny pixel: ", destinyPixel);
 			cv2.imshow('Route', routeMap);
 			#cv2.imwrite('route_test.png',routeMap)
 			#Todo: check if destiny is inside obstacle;
@@ -174,18 +171,17 @@ class MapThread (threading.Thread):
 				pass;
 
 			if(routeLength > 40):
-				pixelX = routePoints[-40][1];
-				pixelY = routePoints[-40][0];
-				print("y=", pixelY, " x=", pixelX);
+				pixelX = routePoints[-40][0];
+				pixelY = routePoints[-40][1];
 				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, MAP_WIDTH / 2 - pixelX);
-				orientationDegree = math.degrees(orientation) - 90
+				orientationDegree = math.degrees(orientation);
 			else: 
 				orientationDegree = 0;
-			print("orientation degree mapa: ", orientationDegree);
 
+			#print("orientation degree mapa: ", orientationDegree);
+			
 			self.add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
-		time.sleep(1)
 
 		print("End thread Map");
 
@@ -216,6 +212,8 @@ class NavigationThread (threading.Thread):
 		turn_degrees_accum    = 0;
 		#clean angle;
 		imu.get_delta_theta();
+		print("destiny degrees", destiny['degree']);
+		print("destiny distance", destiny['distance']);
 
 		#Condition distance more than 2 meters. 
 		while destiny['distance'] > 2 and runProgram:
@@ -242,7 +240,7 @@ class NavigationThread (threading.Thread):
 			if(turn_degrees_needed > 180): 
 				turn_degrees_needed = turn_degrees_needed - 360;
 
-			#print("grados a voltear: ", turn_degrees_needed);
+			print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 5): 
 				print("Tengo un margen menor a 5 grados");
@@ -260,7 +258,7 @@ class NavigationThread (threading.Thread):
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
 			runProgram = cv2.waitKey(1) != 27;
-			time.sleep(1);
+
 
 		print("End thread Navigation");
 		
@@ -270,10 +268,11 @@ class TestThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		
-		while cv2.waitKey(1) != 27:
-			imu.get_magnetic_measurments();
-			imu.get_yaw_orientation();
+		print("hola")
+		while True:
+			print(imu.get_magnetic_measurments());
+			print(imu.get_yaw_orientation());
+			time.sleep(.5)
 			pass;
 
 def init():
@@ -293,16 +292,19 @@ def init():
 '''
 init();
 # Create new threads
-thread1 = LidarSocketThread(1, "LidarSocketThread");
-thread2 = MapThread(2, "MapThread");
-thread3 = NavigationThread(2, "NavigationThread");
+#thread1 = LidarSocketThread(1, "LidarSocketThread");
+#thread2 = MapThread(2, "MapThread");
+#thread3 = NavigationThread(3, "NavigationThread");
+thread4 = TestThread(4, "TestThread");
 
 # Start new Threads
-thread1.start();
-thread2.start();
-thread3.start();
-thread1.join();
-thread2.join();
-thread3.join();
+#thread1.start();
+#thread2.start();
+#thread3.start();
+thread4.start(); 
+#thread1.join();
+#thread2.join();
+#thread3.join();
+thread4.join();
 
 print ("Exiting Main Thread");

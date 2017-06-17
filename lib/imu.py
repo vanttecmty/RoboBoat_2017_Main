@@ -118,7 +118,7 @@ import lib.variables as var
 ####################
 #	CONSTANTES     #
 ####################
-NORTH_YAW = 29;
+NORTH_YAW = -19;
 EARTH_RADIUOS = 6371000;
 vnSensor = None;
 
@@ -161,7 +161,12 @@ def get_gps_coords():
 	return coords;
 
 def get_yaw_orientation():
-	return vnSensor.read_yaw_pitch_roll().x%360;
+	degree = vnSensor.read_yaw_pitch_roll().x%360;
+
+	if(degree > 180):
+		degree = degree - 360;
+
+	return degree;
 
 def get_magnetic_measurments():
 	return vnSensor.read_magnetic_measurements();
