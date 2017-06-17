@@ -17,7 +17,7 @@ def a_star(start, goal, boat_map):
 
 	mapa2=boat_map.copy()
 	path_start=time.time()
-	p=0.5
+	p=4
 
 	if (mapa[goal[0]][goal[1]]==255):
 		print('Finding new goal')
@@ -140,7 +140,7 @@ def a_star(start, goal, boat_map):
 		openNodes.remove(currentNode)
 	
 	#print(parentNode)
-	print('Pathv2 found in:',time.time()-path_start)
+	#print('Pathv2 found in:',time.time()-path_start)
 	route=[]
 	last=parentNode[-1]
 	while last!=start:
