@@ -4,6 +4,19 @@ import cv2
 import time
 import random
 from scipy import spatial
+import threading
+
+lock=threading.Lock()
+p=1.5
+
+nodesThread1=[]
+nodesThread2=[]
+
+startRoute=[]
+goalRoute=[]
+intersection_node=[]
+reachedGoal=False
+threadNumber=0
 
 def closest_node(node, nodes):
     nodes = np.asarray(nodes)
@@ -11,42 +24,26 @@ def closest_node(node, nodes):
     dist_2 = np.einsum('ij,ij->i', deltas, deltas)
     return np.argmin(dist_2)
 
-def a_star(start, goal, boat_map):
-	
+
+def explore_nodes(boat_map,start,goal,p,number):
+	global nodesThread1, nodesThread2
+	global startRoute, goalRoute
+	global reachedGoal, threadNumber
 	mapa=cv2.cvtColor(boat_map, cv2.COLOR_BGR2GRAY)
-
 	mapa2=boat_map.copy()
-	path_start=time.time()
 	
-
-	if (mapa[goal[0]][goal[1]]==255):
-		print('Finding new goal')
-		free=np.argwhere(mapa==0)
-		destino=closest_node(goal,free)
-		print(free[destino])
-		goal[0]=free[destino][0]
-		goal[1]=free[destino][1]
-
 
 	openNodes=[start]
 	closedNodes=[]
 	parentNode=[start]
-
 	nodes=[start]
 	dist2startOpen=np.zeros(1)
 	dist2startAll=np.zeros(1)
 	dist2goal=np.array(spatial.distance.chebyshev(start, goal))
 	total_dist=np.add(dist2startOpen,dist2goal)
 
-	#obtain shape of map
 	h,w=mapa.shape
-	
-	
-	mapa2=boat_map.copy()
-	mapa2[goal[0]][goal[1]]=[0,255,0]
-	p=10
 	while len(openNodes)>0:
-
 		#print('OpenNodes:',openNodes)
 		#Calculate distances
 		total_dist=np.add(dist2startOpen,dist2goal)
@@ -56,15 +53,25 @@ def a_star(start, goal, boat_map):
 		#print('Heuristics:',total_dist)
 		index=np.argmin(total_dist)
 		currentNode=openNodes[index]
-		#print('currentNode:',currentNode)
-		
+		#print('Thread:',number,'currentNode:',currentNode)
+		#time.sleep(1)
 		#mapa2[currentNode[0]][currentNode[1]]=[0,0,255]
 		#cv2.imshow('search',mapa2)
 		#cv2.waitKey(1)
 		
-		if currentNode==goal:
-			print('Path found')
-			break
+		with lock:
+			if (number==1):
+				nodesThread1=nodes
+			else:
+				nodesThread2=nodes
+			if currentNode == goal:
+				reachedGoal=True
+				threadNumber=number
+				break
+
+			else:
+				if currentNode in nodesThread1 and currentNode in nodesThread2:
+					break
 
 		succesors=[]
 		if (currentNode[0]-1>=0 and mapa[currentNode[0]-1][currentNode[1]]==0):			
@@ -141,7 +148,6 @@ def a_star(start, goal, boat_map):
 		openNodes.remove(currentNode)
 	
 	#print(parentNode)
-	print('Pathv2 found in:',time.time()-path_start)
 	route=[]
 	last=parentNode[-1]
 	while last!=start:
@@ -152,5 +158,49 @@ def a_star(start, goal, boat_map):
 		#print('New:',parent)
 		last=parent
 		
-	#print('Elapsed time: ',time.time()-path_start)
-	return route
+	if number==1:
+		startRoute=route
+	else:
+		goalRoute=route
+	
+
+def a_star(start, goal, boat_map,p):
+	mapa=cv2.cvtColor(boat_map, cv2.COLOR_BGR2GRAY)
+
+	mapa2=boat_map.copy()
+	path_start=time.time()
+	
+	if (mapa[goal[0]][goal[1]]==255):
+		print('Finding new goal')
+		free=np.argwhere(mapa==0)
+		destino=closest_node(goal,free)
+		print(free[destino])
+		goal[0]=free[destino][0]
+		goal[1]=free[destino][1]
+	
+	
+	#Create threads here
+	startThread=threading.Thread(target=explore_nodes,args=(boat_map,start,goal,p,1))
+	goalThread=threading.Thread(target=explore_nodes,args=(boat_map,goal,start,p,2))
+
+	startThread.start()
+	goalThread.start()
+
+	startThread.join()
+	goalThread.join()
+		
+	#print(startRoute)
+	#print(goalRoute)
+
+	if reachedGoal:
+		print('Path found with threads')
+		ruta=startRoute+goalRoute
+	else:
+		print('One thread',threadNumber,' found the path')
+		if threadNumber==1:
+			ruta=startRoute
+		else:
+			ruta=goalRoute
+	
+	print('Pathv3 found in:',time.time()-path_start)
+	return ruta
