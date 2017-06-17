@@ -17,7 +17,7 @@ def a_star(start, goal, boat_map):
 
 	mapa2=boat_map.copy()
 	path_start=time.time()
-
+	p=0.5
 
 	if (mapa[goal[0]][goal[1]]==255):
 		print('Finding new goal')
@@ -35,7 +35,7 @@ def a_star(start, goal, boat_map):
 	nodes=[start]
 	dist2startOpen=np.zeros(1)
 	dist2startAll=np.zeros(1)
-	dist2goal=np.array(spatial.distance.euclidean(start, goal))
+	dist2goal=np.array(spatial.distance.chebyshev(start, goal))
 	total_dist=np.add(dist2startOpen,dist2goal)
 
 	#obtain shape of map
@@ -59,7 +59,8 @@ def a_star(start, goal, boat_map):
 		
 		mapa2[currentNode[0]][currentNode[1]]=[0,0,255]
 		#cv2.imshow('search',mapa2)
-		#cv2.waitKey(10)
+		#cv2.waitKey(1)
+		
 		if currentNode==goal:
 			print('Path found')
 			break
@@ -127,7 +128,7 @@ def a_star(start, goal, boat_map):
 					nodes.append(node_succesor)
 					#parentNode.append(currentNode)
 					dist2startOpen=np.append(dist2startOpen,current_succesor_cost)
-					dist=spatial.distance.euclidean(node_succesor, goal)
+					dist=spatial.distance.chebyshev(node_succesor, goal)*(1.0+p)
 					dist2goal=np.append(dist2goal,dist)
 					dist2startAll=np.append(dist2startAll,current_succesor_cost)
 					parentNode.append(currentNode)

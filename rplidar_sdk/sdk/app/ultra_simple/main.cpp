@@ -176,7 +176,7 @@ int main(int argc, const char * argv[]) {
      
     server.sin_addr.s_addr = inet_addr("127.0.0.1");
     server.sin_family = AF_INET;
-    server.sin_port = htons( 8894 );
+    server.sin_port = htons( 8895 );
  
     //Connect to remote server
     if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
