@@ -17,18 +17,17 @@ import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
 
 #Navigation class
-MAP_WIDTH       = 400;
-MAP_HEIGHT      = 400;
-BOUY_RADIOUS    = 6;
-LIDAR_RADIOUS   = 1;
-BOAT_HEIGHT     = 58;
-BOAT_WIDTH      = 34;
+MAP_WIDTH       = 200;#400
+MAP_HEIGHT      = 200;
+BOUY_RADIOUS    = 3;#6
+BOAT_HEIGHT     = 58/2;#58
+BOAT_WIDTH      = 34/2;#34
 BOAT_X1         = int(MAP_WIDTH/2 - BOAT_WIDTH/2);
 BOAT_Y1         = int(MAP_HEIGHT/2 - BOAT_HEIGHT/2);
 BOAT_X2         = int(MAP_WIDTH/2 + BOAT_WIDTH/2);
 BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
-LIDAR_COORD_X   = 200;
-LIDAR_COORD_Y   = int(200 - BOAT_HEIGHT / 2);
+LIDAR_COORD_X   = 100;#200
+LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
 
 runProgram        = True;
 capture           = None;
