@@ -25,7 +25,7 @@ def draw_rectangle(event,x,y,flags,param):
 			primera=True
 			
 			#hsv=cv2.cvtColor(global_image,cv2.COLOR_BGR2HSV)
-			#cv2.imshow('hsv',hsv)
+			##cv2.imshow('hsv',hsv)
 			H,HS,S,SS,L,LS =area_stats(global_image)
 			print(area_stats(global_image))
 			
@@ -41,7 +41,7 @@ def draw_rectangle(event,x,y,flags,param):
 			print (lower)
 			print (upper)
 			filtrada=cv2.inRange(global_image,lower, upper)
-			cv2.imshow('filtrada',filtrada)
+			#cv2.imshow('filtrada',filtrada)
 			cv2.waitKey(0)
 			#print x1,y1,x2,y2
 
@@ -243,11 +243,11 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	
 	epsy=30
 	size=20
-	cv2.imshow('get rectangle',image)
-	cv2.imshow('amarillo',amarillo)
-	cv2.imshow('verde',verde)
+	#cv2.imshow('get rectangle',image)
+	#cv2.imshow('amarillo',amarillo)
+	#cv2.imshow('verde',verde)
 	#cv2.imshow('azul',azul)
-	#cv2.imshow('rojo',rojo)
+	##cv2.imshow('rojo',rojo)
 	h,w,c=image.shape
 	yellow=np.zeros((h,w),dtype=np.uint8)
 	green=yellow.copy()	
@@ -303,7 +303,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 						cv2.drawContours(dentroCircle,contorno,-1,(0,0,0),2)
 	cont=np.zeros(image.shape,dtype=np.uint8)
 	cont=cv2.bitwise_or(cont,dentroCircle)
-	cv2.imshow('Boyas',cont)
+	#cv2.imshow('Boyas',cont)
 	'''
 
 	#Here ends circle detection and starts color detection
@@ -349,7 +349,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	
 	
 	
-	cv2.imshow('obstacles',obstacles)
+	#cv2.imshow('obstacles',obstacles)
 	#cv2.waitKey(0)
 	contours=cv2.findContours(obstacles,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	#print len(contours)

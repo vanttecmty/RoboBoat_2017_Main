@@ -97,8 +97,9 @@ class MapThread (threading.Thread):
 				distance = int(data[1]);
 
 				if( (degree > 0 and degree < 90) or (degree > 270 and degree < 360) and distance > 1000):
-					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(distance) / 25);
-					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(distance) / 25);
+					#pasar de milimetros a centimetros -> dividir entre 10
+					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(distance/10) / 5);
+					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(distance/10) / 5);
 					#print(pixelX, pixelY);
 					cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
 					cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
@@ -115,8 +116,8 @@ class MapThread (threading.Thread):
 			for obstacle in camObstacles:
 				#obstacle is [distance, degree]
 				#print("cam obstacles");
-				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
-				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 25);
+				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
+				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
 				cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
 				cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
 				pass;
@@ -124,16 +125,17 @@ class MapThread (threading.Thread):
 			#print("destiny", destiny);
 			
 			print(destiny);
-			#locate destiny pixels if is less than 10 meters.
-			if(destiny['distance'] < 10):
-				destinyPixelX = LIDAR_COORD_X + int (math.cos(math.radians(destiny['degree'] - 90)) * float(destiny['distance']) / 25);
-				destinyPixelY = LIDAR_COORD_Y + int (math.sin(math.radians(destiny['degree'] - 90)) * float(destiny['distance']) / 25);
+			#locate destiny pixels if is less than 8 meters.
+			if(destiny['distance'] < 8):
+				#escalar medidad de metros a centimetro -> multiplicar entre 100 
+				destinyPixelX = LIDAR_COORD_X + int (math.cos(math.radians(destiny['degree'] + 90)) * float(destiny['distance'] *100) / 5);
+				destinyPixelY = LIDAR_COORD_Y + int (math.sin(math.radians(destiny['degree'] + 90)) * float(destiny['distance'] *100) / 5);
 				destinyPixel = [destinyPixelY, destinyPixelX];
 			#locate destiny by orientation.
 			else:
 				#locate destiny in top border.
 				if(math.fabs(destiny['degree']) < 45):
-					destinyDistanceY = 200;
+					destinyDistanceY = MAP_HEIGHT/2;
 					destinyPixelY    = 0;
 					destinyDistanceX = destinyDistanceY / math.tan(math.radians(destiny['degree'] + 90));
 					#print("destinyDistanceX ", destinyDistanceX);
@@ -142,22 +144,22 @@ class MapThread (threading.Thread):
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 				#locate destiny in right border
 				elif(destiny['degree'] < -45 and  destiny['degree'] > -135):
-					destinyDistanceX = 200;
-					destinyPixelX    = 399;
+					destinyDistanceX = MAP_HEIGHT/2;
+					destinyPixelX    = MAP_WIDTH - 1;
 					destinyDistanceY = math.tan(math.radians(destiny['degree'] + 90)) * destinyDistanceX;
 					destinyPixelY    = int(MAP_WIDTH/2 - destinyDistanceY);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 				#locate destiny in left border
 				elif(destiny['degree'] > 45 and  destiny['degree'] < 135):
-					destinyDistanceX = 200;
+					destinyDistanceX = MAP_HEIGHT/2;
 					destinyPixelX    = 0;
 					destinyDistanceY = math.tan(math.radians(destiny['degree'] + 90)) * destinyDistanceX;
 					destinyPixelY    = int(MAP_WIDTH/2 + destinyDistanceY);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 				#locate destiny in bottom border
 				elif(math.fabs(destiny['degree']) > 135):
-					destinyDistanceY = 200;
-					destinyPixelY    = 399;
+					destinyDistanceY = MAP_HEIGHT/2;
+					destinyPixelY    = MAP_HEIGHT - 1;
 					destinyDistanceX = destinyDistanceY / math.tan(math.radians(destiny['degree'] + 90));
 					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
@@ -177,8 +179,8 @@ class MapThread (threading.Thread):
 				pixelX = routePoints[-40][1];
 				pixelY = routePoints[-40][0];
 				print("y=", pixelY, " x=", pixelX);
-				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, MAP_WIDTH / 2 - pixelX);
-				orientationDegree = math.degrees(orientation) - 90
+				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, pixelX - MAP_WIDTH / 2);
+				orientationDegree = math.degrees(orientation) - 90;
 			else: 
 				orientationDegree = 0;
 			print("orientation degree mapa: ", orientationDegree);
@@ -194,7 +196,6 @@ class MapThread (threading.Thread):
 		return mapa;
 
 	def add_boat(self, mapa):
-		cv2.circle(mapa, (LIDAR_COORD_X, LIDAR_COORD_Y), LIDAR_RADIOUS, (255,255,255), -1, 8);
 		cv2.rectangle(mapa,(BOAT_X1, BOAT_Y1),(BOAT_X2, BOAT_Y2), (0,255,0), 1, 8);	
 
 class NavigationThread (threading.Thread):
