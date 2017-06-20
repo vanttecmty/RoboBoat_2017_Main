@@ -162,7 +162,7 @@ int main(int argc, const char * argv[]) {
     int sock;
     struct sockaddr_in server;
     char message[2000];
-    char measure[50];
+    char measure[100];
     int measures[360];
     memset(measures, 0, 360);
      

@@ -3,7 +3,7 @@
 //Receiver arduino pins
 const int PIN_X8R_4 = 6;
 const int PIN_X8R_2 = 3;
-const int PIN_X8R_5 = 9;
+const int PIN_X8R_5 = 5;
 
 String inputString;
 
@@ -15,10 +15,6 @@ float channel5;
 //Thrusters 
 Servo thrusterRight;
 Servo thrusterLeft;
- 
-String valLeft;
-
-boolean autMode = false;
 
 void setup() {
   //Pin modes
@@ -41,22 +37,20 @@ void setup() {
 
 void read_values () {
   //Read channel frequecies
-  channel4 = pulseIn(PIN_X8R_4, HIGH);//map(pulseIn(PIN_X8R_4, HIGH), 1150, 2650, 975,2025);
-  channel2 = pulseIn(PIN_X8R_2, HIGH);//map(pulseIn(PIN_X8R_2, HIGH), 1150, 2650, 975,2025);
-  channel5 = pulseIn(PIN_X8R_5, HIGH);//map(pulseIn(PIN_X8R_5, HIGH), 1150, 2650, 975,2025);
+  channel4 = pulseIn(PIN_X8R_4, HIGH);
+  channel2 = pulseIn(PIN_X8R_2, HIGH);
+  channel5 = pulseIn(PIN_X8R_5, HIGH);
 }
 
 void select() {
   //Use channel 5 to select current mode
   if (channel5 < 1300) {
-      
-      power_Difference();
-      autMode = false;
-  } else if ( channel5 > 1600) {
-      autMode = true;
+     power_Difference();
+  }
+  else if ( channel5 > 1600) {
       autonomous_Mode();
-      //Serial.println("a");
-  }else {
+  }
+  else {
       thrusterRight.writeMicroseconds(1500);
       thrusterLeft.writeMicroseconds(1500);
   }
@@ -66,7 +60,6 @@ void power_Difference() {
   float Y;
   float R;
   float L;
-
 
   if ((channel4 > 1450 & channel4 < 1550) & (channel2 > 1450 & channel2 < 1550)){
     R=1500;
@@ -147,7 +140,6 @@ void autonomous_Mode() {
           int power = valRight.toInt();
           thrusterRight.writeMicroseconds(power);
           Serial.print(power);
-          //servoRight.write(angle); 
         }
     }  
     //Delete Previous Message
