@@ -124,7 +124,7 @@ class MapThread (threading.Thread):
 
 			#print("destiny", destiny);
 			
-			print(destiny);
+			#print(destiny);
 			#locate destiny pixels if is less than 8 meters.
 			if(destiny['distance'] < 8):
 				#escalar medidad de metros a centimetro -> multiplicar entre 100 
@@ -178,12 +178,12 @@ class MapThread (threading.Thread):
 			if(routeLength > 40):
 				pixelX = routePoints[-40][1];
 				pixelY = routePoints[-40][0];
-				print("y=", pixelY, " x=", pixelX);
+				#print("y=", pixelY, " x=", pixelX);
 				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, pixelX - MAP_WIDTH / 2);
 				orientationDegree = math.degrees(orientation) - 90;
 			else: 
 				orientationDegree = 0;
-			print("orientation degree mapa: ", orientationDegree);
+			#print("orientation degree mapa: ", orientationDegree);
 
 			self.add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
@@ -247,16 +247,15 @@ class NavigationThread (threading.Thread):
 
 			if(math.fabs(turn_degrees_needed) < 5): 
 				print("Tengo un margen menor a 5 grados");
+				motors.move(100,100);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
 					print("Going to move left")
-					#motors.move_right(100);
-					#motors.move_left(0);
+					motors.move(100,0);
 				else: 
 					print("Going to move right")
-					#motors.move_left(100);
-					#motors.move_right(0);
+					motors.move(0,100);
 			#ir derecho;
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
