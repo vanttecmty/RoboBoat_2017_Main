@@ -48,7 +48,7 @@ void read_values () {
 
 void select() {
   //Use channel 5 to select current mode
-  if (channel5 < 1200) {
+  if (channel5 < 1300) {
       
       power_Difference();
       autMode = false;
@@ -104,7 +104,7 @@ void power_Difference() {
 
 void autonomous_Mode() {
   // put your main code here, to run repeatedly:
-  while(!Serial.available()) {}
+  //while(!Serial.available()) {}
     // serial read section
     char c;
     
