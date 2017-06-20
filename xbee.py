@@ -22,7 +22,7 @@ class xbee:
 	def set_flying(self, fly):
 		self.flying=fly
 
-	def send(self):
+	def send2station(self):
 		date=str(datetime.datetime.now())
 		print(date)
 		fecha=date.split('-')
@@ -33,6 +33,13 @@ class xbee:
 		print(string)
 		self.connection.write(bytes(string, encoding='utf-8'))
 
-	def read(self):
+	def send2boat(self,string):
+		self.connection.write(bytes(string, encoding='utf-8'))
+
+	def receive_from_boat(self):
 		leido=self.connection.read(9).decode("utf-8")
+		print('Read',leido)
+
+	def receive_from_station(self):
+		leido=self.connection.read(27).decode("utf-8")
 		print('Read',leido)
