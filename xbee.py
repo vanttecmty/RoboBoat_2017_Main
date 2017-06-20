@@ -1,10 +1,7 @@
 import datetime
 import serial
 
-
-
 class xbee:
-
 	def __init__(self,USB):
 		self.connection=serial.Serial(USB,9600)
 		self.timestamp=''
@@ -36,10 +33,10 @@ class xbee:
 	def send2boat(self,string):
 		self.connection.write(bytes(string, encoding='utf-8'))
 
-	def receive_from_boat(self):
+	def receive_from_station(self):
 		leido=self.connection.read(9).decode("utf-8")
 		print('Read',leido)
 
-	def receive_from_station(self):
+	def receive_from_boat(self):
 		leido=self.connection.read(27).decode("utf-8")
 		print('Read',leido)

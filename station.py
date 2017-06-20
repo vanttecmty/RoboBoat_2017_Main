@@ -13,11 +13,17 @@ import sys
 import os
 import serial
 import io
-from bluetooth import *
+import xbee 
 from PIL import Image
+from bluetooth import *
 from array import array
+import lib.bluetoothServer as bt
 
-arduinoBaudRate = 115200;
-blueTooth = 0;
+xb = xbee('/dev/ttyUSB0')
+
+
+
+
+
 
 
