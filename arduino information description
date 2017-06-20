@@ -1,0 +1,17 @@
+Challenge: Speed, Docking, Path, Follow, Return
+Timestamp: yyyymmddhhmmss (EN UTC)
+latitud y longitud: HDDD.DDDDDD
+
+Si el dron despegó o no.
+Si está en vuelo o no.
+
+
+Estación al barco:
+1.- code sólo para follow the leader   12,23,34 o 41
+2.-	Status: success. 0(mal/detenerse) o 1 (bien)
+3.- Si el dron despegó o no. 0 o 1
+4.- Si está en vuelo o no. 0 o 1
+5.- Killswitch remoto 0 o 1
+
+
+Speed/Timestamp/latitud/despegue/vuelo
