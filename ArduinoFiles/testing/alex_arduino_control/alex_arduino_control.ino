@@ -2,7 +2,7 @@
 
 //Receiver arduino pins
 const int PIN_X8R_4 = 6;
-const int PIN_X8R_2 = 3;
+const int PIN_X8R_2 = 9;
 const int PIN_X8R_5 = 5;
 
 String inputString;
