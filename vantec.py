@@ -78,6 +78,17 @@ class MapThread (threading.Thread):
 		threading.Thread.__init__(self);
 		self.threadID = threadID;
 		self.name = name;
+		self.previous_map=np.array((MAP_HEIGHT,MAP_WIDTH),dtype=np.uint8)
+
+
+	def join_maps(self):
+		routeMap=np.bitwise_or(routeMap,self.previous_map)
+
+	def translate_previous(self,dx,dy):
+		cols,rows,ch=self.previous_map.shape
+		M=np.float32([[1,0,dx],[0,1,dy]])
+		self.previous_map=cv2.warpAffine(self.previous_map,M,(cols,rows))
+
 	def run(self):
 		global routeMap, orientationDegree;
 
