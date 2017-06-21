@@ -63,7 +63,7 @@ def a_star(start, goal, boat_map):
 		#cv2.waitKey(1)
 		
 		if currentNode==goal:
-			print('Path found')
+			#print('Path found')
 			break
 
 		succesors=[]

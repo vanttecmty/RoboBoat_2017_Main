@@ -329,7 +329,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		rindex=np.nonzero(rojo)
 		if (len(rindex[0])>1):
 			red=DBSCAN(rojo,epsy,size,False)
-			#obstacles=np.bitwise_or(obstacles,red)
+			obstacles=np.bitwise_or(obstacles,red)
 
 
 	image3=np.zeros(image.shape,dtype=np.uint8)
@@ -339,7 +339,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		bindex=np.nonzero(azul)
 		if (len(bindex[0]>1)):
 			blue=DBSCAN(azul,epsy,size,True)
-			#obstacles=np.bitwise_or(obstacles,blue)
+			obstacles=np.bitwise_or(obstacles,blue)
 		
 	if 'n' in colors:
 		nindex=np.nonzero(negro)

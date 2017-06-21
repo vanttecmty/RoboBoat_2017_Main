@@ -118,7 +118,7 @@ import lib.variables as var
 ####################
 #	CONSTANTES     #
 ####################
-NORTH_YAW = -19;
+NORTH_YAW = -151;
 EARTH_RADIUOS = 6371000;
 vnSensor = None;
 

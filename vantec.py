@@ -164,7 +164,7 @@ class MapThread (threading.Thread):
 					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 
-			#print("destiny pixel: ", destinyPixel);
+			print("destiny pixel: ", destinyPixel);
 			cv2.imshow('Route', routeMap);
 			#cv2.imwrite('route_test.png',routeMap)
 			#Todo: check if destiny is inside obstacle;
@@ -183,7 +183,7 @@ class MapThread (threading.Thread):
 				orientationDegree = math.degrees(orientation) - 90;
 			else: 
 				orientationDegree = 0;
-			#print("orientation degree mapa: ", orientationDegree);
+			print("orientation degree mapa: ", orientationDegree);
 
 			self.add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
@@ -242,8 +242,10 @@ class NavigationThread (threading.Thread):
 
 			if(turn_degrees_needed > 180): 
 				turn_degrees_needed = turn_degrees_needed - 360;
-
-			#print("grados a voltear: ", turn_degrees_needed);
+			elif (turn_degrees_needed < 180):
+				turn_degrees_needed = turn_degrees_needed + 360;
+			
+			print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 5): 
 				print("Tengo un margen menor a 5 grados");
@@ -251,11 +253,11 @@ class NavigationThread (threading.Thread):
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
-					print("Going to move left")
-					motors.move(100,0);
+					#print("Going to move left")
+					motors.move(-50,50);
 				else: 
-					print("Going to move right")
-					motors.move(0,100);
+					#print("Going to move right")
+					motors.move(50,-50);
 			#ir derecho;
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
