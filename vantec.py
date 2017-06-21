@@ -242,7 +242,9 @@ class NavigationThread (threading.Thread):
 
 			if(turn_degrees_needed > 180): 
 				turn_degrees_needed = turn_degrees_needed - 360;
-
+			elif (turn_degrees_needed < 180):
+				turn_degrees_needed = turn_degrees_needed + 360;
+			
 			print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 5): 
