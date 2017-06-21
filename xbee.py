@@ -6,12 +6,14 @@ class xbee:
 		self.connection=serial.Serial(USB,9600)
 		self.timestamp=''
 		self.challenge='0'
-		self.latlon='HDDD.DDDDDD'
+		self.latitude= 'HDDD.DDDDDD'
+		self.longitude='HDDD.DDDDDD'
 		self.takeoff='0'
 		self.flying='0'
 
 	def set_latlong(self,latitude,longitude):
-		self.latlon='HDDD.DDDDDD'
+		self.latitude='HDDD.DDDDDD'
+		self.longitude='HDDD.DDDDDD'
 
 	def set_takeoff(self,take):
 		self.takeoff=take
@@ -26,7 +28,7 @@ class xbee:
 		dia=fecha[2].split(' ')[0]
 		horas=fecha[2].split(' ')[1].split(':')
 		self.timestamp=fecha[0]+fecha[1]+dia+horas[0]+horas[1]+horas[2][:2]
-		string=self.timestamp+','+self.latlon+','+self.challenge+','+self.takeoff+','+self.flying
+		string=self.timestamp+'-'+self.latlon+'-'+self.challenge+'-'+self.takeoff+'-'+self.flying
 		print(string)
 		self.connection.write(bytes(string, encoding='utf-8'))
 
@@ -36,7 +38,9 @@ class xbee:
 	def receive_from_station(self):
 		leido=self.connection.read(9).decode("utf-8")
 		print('Read',leido)
+		return leido;
 
 	def receive_from_boat(self):
 		leido=self.connection.read(27).decode("utf-8")
 		print('Read',leido)
+		return leido;

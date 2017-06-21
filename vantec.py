@@ -295,7 +295,7 @@ init();
 # Create new threads
 thread1 = LidarSocketThread(1, "LidarSocketThread");
 thread2 = MapThread(2, "MapThread");
-thread3 = NavigationThread(2, "NavigationThread");
+thread3 = NavigationThread(3, "NavigationThread");
 
 # Start new Threads
 thread1.start();
