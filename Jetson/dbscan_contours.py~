@@ -7,7 +7,7 @@ tecla=-1
 
 minRadius=30
 buoy_diameter=20.32 #cm
-global_image=[]
+global_image=None
 def draw_rectangle(event,x,y,flags,param):
 	global x1,x2,y1,y2,primera
 	if event==cv2.EVENT_LBUTTONDOWN:
@@ -23,8 +23,11 @@ def draw_rectangle(event,x,y,flags,param):
 			#imagen2=image.copy()
 			#cv2.rectangle(imagen2, (x1,y1),(x2,y2),(0,0,255),2)
 			primera=True
+			
+			#hsv=cv2.cvtColor(global_image,cv2.COLOR_BGR2HSV)
+			##cv2.imshow('hsv',hsv)
 			H,HS,S,SS,L,LS =area_stats(global_image)
-			print(area_stats(hsv))
+			print(area_stats(global_image))
 			
 			HL=max([H-HS,0])
 			SL=max([S-SS,0])
@@ -33,12 +36,13 @@ def draw_rectangle(event,x,y,flags,param):
 			SH=max([S+SS,0])
 			LH=max([L+LS,0])
 						
-			lower=numpy.array([HL, SL, LL])
-			upper=numpy.array([HH ,SH,LH])
-			#print lower
-			#print upper
-			filtrada=cv2.inRange(hsv,lower, upper)
+			lower=np.array([HL, SL, LL])
+			upper=np.array([HH ,SH,LH])
+			print (lower)
+			print (upper)
+			filtrada=cv2.inRange(global_image,lower, upper)
 			#cv2.imshow('filtrada',filtrada)
+			cv2.waitKey(0)
 			#print x1,y1,x2,y2
 
 def area_stats(sourceImage):
@@ -55,8 +59,10 @@ def area_stats(sourceImage):
 	return np.mean(promedio[0]),np.std(promedio[0]),np.mean(promedio[1]),np.std(promedio[1]),np.mean(promedio[2]),np.std(promedio[2])
 	
 	
-def DBSCAN(array, epsylon, minPts,blu=False):
+	#yrgb
+def DBSCAN(array, epsylon, minPts,return_centroid=False,blu=False):
 	start_time = time.time()
+
 	todos_contornos=cv2.findContours(array,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	#print(todos_contornos[1])
 	contours=[]
@@ -179,8 +185,8 @@ def DBSCAN(array, epsylon, minPts,blu=False):
 				cv2.circle(obstacles,center,radius,255,2)
 				
 
-	elapsed_time = time.time() - start_time
-	print ('Elapsed Time ',elapsed_time)
+	#elapsed_time = time.time() - start_time
+	#print ('Elapsed Time ',elapsed_time)
 	return obstacles
 	
 
@@ -188,11 +194,12 @@ def DBSCAN(array, epsylon, minPts,blu=False):
 cv2.namedWindow('get rectangle')
 cv2.setMouseCallback('get rectangle',draw_rectangle)
 
-'''
-gl=np.array([  69.02530498,  180.55271054,   91.40301005]) #color anexo
-gu=np.array([  72.76151673,  200.26382693,  130.08665403])
-yl=np.array([  22.73504443,  212.11690445,  131.97380311])
-yu=np.array([  24.51509933,  235.90264702,  175.83413249])
+
+gl=np.array([ 58.32762133,  87.85200046,  28.7195858 ]) #color anexo
+gu=np.array([  95.13517359,  146.22341797,   64.02411252])
+
+yl=np.array([  80.3520097,   174.51407643,  191.33034903])
+yu=np.array([ 125.59920982,  219.38139395,  233.45850114])
 
 '''
 gl=np.array([  71.49535277,  150.41099537,    2.82631499])
@@ -200,14 +207,15 @@ gu=np.array([ 144.98700017,  229.38312228,   86.85799873])
 
 yl=np.array([   0,          185.84549612,  214.80200567])
 yu=np.array([  40.74302368,  247.40295108,  259.97206265])
-
+'''
 bl=np.array([ 78.12765314,  26.00777318,   0.        ])
 bu=np.array([ 148.10418077,   80.51817838,   53.99514731])
 
 rl=np.array([   0,            0,          115.39777469])
 ru=np.array([  43.71792393,   47.60779081,  239.44837916])
 
-
+nl=np.array([   0,            0,          0])
+nu=np.array([  20,   20,  20])
 
 hsblue=np.array([ 107.19552311,  184.64772921,  102.44292567])
 hsblue=np.array([ 109.66161975,  218.94410753,  164.98564576])
@@ -220,7 +228,7 @@ primera=True
 
 	
 	
-def get_obstacles(image):
+def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	#image=cv2.imread(path+image_file)
 	
 	#image=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)	
@@ -230,21 +238,22 @@ def get_obstacles(image):
 	rojo=cv2.inRange(image,rl, ru)
 	amarillo=cv2.inRange(image,yl, yu)
 	verde=cv2.inRange(image,gl, gu)
+	negro=cv2.inRange(image,nl, nu)
 
 	
 	epsy=30
 	size=20
-	cv2.imshow('get rectangle',image)
+	#cv2.imshow('get rectangle',image)
 	#cv2.imshow('amarillo',amarillo)
 	#cv2.imshow('verde',verde)
 	#cv2.imshow('azul',azul)
-	#cv2.imshow('rojo',rojo)
-	cv2.waitKey(0)
+	##cv2.imshow('rojo',rojo)
 	h,w,c=image.shape
 	yellow=np.zeros((h,w),dtype=np.uint8)
 	green=yellow.copy()	
 	blue=green.copy()
 	red=blue.copy()
+	ne=blue.copy()
 
 	'''
 	#Circle detection
@@ -300,32 +309,43 @@ def get_obstacles(image):
 	#Here ends circle detection and starts color detection
 
 	obstacles=np.zeros((h,w),dtype=np.uint8)
-	yindex=np.nonzero(amarillo)
-	#print(yindex.shape)
-	if (len(yindex[0])>1):
-		yellow=DBSCAN(amarillo,epsy,size)
-		if yellow is not None:
-			obstacles=np.bitwise_or(obstacles,yellow)
 
-	gindex=np.nonzero(verde)
-	if (len(gindex[0])>1):
-		green=DBSCAN(verde,epsy,size)
-		if green is not None:
-			obstacles=np.bitwise_or(obstacles,green)
+	if 'y' in colors:
+		yindex=np.nonzero(amarillo)
+		#print(yindex.shape)
+		if (len(yindex[0])>1):
+			yellow=DBSCAN(amarillo,epsy,size,False)
+			if yellow is not None:
+				obstacles=np.bitwise_or(obstacles,yellow)
 
-	rindex=np.nonzero(rojo)
-	if (len(rindex[0])>1):
-		red=DBSCAN(rojo,epsy,size)
-		#obstacles=np.bitwise_or(obstacles,red)
+	if 'g' in colors:
+		gindex=np.nonzero(verde)
+		if (len(gindex[0])>1):
+			green=DBSCAN(verde,epsy,size,False)
+			if green is not None:
+				obstacles=np.bitwise_or(obstacles,green)
+
+	if 'r' in colors:	
+		rindex=np.nonzero(rojo)
+		if (len(rindex[0])>1):
+			red=DBSCAN(rojo,epsy,size,False)
+			obstacles=np.bitwise_or(obstacles,red)
+
 
 	image3=np.zeros(image.shape,dtype=np.uint8)
 	dentroCircle=np.zeros(image.shape,dtype=np.uint8)
-	bindex=np.nonzero(azul)
-	if (len(bindex[0]>1)):
-		blue=DBSCAN(azul,epsy,size,True)
-		#obstacles=np.bitwise_or(obstacles,blue)
+
+	if 'b' in colors:
+		bindex=np.nonzero(azul)
+		if (len(bindex[0]>1)):
+			blue=DBSCAN(azul,epsy,size,True)
+			obstacles=np.bitwise_or(obstacles,blue)
 		
-	
+	if 'n' in colors:
+		nindex=np.nonzero(negro)
+		if (len(bindex[0]>1)):
+			ne=DBSCAN(azul,epsy,size,True)
+			obstacles=np.bitwise_or(obstacles,ne)
 	
 	
 	
@@ -334,13 +354,23 @@ def get_obstacles(image):
 	contours=cv2.findContours(obstacles,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	#print len(contours)
 
+	obstacles_centroid=[0,0]
 	found_obstacles=[]
+
+	if buoy=='A0':
+		buoy_diameter=20.32
+	elif buoy=='A2':
+		buoy_diameter=36.86
+
 	for contorno in contours[1]:
 		M1 = cv2.moments(contorno)
 		if (M1['m00']==0):
 			M1['m00']=1
 		cx1 = int(M1['m10']/M1['m00'])
 		cy1 = int(M1['m01']/M1['m00'])
+
+		obstacles_centroid[0]+=cy1
+		obstacles_centroid[1]+=cx1		
 		rect=cv2.boundingRect(contorno)
 		x=int(rect[0])
 		y=int(rect[1])
@@ -359,10 +389,8 @@ def get_obstacles(image):
 
 		degrees=dpp*pixels
 		
-
-		distance=109 	#Distance to buoy
 		pixel_width=dx	#Pixel
-		W=20.32 		#Real Width
+		W=buoy_diameter	#Real Width
 		F=697.34		#Focal length
 		distance=(W*F)/pixel_width
 		'''
@@ -371,6 +399,34 @@ def get_obstacles(image):
 		print ('Distance to buoy (cm): ',distance)
 		'''
 
-		found_obstacles.append([distance,degrees])
+		found_obstacles.append([distance,-1*degrees])
+
+	size=len(contours[1])
+	if return_centroid and size>=1:
+		distance=0
+		degrees=0
+		for obsta in found_obstacles:
+			distance+=obsta[0]
+			degrees+=obsta[1]
+		centroid_values=[distance/size,degrees/size]
+		return obstacles,centroid_values 
+	else:	
+		return obstacles,found_obstacles;
+
+
+
+
+'''
+key=-1
+capture=cv2.VideoCapture(0)
 	
-	return obstacles,found_obstacles	
+while key==-1:
+	ret,global_image=capture.read()
+	#if ret:
+	cv2.imshow('frame',global_image)
+	key=cv2.waitKey(10)
+	#print('Key:',key)
+	obstaculos=get_obstacles(global_image,'rg',True,'A0')
+	print(obstaculos[1])
+'''
+

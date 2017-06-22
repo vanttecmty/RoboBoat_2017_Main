@@ -118,7 +118,7 @@ import lib.variables as var
 ####################
 #	CONSTANTES     #
 ####################
-NORTH_YAW = -151;
+NORTH_YAW = 0;
 EARTH_RADIUOS = 6371000;
 vnSensor = None;
 
@@ -227,11 +227,14 @@ def get_degrees_and_distance_to_gps_coords(latitude2, longitud2):
 	latitude1 = coords['latitude'];
 	longitud1 = coords['longitud'];
 
+	#print(coords);
+	#print(latitude2, longitud2);
+
 	longitud_distance = (longitud1 - longitud2);
 	y_distance = math.sin(longitud_distance) * math.cos(latitude2);
 	x_distance = math.cos(latitude1) * math.sin(latitude2) - math.sin(latitude1) * math.cos(latitude2) * math.cos(longitud_distance);
 	bearing = math.atan2(y_distance, x_distance);
-	bearing = math.degrees(bearing) + north;
+	bearing = math.degrees(bearing) - north;
 	bearing = (bearing + 360) % 360;
 
 	if (bearing > 180):
@@ -247,7 +250,7 @@ def get_degrees_and_distance_to_gps_coords(latitude2, longitud2):
 
 	return {
 		'distance': int(distance),
-		'degree': int(bearing)
+		'degree': int(bearing) * -1
 	}
 
 def compass():
