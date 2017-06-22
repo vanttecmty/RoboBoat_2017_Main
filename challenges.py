@@ -34,17 +34,18 @@ class Autonomous_Navigation:
 
 		red_contours=cv2.findContours(red,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		green_contours=cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
+		binary=np.bitwise_or(binary,red)
+		foundRed=False
+		foundGreen=False
 		if len(red_contours[1])>=1:
 
 			red_area_max=0
 			#Find 2 biggest areas
 			biggest_red=None
-			foundRed=False
 			for contorno in red_contours[1]:
-				print('Contour len:',len(contorno))
+				#print('Contour len:',len(contorno))
 				area=cv2.contourArea(contorno)
-				print('Area:',area)
+				#print('Area:',area)
 				if area>red_area_max:
 					red_area_max=area
 					biggest_red=contorno
@@ -55,86 +56,50 @@ class Autonomous_Navigation:
 			green_area_max=0
 			#Find 2 biggest areas
 			biggest_green=None
-			foundGreen=False
-			for contorno in red_contours[1]:
-				print('Contour len:',len(contorno))
+			for contorno in green_contours[1]:
+				#print('Contour len:',len(contorno))
 				area=cv2.contourArea(contorno)
-				print('Area:',area)
-				if area>red_area_max:
-					red_area_max=area
-					biggest_red=contorno
-					foundRed=True
+				#print('Area:',area)
+				if area>green_area_max:
+					green_area_max=area
+					biggest_green=contorno
+					foundGreen=True
 					
 
-			if First:
-				x1,y1,dx1,dy1 = cv2.boundingRect(biggest1)
+		if foundRed:
+			x1,y1,dx1,dy1 = cv2.boundingRect(biggest_red)
+			print(x1+dx1,y1+dy1)
+			cv2.rectangle(image,(x1,y1),(x1+dx1,y1+dy1),(0,0,255),2,8)
+			
+		if foundGreen:
+			x2,y2,dx2,dy2=cv2.boundingRect(biggest_green)
+			print(x2+dx2,y2+dy2)
+			cv2.rectangle(image,(x2,y2),(x2+dx2,y2+dy2),(0,0,255),2,8)
 
-				cv2.rectangle(image,(x1,y1),(x1+dx1,y1+dy1),(0,0,255),2,8)
+		cv2.imshow('Can buoys',image)
+		cv2.waitKey(0)
+		if foundRed and foundGreen:
+			x=int((x1+x2)/2)
+			y=int((y1+y2)/2)
+			cv2.circle(binary,(x,y),10,255,-1,8)
+			cv2.imshow('binary',binary)
+			return foundRed,foundGreen,x,y
+		else:
+			if foundRed:
+				x=x1
+				y=y1
+				cv2.circle(binary,(x,y),10,255,-1,8)
+				cv2.imshow('binary',binary)
+			elif foundGreen:
+				x=x2
+				y=y2
+				cv2.circle(binary,(x,y),10,255,-1,8)
+				cv2.imshow('binary',binary)
+				return foundRed,foundGreen,x,y
+
 				
-			if Second:
-				x2,y2,dx2,dy2=cv2.boundingRect(biggest2)
-				alto2=x2+dx2
-				ancho2=y2+dy2
-				cv2.rectangle(image,(x2,y2),(x2+dx2,y2+dy2),(0,0,255),2,8)
 
-			cv2.imshow('Can buoys',image)
-			cv2.waitKey(0)
-			if First:
-				if Second:
-					x=int((x1+x2)/2)
-					y=int((y1+y2)/2)
-					cv2.circle(binary,(x,y),10,255,-1,8)
-					cv2.imshow('binary',binary)
-					if len(foundRed)>=1:
-						boolRed=True
-					else:
-						boolRed=False
-
-					if len(foundGreen)>=1:
-						boolGreen=True
-					else:
-						boolGreen=False
-
-					return boolRed,boolGreen,x,y
-				else:
-					x=x1
-					y=y1
-					cv2.circle(binary,(x,y),10,255,-1,8)
-					cv2.imshow('binary',binary)
-
-					if len(foundRed)>=1:
-						boolRed=True
-					else:
-						boolRed=False
-
-					if len(foundGreen)>=1:
-						boolGreen=True
-					else:
-						boolGreen=False
-
-					return boolRed,boolGreen,x,y
-
-			return False,False,0,0
-
-			'''
-			In case finding the 2 biggest area does not work, use polyApprox to search for squares:
-			epsilon = 0.1*cv2.arcLength(cnt,True)
-	    	approx = cv2.approxPolyDP(cnt,epsilon*perimeter,True)
-			if len(approx) == 4:
-				# compute the bounding box of the contour and use the
-				# bounding box to compute the aspect ratio
-				(x, y, w, h) = cv2.boundingRect(approx)
-				ar = w / float(h)
-	 
-				# a square will have an aspect ratio that is approximately
-				# equal to one, otherwise, the shape is a rectangle
-				shape = "square" if ar >= 0.95 and ar <= 1.05 else "rectangle"
-
-
-
-
-
-			'''
+		return False,False,0,0
 		
 class Speed_Challenge:
 

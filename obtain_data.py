@@ -125,8 +125,6 @@ class MapThread (threading.Thread):
 			print(name)
 			cv2.imwrite(name+'.png',frame[1])
 			cv2.waitKey(5);
-			values = dbscan.get_obstacles(frame[1],'gy', False);
-			camObstacles = values[1];
 
 			coordenadas=imu.get_gps_coords();
 			yaw=imu.get_yaw_orientation();
@@ -134,17 +132,9 @@ class MapThread (threading.Thread):
 
 			with open("measurements.txt", "a") as myfile:
 				myfile.write(str(name)+','+str(coordenadas['longitud'])+','+str(coordenadas['latitude'])+','+str(yaw)+','+str(magnetic.x)+'\n')
-			for obstacle in camObstacles:
-				#obstacle is [distance, degree]
-				#print("cam obstacles");
-				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
-				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
-				cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
-				cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
-				pass;
 
-			cv2.imwrite(name+'-map.png',routeMap)
-			cv2.waitKey(1000)
+			#cv2.imwrite(name+'-map.png',routeMap)
+			cv2.waitKey(250)
 
 
 

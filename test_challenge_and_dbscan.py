@@ -26,6 +26,7 @@ def draw_rectangle(event,x,y,flags,param):
 			imagen2=image.copy()
 			cv2.rectangle(imagen2, (x1,y1),(x2,y2),(0,0,255),2)
 			primera=True
+			hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 			H,HS,S,SS,L,LS =area_stats(image)
 			print(area_stats(image))
 			
@@ -84,6 +85,7 @@ files=os.listdir(path)
 
 for image_file in files:
 	image=cv2.imread(path+image_file)
+	print('Image name:',image_file)
 	cv2.imshow("image",image)
 	
 	autonomous=challenge.Autonomous_Navigation()
