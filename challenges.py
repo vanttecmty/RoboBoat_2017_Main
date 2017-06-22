@@ -5,7 +5,7 @@ from pathfinding import closest_node
 from scipy import spatial
 
 
-class Autonomous_Navigation():
+class Autonomous_Navigation:
 
 	def __init__(self):
 		self.set_camera()
@@ -16,7 +16,7 @@ class Autonomous_Navigation():
 		y=int(centroid[0]*math.sin(centroid[1]))
 		return [centroid[0],centroid[1],(x,y)] #return distance, degrees and pixels for map image
  
-class Speed_Challenge():
+class Speed_Challenge:
 
 	def get_entrance(self,image):
 		obstacles,centroid=dbscan_contours.get_obstacles(image,'rg',True,'A2') #Get a centroid of all red and green obstacles	
@@ -30,7 +30,7 @@ class Speed_Challenge():
 		y=int(centroid[0]*math.sin(centroid[1]))
 		return [centroid[0],centroid[1],(x,y)] #return distance, degrees and pixels for map image
 
-class Find_The_Path():
+class Find_The_Path:
 	
 	def get_route_from_obstacles(self,boat_map):
 		mapa=cv2.cvtColor(boat_map, cv2.COLOR_BGR2GRAY)
@@ -85,3 +85,5 @@ class Find_The_Path():
 			ruta=pathfinding.a_star([int(h/2),int(w/2)],destination,mapa)
 
 			return ruta
+
+class Follow_the_Leader:

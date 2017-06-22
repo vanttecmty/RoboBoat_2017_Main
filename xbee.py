@@ -37,9 +37,9 @@ class xbee:
 		self.connection.write(bytes(string, encoding='utf-8'))
 
 	def receive_from_boat(self):
-		leido=self.connection.read(9).decode("utf-8")
-		print('Read',leido)
+		leido=self.connection.read(27).decode("utf-8")
+		print('Read:',leido)
 
 	def receive_from_station(self):
-		leido=self.connection.read(27).decode("utf-8")
-		print('Read',leido)
+		leido=self.connection.read(9).decode("utf-8")
+		print('Read:',leido)
