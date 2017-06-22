@@ -3,7 +3,14 @@ import math
 import pathfindingv2 as pathfinding
 from pathfinding import closest_node
 from scipy import spatial
+sys.path.append('/usr/local/lib/python3.4/site-packages/')
+import cv2
 
+red_low=np.array([   0,            0,          115.39777469])
+red_upper=np.array([  43.71792393,   47.60779081,  239.44837916])
+
+green_low=np.array([  71.49535277,  150.41099537,    2.82631499])
+green_upper=np.array([ 144.98700017,  229.38312228,   86.85799873])
 
 class Autonomous_Navigation:
 
@@ -11,11 +18,104 @@ class Autonomous_Navigation:
 		self.set_camera()
 
 	def get_destination(self,image):
-		obstacles,centroid=dbscan_contours.get_obstacles(image,'rg',True,'A2') #Get a centroid of all red and green obstacles	
-		x=int(centroid[0]*math.cos(centroid[1]))
-		y=int(centroid[0]*math.sin(centroid[1]))
-		return [centroid[0],centroid[1],(x,y)] #return distance, degrees and pixels for map image
+
+		red=cv2.inRange(image,red_low,red_upper)
+		green=cv2.inRange(image,green_low,green_upper)
+		binary=np.bitwise_or(red,green)
+		contornos=cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+
+
+		'''
+		In case finding the 2 biggest area does not work, use polyApprox to search for squares:
+		epsilon = 0.1*cv2.arcLength(cnt,True)
+    	approx = cv2.approxPolyDP(cnt,epsilon*perimeter,True)
+		if len(approx) == 4:
+			# compute the bounding box of the contour and use the
+			# bounding box to compute the aspect ratio
+			(x, y, w, h) = cv2.boundingRect(approx)
+			ar = w / float(h)
  
+			# a square will have an aspect ratio that is approximately
+			# equal to one, otherwise, the shape is a rectangle
+			shape = "square" if ar >= 0.95 and ar <= 1.05 else "rectangle"
+
+
+
+
+
+		'''
+		foundRed=np.argwhere(red==255)
+		foundGreen=np.argwhere(green==255)
+		if len(contornos)>=1:
+
+			area_max1=0
+			area_max2=0
+			#Find 2 biggest areas
+			biggest1=None
+			biggest2=None
+			First=False
+			Second=False
+			for contorno in contornos:
+				area=cv2.contourArea(contorno)
+				print('Area:',area)
+				if area>area_max:
+					area_max=area
+					biggest1=contorno
+					First=True
+				elif area>area_max2:
+					area_max2=area
+					biggest2=contorno
+					Second=True
+
+
+
+			if biggest1!=None:
+				x1,y1,w,h = cv2.boundingRect(biggest1)
+				alto1=x1+w
+				ancho1=y1+h
+				
+			if biggest2!=None:
+				x2,y2,w,h=cv2.boundingRect(biggest2)
+				alto2=x2+w
+				ancho2=y2+h
+
+
+
+			if First:
+				if Second:
+					x=(x1+alto1+x2+alto2)/2
+					y=(y1+y2+ancho2)/2
+					if len(foundRed)>=1:
+						boolRed=True
+					else:
+						boolRed=False
+
+					if len(foundGreen)>=1:
+						boolGreen=True
+					else:
+						boolGreen=False
+
+					return boolRed,boolGreen,x,y
+				else
+					x=x1+alto1
+					y=(y1+ancho2)/2
+
+					if len(foundRed)>=1:
+						boolRed=True
+					else:
+						boolRed=False
+
+					if len(foundGreen)>=1:
+						boolGreen=True
+					else:
+						boolGreen=False
+
+					return boolRed,boolGreen,x,y
+
+			return False,False,0,0
+
+		
 class Speed_Challenge:
 
 	def get_entrance(self,image):
@@ -87,3 +187,36 @@ class Find_The_Path:
 			return ruta
 
 class Follow_the_Leader:
+
+	def __init__(self):
+		#Load the hu moments of the numbers.
+		self.number1=[]
+		self.number2=[]
+		self.number3=[]
+		self.number4=[]
+
+	def find_challenge(self,image):
+		#Filter by color to find white pixels.
+		white_pixels==cv2.inrange(image,[240,240,240],[255,255,255])
+
+	def find_number(self,image,numero1,numbero2):
+		#Filter by color to find black pixels.
+		black_pixels==cv2.inrange(image,[0,0,0],[10,10,10])
+		#Find contours in image.
+		contornos=cv2.findContours(array,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		#
+		#Compare contours
+		for contorno in contornos:
+			pass
+			match=cv2.matchshape(contorno,self.number1,1,0.0)
+			if (match<0.1):
+				print('Found number 1')
+			match=cv2.matchshape(contorno,self.number2,1,0.0)
+			if (match<0.1):
+				print('Found number 1')
+			match=cv2.matchshape(contorno,self.number3,1,0.0)
+			if (match<0.1):
+				print('Found number 1')
+			match=cv2.matchshape(contorno,self.number4,1,0.0)
+			if (match<0.1):
+				print('Found number 1')

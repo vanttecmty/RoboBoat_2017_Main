@@ -1,4 +1,5 @@
 import datetime
+sys.path.append('/usr/local/lib/python3.4/site-packages/')
 import threading
 import time
 import math
