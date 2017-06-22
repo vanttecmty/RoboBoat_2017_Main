@@ -347,10 +347,10 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		nindex=np.nonzero(negro)
 		if (len(bindex[0]>1)):
 			ne=DBSCAN(azul,epsy,size,True)
-				if ne is not None:
+			if ne is not None:
 				#obstacles=np.bitwise_or(obstacles,ne)
 				pass
-	
+
 	
 	
 	#cv2.imshow('obstacles',obstacles)

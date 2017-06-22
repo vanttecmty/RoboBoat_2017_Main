@@ -1,16 +1,16 @@
 
-import numpy
+import numpy as np
 import os
 import sys
 sys.path.append('/usr/local/lib/python3.4/site-packages/')
 import cv2
-import challenge
-import Jetson.dbscan as dbscan
+import challenges as challenge
+import Jetson.dbscan_contours as dbscan
 
 tecla=-1
 minVal=0
 maxVal=47
-
+primera=True
 def draw_rectangle(event,x,y,flags,param):
 	global x1,x2,y1,y2,primera
 	if event==cv2.EVENT_LBUTTONDOWN:
@@ -36,17 +36,17 @@ def draw_rectangle(event,x,y,flags,param):
 			SH=max([S+SS,0])
 			LH=max([L+LS,0])
 						
-			lower=numpy.array([HL, SL, LL])
-			upper=numpy.array([HH ,SH,LH])
+			lower=np.array([HL, SL, LL])
+			upper=np.array([HH ,SH,LH])
 			print (lower)
 			print (upper)
-			filtrada=cv2.inRange(hsv,lower, upper)
+			filtrada=cv2.inRange(image,lower, upper)
 			cv2.imshow('filtrada',filtrada)
 			print (x1,y1,x2,y2)
 
 def area_stats(sourceImage):
 	area=abs(x2-x1)*abs(y2-y1)	
-	promedio=numpy.zeros((3, area),dtype=numpy.int)
+	promedio=np.zeros((3, area),dtype=np.int)
 	i=0
 	for x in range(x1,x2):
 		for y in range(y1,y2):
@@ -55,32 +55,32 @@ def area_stats(sourceImage):
 			promedio[2][i]=sourceImage[y][x][2]
 			i+=1
 
-	return numpy.mean(promedio[0]),numpy.std(promedio[0]),numpy.mean(promedio[1]),numpy.std(promedio[1]),numpy.mean(promedio[2]),numpy.std(promedio[2])
+	return np.mean(promedio[0]),np.std(promedio[0]),np.mean(promedio[1]),np.std(promedio[1]),np.mean(promedio[2]),np.std(promedio[2])
 
 cv2.namedWindow('image')
 cv2.setMouseCallback('image',draw_rectangle)
 
 
-gl=numpy.array([  71.49535277,  150.41099537,    2.82631499])
-gu=numpy.array([ 144.98700017,  229.38312228,   86.85799873])
 
-yl=numpy.array([   0,          185.84549612,  214.80200567])
-yu=numpy.array([  40.74302368,  247.40295108,  259.97206265])
 
-bl=numpy.array([ 78.12765314,  26.00777318,   0.        ])
-bu=numpy.array([ 148.10418077,   80.51817838,   53.99514731])
+gl=np.array([ 93.87969614,  86.42179145,  33.96279703])  #buoy cans
+gu=np.array([ 137.11582457,  127.58940676,   66.06295885])
 
-rl=numpy.array([   0,            0,          115.39777469])
-ru=numpy.array([  43.71792393,   47.60779081,  239.44837916])
+yl=np.array([   0,          185.84549612,  214.80200567])
+yu=np.array([  40.74302368,  247.40295108,  259.97206265])
 
-hsblue=numpy.array([ 107.19552311,  184.64772921,  102.44292567])
-hsblue=numpy.array([ 109.66161975,  218.94410753,  164.98564576])
+bl=np.array([ 78.12765314,  26.00777318,   0.        ])
+bu=np.array([ 148.10418077,   80.51817838,   53.99514731])
+
+rl=np.array([   0,            0,          115.39777469])
+ru=np.array([  43.71792393,   47.60779081,  239.44837916])
+
+hsblue=np.array([ 107.19552311,  184.64772921,  102.44292567])
+hsblue=np.array([ 109.66161975,  218.94410753,  164.98564576])
 
 
 path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
 files=os.listdir(path)
-
-circle_contour=numpy.load('circle.npy')
 
 for image_file in files:
 	image=cv2.imread(path+image_file)
@@ -88,7 +88,8 @@ for image_file in files:
 	
 	autonomous=challenge.Autonomous_Navigation()
 
-	autonomous.get_destination(image)
+	foundRed,foundGreen,x,y=autonomous.get_destination(image)
+	print(foundRed,foundGreen,x,y)
 	tecla=cv2.waitKey(0)
 	print (tecla)
 	if tecla==1048689 or tecla==113:
