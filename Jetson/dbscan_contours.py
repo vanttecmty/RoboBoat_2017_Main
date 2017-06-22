@@ -42,7 +42,7 @@ def draw_rectangle(event,x,y,flags,param):
 			print (upper)
 			filtrada=cv2.inRange(global_image,lower, upper)
 			#cv2.imshow('filtrada',filtrada)
-			cv2.waitKey(0)
+			#cv2.waitKey(0)
 			#print x1,y1,x2,y2
 
 def area_stats(sourceImage):
@@ -339,13 +339,13 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		bindex=np.nonzero(azul)
 		if (len(bindex[0]>1)):
 			blue=DBSCAN(azul,epsy,size,True)
-			obstacles=np.bitwise_or(obstacles,blue)
+			#obstacles=np.bitwise_or(obstacles,blue)
 		
 	if 'n' in colors:
 		nindex=np.nonzero(negro)
 		if (len(bindex[0]>1)):
 			ne=DBSCAN(azul,epsy,size,True)
-			obstacles=np.bitwise_or(obstacles,ne)
+			#obstacles=np.bitwise_or(obstacles,ne)
 	
 	
 	
@@ -414,12 +414,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		return obstacles,found_obstacles;
 
 
-
-
 '''
-key=-1
-capture=cv2.VideoCapture(0)
-	
 while key==-1:
 	ret,global_image=capture.read()
 	#if ret:
