@@ -68,17 +68,18 @@ class Autonomous_Navigation:
 
 
 			if biggest1!=None:
-				x1,y1,w,h = cv2.boundingRect(biggest1)
-				alto1=x1+w
-				ancho1=y1+h
+				x1,y1,dx1,dy1 = cv2.boundingRect(biggest1)
+				alto1=x1+dx1
+				ancho1=y1+dy1
+				cv2.rectangle(image,(x1,y1),(x1+dx1,y1+dy1),(0,0,255),2,8)
 				
 			if biggest2!=None:
-				x2,y2,w,h=cv2.boundingRect(biggest2)
-				alto2=x2+w
-				ancho2=y2+h
+				x2,y2,dx2,dy2=cv2.boundingRect(biggest2)
+				alto2=x2+dx2
+				ancho2=y2+dy2
+				cv2.rectangle(image,(x2,y2),(x2+dx2,y2+dy2),(0,0,255),2,8)
 
-
-
+			cv2.imshow('Can buoys',image)
 			if First:
 				if Second:
 					x=(x1+alto1+x2+alto2)/2

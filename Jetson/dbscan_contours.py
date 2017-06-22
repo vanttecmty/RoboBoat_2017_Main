@@ -311,7 +311,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	obstacles=np.zeros((h,w),dtype=np.uint8)
 
 	if 'y' in colors:
-		yindex=np.nonzero(amarillo)
+		yindex=np.argwhere(amarillo==255)
 		#print(yindex.shape)
 		if (len(yindex[0])>1):
 			yellow=DBSCAN(amarillo,epsy,size,False)
@@ -319,14 +319,14 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 				obstacles=np.bitwise_or(obstacles,yellow)
 
 	if 'g' in colors:
-		gindex=np.nonzero(verde)
+		gindex=np.argwhere(verde==255)
 		if (len(gindex[0])>1):
 			green=DBSCAN(verde,epsy,size,False)
 			if green is not None:
 				obstacles=np.bitwise_or(obstacles,green)
 
 	if 'r' in colors:	
-		rindex=np.nonzero(rojo)
+		rindex=np.argwhere(rojo==255)
 		if (len(rindex[0])>1):
 			red=DBSCAN(rojo,epsy,size,False)
 			obstacles=np.bitwise_or(obstacles,red)
@@ -339,13 +339,17 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		bindex=np.nonzero(azul)
 		if (len(bindex[0]>1)):
 			blue=DBSCAN(azul,epsy,size,True)
-			#obstacles=np.bitwise_or(obstacles,blue)
+			if blue is not None:
+				#obstacles=np.bitwise_or(obstacles,blue)
+				pass
 		
 	if 'n' in colors:
 		nindex=np.nonzero(negro)
 		if (len(bindex[0]>1)):
 			ne=DBSCAN(azul,epsy,size,True)
-			#obstacles=np.bitwise_or(obstacles,ne)
+				if ne is not None:
+				#obstacles=np.bitwise_or(obstacles,ne)
+				pass
 	
 	
 	
