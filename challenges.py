@@ -14,9 +14,6 @@ green_upper=np.array([ 144.98700017,  229.38312228,   86.85799873])
 
 class Autonomous_Navigation:
 
-	def __init__(self):
-		self.set_camera()
-
 	def get_destination(self,image):
 
 		red=cv2.inRange(image,red_low,red_upper)

@@ -235,7 +235,6 @@ class NavigationThread (threading.Thread):
 
 		#Condition distance more than 2 meters. 
 		while destiny['distance'] > 2 and runProgram:
-			time.sleep(2)
 			#print("degrees: ", imu.NORTH_YAW);
 			#print("coords: ", imu.get_gps_coords());
 			print("destiny: ", destiny);
@@ -271,7 +270,7 @@ class NavigationThread (threading.Thread):
 			#print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 10): 
-				print("Tengo un margen menor a 5 grados");
+				print("Tengo un margen menor a 10 grados");
 				motors.move(50, 50);
 			else:
 				#girar
