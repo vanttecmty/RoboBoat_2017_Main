@@ -85,3 +85,5 @@ class Find_The_Path:
 			ruta=pathfinding.a_star([int(h/2),int(w/2)],destination,mapa)
 
 			return ruta
+
+class Follow_the_Leader:
