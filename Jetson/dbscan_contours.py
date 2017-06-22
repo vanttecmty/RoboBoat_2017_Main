@@ -8,6 +8,7 @@ tecla=-1
 minRadius=30
 buoy_diameter=20.32 #cm
 global_image=None
+
 def draw_rectangle(event,x,y,flags,param):
 	global x1,x2,y1,y2,primera
 	if event==cv2.EVENT_LBUTTONDOWN:

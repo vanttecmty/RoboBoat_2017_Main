@@ -223,6 +223,10 @@ class NavigationThread (threading.Thread):
 		destinyCoords = [29.190086, -81.050185];
 		self.go_to_destiny(29.190086, -81.050185);
 
+		autonomous=challenge.Autonomous_Navigation()
+		foundRed,foundGreen,x,y=autonomous.get_destination(image)
+
+
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
 		destiny               = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
@@ -285,6 +289,7 @@ class NavigationThread (threading.Thread):
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
 			runProgram = cv2.waitKey(1) != 27;
 			#time.sleep(1);
+
 
 		motors.move(0,0);
 		print("End thread Navigation");

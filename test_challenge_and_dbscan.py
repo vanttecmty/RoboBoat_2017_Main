@@ -26,23 +26,40 @@ def draw_rectangle(event,x,y,flags,param):
 			imagen2=image.copy()
 			cv2.rectangle(imagen2, (x1,y1),(x2,y2),(0,0,255),2)
 			primera=True
+
 			hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+			cv2.imshow('hsv',hsv)
+
 			H,HS,S,SS,L,LS =area_stats(image)
+			H2,HS2,S2,SS2,L2,LS2 =area_stats(hsv)
 			print(area_stats(image))
-			
+			print(area_stats(hsv))
 			HL=max([H-HS,0])
 			SL=max([S-SS,0])
 			LL=max([L-LS,0])
 			HH=max([H+HS,0])
 			SH=max([S+SS,0])
 			LH=max([L+LS,0])
+
+			HL2=max([H2-HS2,0])
+			SL2=max([S2-SS2,0])
+			LL2=max([L2-LS2,0])
+			HH2=max([H2+HS2,0])
+			SH2=max([S2+SS2,0])
+			LH2=max([L2+LS2,0])
 						
 			lower=np.array([HL, SL, LL])
 			upper=np.array([HH ,SH,LH])
 			print (lower)
 			print (upper)
+			lower2=np.array([HL2, SL2, LL2])
+			upper2=np.array([HH2 ,SH2,LH2])
+			print (lower2)
+			print (upper2)
 			filtrada=cv2.inRange(image,lower, upper)
-			cv2.imshow('filtrada',filtrada)
+			cv2.imshow('filtrada normal',filtrada)
+			filtrada2=cv2.inRange(hsv,lower2, upper2)
+			cv2.imshow('filtrada hsv',filtrada2)
 			print (x1,y1,x2,y2)
 
 def area_stats(sourceImage):
@@ -84,15 +101,20 @@ path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
 files=os.listdir(path)
 
 for image_file in files:
+
 	image=cv2.imread(path+image_file)
 	print('Image name:',image_file)
 	cv2.imshow("image",image)
 	
 	autonomous=challenge.Autonomous_Navigation()
+	tecla=255
+	while(tecla==255):
+		foundRed,foundGreen,x,y=autonomous.get_destination(image)
+		#print(foundRed,foundGreen,x,y)
+		tecla=cv2.waitKey(100)
+		#print (tecla)
+		if tecla==1048689 or tecla==113:
+			break
 
-	foundRed,foundGreen,x,y=autonomous.get_destination(image)
-	print(foundRed,foundGreen,x,y)
-	tecla=cv2.waitKey(0)
-	print (tecla)
 	if tecla==1048689 or tecla==113:
-		break
+			break
