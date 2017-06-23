@@ -11,6 +11,10 @@ tecla=-1
 minVal=0
 maxVal=47
 primera=True
+
+def nothing(x):
+	pass
+
 def draw_rectangle(event,x,y,flags,param):
 	global x1,x2,y1,y2,primera
 	if event==cv2.EVENT_LBUTTONDOWN:
@@ -32,8 +36,8 @@ def draw_rectangle(event,x,y,flags,param):
 
 			H,HS,S,SS,L,LS =area_stats(image)
 			H2,HS2,S2,SS2,L2,LS2 =area_stats(hsv)
-			print(area_stats(image))
-			print(area_stats(hsv))
+			#print(area_stats(image))
+			#print(area_stats(hsv))
 			HL=max([H-HS,0])
 			SL=max([S-SS,0])
 			LL=max([L-LS,0])
@@ -50,17 +54,17 @@ def draw_rectangle(event,x,y,flags,param):
 						
 			lower=np.array([HL, SL, LL])
 			upper=np.array([HH ,SH,LH])
-			print (lower)
-			print (upper)
+			#print (lower)
+			#print (upper)
 			lower2=np.array([HL2, SL2, LL2])
 			upper2=np.array([HH2 ,SH2,LH2])
-			print (lower2)
-			print (upper2)
-			filtrada=cv2.inRange(image,lower, upper)
-			cv2.imshow('filtrada normal',filtrada)
+			#print (lower2)
+			#print (upper2)
+			#filtrada=cv2.inRange(image,lower, upper)
+			#cv2.imshow('filtrada normal',filtrada)
 			filtrada2=cv2.inRange(hsv,lower2, upper2)
 			cv2.imshow('filtrada hsv',filtrada2)
-			print (x1,y1,x2,y2)
+			print (str(HL2)+','+str(SL2)+','+str(LL2)+','+str(HH2)+','+str(SH2)+','+str(LH2))
 
 def area_stats(sourceImage):
 	area=abs(x2-x1)*abs(y2-y1)	
@@ -79,40 +83,46 @@ cv2.namedWindow('image')
 cv2.setMouseCallback('image',draw_rectangle)
 
 
-
-
-gl=np.array([ 93.87969614,  86.42179145,  33.96279703])  #buoy cans
-gu=np.array([ 137.11582457,  127.58940676,   66.06295885])
-
-yl=np.array([   0,          185.84549612,  214.80200567])
-yu=np.array([  40.74302368,  247.40295108,  259.97206265])
-
-bl=np.array([ 78.12765314,  26.00777318,   0.        ])
-bu=np.array([ 148.10418077,   80.51817838,   53.99514731])
-
-rl=np.array([   0,            0,          115.39777469])
-ru=np.array([  43.71792393,   47.60779081,  239.44837916])
-
-hsblue=np.array([ 107.19552311,  184.64772921,  102.44292567])
-hsblue=np.array([ 109.66161975,  218.94410753,  164.98564576])
-
-
-path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
+#path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
+path='/home/gabriel/Roboboat/RoboBoat_2017_Main/dataset/'
 files=os.listdir(path)
 
+autonomous=challenge.Autonomous_Navigation()
 for image_file in files:
 
 	image=cv2.imread(path+image_file)
 	print('Image name:',image_file)
-	cv2.imshow("image",image)
 	
-	autonomous=challenge.Autonomous_Navigation()
-	tecla=255
-	while(tecla==255):
+	
+	
+	tecla=-1
+	while(tecla==-1):
 		foundRed,foundGreen,x,y=autonomous.get_destination(image)
+		#obstacles,obstaclesFound=dbscan.get_obstacles(image,colors='rgybno',return_centroid=False,buoy='A2')
+		#cv2.imshow("obstacles",obstacles)
+		'''
+		gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+		minVal=100
+		maxVal=120
+		canny=cv2.Canny(gray,minVal,maxVal,True)
+		cv2.imshow('Canny',canny)
+		contours=cv2.findContours(canny,cv2.RETR_LIST ,cv2.CHAIN_APPROX_SIMPLE)
+		#print(contours[1])
+		if len(contours[1])>1:
+			for contorno in contours[1]:
+				epsilon = 0.1*cv2.arcLength(contorno,True)
+				approx = cv2.approxPolyDP(contorno,epsilon,True)
+				print(len(approx))
+				area=cv2.contourArea(contorno)
+				if  len(approx)==4 and area>100:
+					cv2.drawContours(image, contorno, -1, (255,0,0), 3)
+		'''
+
+		cv2.imshow("image",image)
+		
 		#print(foundRed,foundGreen,x,y)
-		tecla=cv2.waitKey(100)
-		#print (tecla)
+		tecla=cv2.waitKey(0)
+		print (tecla)
 		if tecla==1048689 or tecla==113:
 			break
 
