@@ -60,11 +60,12 @@ def draw_rectangle(event,x,y,flags,param):
 			upper2=np.array([HH2 ,SH2,LH2])
 			#print (lower2)
 			#print (upper2)
-			#filtrada=cv2.inRange(image,lower, upper)
-			#cv2.imshow('filtrada normal',filtrada)
+			filtrada=cv2.inRange(image,lower, upper)
+			cv2.imshow('filtrada BGR',filtrada)
 			filtrada2=cv2.inRange(hsv,lower2, upper2)
-			cv2.imshow('filtrada hsv',filtrada2)
-			print (str(HL2)+','+str(SL2)+','+str(LL2)+','+str(HH2)+','+str(SH2)+','+str(LH2))
+			cv2.imshow('filtrada HSV',filtrada2)
+			print ('BGR: '+str(HL)+','+str(SL)+','+str(LL)+','+str(HH)+','+str(SH)+','+str(LH))
+			print ('HSV: '+str(HL2)+','+str(SL2)+','+str(LL2)+','+str(HH2)+','+str(SH2)+','+str(LH2))
 
 def area_stats(sourceImage):
 	area=abs(x2-x1)*abs(y2-y1)	
@@ -84,10 +85,11 @@ cv2.setMouseCallback('image',draw_rectangle)
 
 
 #path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
-path='/home/gabriel/Roboboat/RoboBoat_2017_Main/dataset/'
+path='/home/gabriel/Roboboat/RoboBoat_2017_Main/numeros/'
 files=os.listdir(path)
 
 autonomous=challenge.Autonomous_Navigation()
+docking=challenge.Automated_Docking()
 for image_file in files:
 
 	image=cv2.imread(path+image_file)
@@ -97,32 +99,14 @@ for image_file in files:
 	
 	tecla=-1
 	while(tecla==-1):
-		foundRed,foundGreen,x,y=autonomous.get_destination(image)
-		#obstacles,obstaclesFound=dbscan.get_obstacles(image,colors='rgybno',return_centroid=False,buoy='A2')
-		#cv2.imshow("obstacles",obstacles)
-		'''
-		gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-		minVal=100
-		maxVal=120
-		canny=cv2.Canny(gray,minVal,maxVal,True)
-		cv2.imshow('Canny',canny)
-		contours=cv2.findContours(canny,cv2.RETR_LIST ,cv2.CHAIN_APPROX_SIMPLE)
-		#print(contours[1])
-		if len(contours[1])>1:
-			for contorno in contours[1]:
-				epsilon = 0.1*cv2.arcLength(contorno,True)
-				approx = cv2.approxPolyDP(contorno,epsilon,True)
-				print(len(approx))
-				area=cv2.contourArea(contorno)
-				if  len(approx)==4 and area>100:
-					cv2.drawContours(image, contorno, -1, (255,0,0), 3)
-		'''
-
+		#foundRed,foundGreen,x,y,returned_image=autonomous.get_destination(image)
+		
+		docking.search_number(image,1)
 		cv2.imshow("image",image)
 		
 		#print(foundRed,foundGreen,x,y)
 		tecla=cv2.waitKey(0)
-		print (tecla)
+		#print (tecla)
 		if tecla==1048689 or tecla==113:
 			break
 
