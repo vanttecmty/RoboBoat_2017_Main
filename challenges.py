@@ -8,11 +8,16 @@ import sys
 sys.path.append('/usr/local/lib/python3.4/site-packages/')
 import cv2
 
-red_low=np.array([  0,         3.12572092,  85.37949534]) #red buoy cans bgr
-red_upper=np.array([  32.33085987,   43.29067253,  181.69263581])
+red_low=np.array([  34.72515661,  103.21375985,  231.50527537]) #red buoy cans bgr
+red_upper=np.array([  72.92496159,  131.90207939,  244.007727  ])
 
-green_low_close=np.array([ 93.87969614,  86.42179145,  33.96279703])  #green buoy cans bgr
-green_upper_close=np.array([ 137.11582457,  127.58940676,   66.06295885])
+
+
+green_low_close=np.array([ 248.49619806,  249.48784014,  248.80535085])  #green buoy cans bgr
+green_upper_close=np.array([ 251.73642606,  250.75613149,  250.6499683 ])
+
+
+
 
 green_low_far=np.array([ 53.95902545,  55.10921768,  31.3839107 ])  #green buoy cans bgr
 green_upper_far=np.array([ 70.69097455,  75.92411565,  47.13275597])
@@ -34,20 +39,20 @@ def nothing(x):
 
 minVal=0
 maxVal=254
-cv2.namedWindow('Canny')
-cv2.createTrackbar('minVal','Canny',167,255,nothing)
-cv2.createTrackbar('maxVal','Canny',170,255,nothing)
+#cv2.namedWindow('Canny')
+#cv2.createTrackbar('minVal','Canny',167,255,nothing)
+#cv2.createTrackbar('maxVal','Canny',170,255,nothing)
 
 
 class Autonomous_Navigation:
 
 	def get_destination(self,image):
 
-		hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
-		gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-		canny=cv2.Canny(gray,minVal,maxVal,True)
-		cv2.imshow('Canny',canny)
-		cv2.waitKey(500)
+		#hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+		#gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+		#canny=cv2.Canny(gray,minVal,maxVal,True)
+		#cv2.imshow('Canny',canny)
+		#cv2.waitKey(500)
 		red=cv2.inRange(image,red_low,red_upper)
 		green_close=cv2.inRange(image,green_low_close,green_upper_close)
 		green_far=cv2.inRange(image,green_low_far,green_upper_far)

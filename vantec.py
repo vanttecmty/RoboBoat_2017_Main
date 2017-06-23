@@ -15,6 +15,7 @@ import lib.variables as var
 import lib.motors as motors
 import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
+import challenges as challenge
 
 #Navigation class
 MAP_WIDTH       = 200;#400
@@ -30,6 +31,7 @@ LIDAR_COORD_X   = 100;#200
 LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
 
 runProgram        = True;
+frame             = None;
 capture           = None;
 emptyMap          = None;
 routeMap          = None;
@@ -90,7 +92,7 @@ class MapThread (threading.Thread):
 		self.previous_map=cv2.warpAffine(self.previous_map,M,(cols,rows))
 
 	def run(self):
-		global routeMap, orientationDegree;
+		global routeMap, orientationDegree, frame;
 
 		emptyMap = self.new_map(MAP_WIDTH, MAP_HEIGHT);
 		routeMap = emptyMap.copy();
@@ -195,9 +197,9 @@ class MapThread (threading.Thread):
 				#print("yy= ", MAP_HEIGHT / 2 - pixelY, "xx= ", pixelX - MAP_WIDTH / 2);
 				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, pixelX - MAP_WIDTH / 2);
 				#print("orientation= ", orientation);
-				orientationDegree = math.degrees(orientation) - 90;
-			else: 
-				orientationDegree = 0;
+				#orientationDegree = math.degrees(orientation) - 90;
+			#else: 
+				#orientationDegree = 0;
 			#print("orientation degree mapa: ", orientationDegree);
 
 			self.add_boat(routeMap);	
@@ -219,13 +221,39 @@ class NavigationThread (threading.Thread):
 		self.threadID = threadID;
 		self.name     = name;
 	def run(self):
-		global orientationDegree, destinyCoords;
-		destinyCoords = [29.190086, -81.050185];
-		self.go_to_destiny(29.190086, -81.050185);
+		global orientationDegree, destinyCoords, frame;
+		destinyCoords = [29.190093, -81.050142];
+		self.go_to_destiny(29.190093, -81.050142);
 
-		autonomous=challenge.Autonomous_Navigation()
-		foundRed,foundGreen,x,y=autonomous.get_destination(image)
+		autonomous = challenge.Autonomous_Navigation();
+		foundRed,foundGreen, centroideX, centroideY = autonomous.get_destination(frame[1]);
+		centroideDegree = 0;
 
+		#orientation
+		'''while foundRed or foundGreen:
+			if(foundRed and not foundGreen):
+				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
+				centroideDegree = math.degrees(orientation) - 90;
+				centroideDegree = centroideDegree - 45;
+			elif(not foundRed and foundGreen):
+				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
+				centroideDegree = math.degrees(orientation) - 90;
+				centroideDegree = centroideDegree + 45;
+			elif(foundRed and foundGreen):
+				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
+				centroideDegree = math.degrees(orientation) - 90;
+
+			foundRed,foundGreen, x, y = autonomous.get_destination(frame[1]);
+
+		destiny['distance'] = 0;
+		destiny['degree']   = centroideDegree;
+
+		motors.move(50, 50);
+		time.sleep(1);
+		motors.move(0, 0);
+'''
+		destinyCoords = [29.189981, -81.050218];
+		self.go_to_destiny(29.189981, -81.050218);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
@@ -275,7 +303,8 @@ class NavigationThread (threading.Thread):
 
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
-				motors.move(50, 50);
+				velocity = destiny['distance'] * 10;
+				motors.move(velocity, velocity);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
