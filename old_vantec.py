@@ -254,17 +254,10 @@ class NavigationThread (threading.Thread):
 		global orientationDegree, destinyCoords, frame;
 		#destinyCoords = [29.190093, -81.050142];
 		#self.go_to_destiny(29.190093, -81.050142);
-		var.currChallenge = 'a';
+
 		self.challenge_1();
-		motors.move(50,50);
-		time.sleep(2);
-		motors.move(0,0);
-		var.currChallenge = 'N';
-		#curso muelle
-		self.go_to_destiny(29.151485, -81.017215);
-		var.currChallenge = 's';
-		self.challenge_2();
-		self.go_to_destiny(29.151498, -81.017470);
+		print("challenge 1")
+		#destinyCoords = [29.189981, -81.050218];
 		self.go_to_destiny(29.15140, -81.01741);
 
 	def go_to_destiny(self, latitude2, longitud2):
@@ -278,7 +271,7 @@ class NavigationThread (threading.Thread):
 		imu.get_delta_theta();
 
 		#Condition distance more than 2 meters. 
-		while destiny['distance'] > 3 and runProgram:
+		while destiny['distance'] > 2 and runProgram:
 			#print("degrees: ", imu.NORTH_YAW);
 			#print("coords: ", imu.get_gps_coords());
 			print("destiny: ", destiny);
@@ -316,10 +309,6 @@ class NavigationThread (threading.Thread):
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
 				velocity = destiny['distance'] * 10;
-
-				if (velocity > 300):
-					velocity = 200;
-
 				motors.move(velocity, velocity);
 			else:
 				#girar
@@ -339,103 +328,6 @@ class NavigationThread (threading.Thread):
 		motors.move(0,0);
 		print("End thread Navigation");
 	
-	def challenge_2(self):
-		global destiny, runProgram;
-		ch1_image = capture.read();		
-		cv2.imshow('frame', ch1_image[1]);
-		cv2.waitKey(1);
-		autonomous = challenge.Autonomous_Navigation();
-		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
-		date=str(datetime.datetime.now())
-		name=date[:10]+'-'+date[11:19]
-		cv2.imwrite('postes/'+name+'.png',image)
-		lastCentroideDegree = 0;
-		centroideDegree = lastCentroideDegree;
-		turn_degrees_needed = 0;
-		turn_degrees_accum = 0;
-		#clean angle;
-		imu.get_delta_theta();
-		LastCentroideY = centroideY;
-		counter = 0;
-
-		myFirstCoords = imu.get_gps_coords();
-		ch1_destiny = {};
-		ch1_destiny['distance'] = 0;
-
-		while foundRed or foundGreen or counter < 100 or math.fabs(ch1_destiny['distance']) < 15:
-			print("rojo ", foundRed, "verde ", foundGreen, "counter ", counter);
-			centroideDegree = (centroideX * 69.0/680.0 - 35) * -1;
-
-			if(foundRed and not foundGreen):
-				print("solo rojo");
-				centroideDegree = centroideDegree - 45;
-			elif(not foundRed and foundGreen):
-				print("solo  verde");
-				centroideDegree = centroideDegree + 45;
-
-			print("centroideDegree", centroideDegree);
-
-			if(centroideDegree != lastCentroideDegree):
-				turn_degrees_needed = centroideDegree;
-				turn_degrees_accum  = 0;
-
-				#clean angle;
-				imu.get_delta_theta();
-				lastCentroideDegree = centroideDegree;
-
-			imu_angle = imu.get_delta_theta()['z']%360;
-
-			if(imu_angle > 180):
-				imu_angle = imu_angle -360;
-			#print("grados imu: ", imu_angle);
-
-			#threshold
-			if(math.fabs(imu_angle) > 1):
-				turn_degrees_accum += imu_angle;
-
-			#print("grados acc: ", turn_degrees_accum);
-			turn_degrees_needed = (lastCentroideDegree + turn_degrees_accum)%360;
-
-			if(turn_degrees_needed > 180): 
-				turn_degrees_needed = turn_degrees_needed - 360;
-			elif (turn_degrees_needed < -180):
-				turn_degrees_needed = turn_degrees_needed + 360;
-
-			#print("grados a voltear: ", turn_degrees_needed);
-
-			if(math.fabs(turn_degrees_needed) < 10): 
-				print("Tengo un margen menor a 10 grados");
-				motors.move(70, 70);
-			else:
-				#girar
-				if(turn_degrees_needed > 0):
-					print("Going to move left")
-					motors.move(25, -25);
-				else: 
-					print("Going to move right")
-					motors.move(-25, 25);
-			
-			#recorrer 2 metros
-			ch1_image = capture.read();
-			cv2.imshow('frame', ch1_image[1]);
-			cv2.waitKey(1);
-
-			if(LastCentroideY != centroideY):
-				LastCentroideY = centroideY;
-
-			foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
-			date=str(datetime.datetime.now())
-			name=date[:10]+'-'+date[11:19]
-			cv2.imwrite('postes/'+name+'.png',image)
-			cv2.imwrite('postes/'+name+'-found.png',image2)
-			counter = (counter + 1)%1000000;
-			ch1_destiny = imu.get_degrees_and_distance_to_gps_coords(myFirstCoords['latitude'], myFirstCoords['longitud']);
-		
-		motors.move(100, 100);
-		time.sleep(2);
-		motors.move(0, 0);
-
-
 	def challenge_1(self):
 		global destiny, runProgram;
 		ch1_image = capture.read();		

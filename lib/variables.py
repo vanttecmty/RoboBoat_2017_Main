@@ -63,7 +63,7 @@ else:
 
 #ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 
-#ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
+ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
  
 '''
 if(arduinoMega != ''):
