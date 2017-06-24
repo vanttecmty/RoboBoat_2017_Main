@@ -227,8 +227,8 @@ class NavigationThread (threading.Thread):
 		self.name     = name;
 	def run(self):
 		global orientationDegree, destinyCoords, frame;
-		destinyCoords = [29.190093, -81.050142];
-		self.go_to_destiny(29.190093, -81.050142);
+		#destinyCoords = [29.190093, -81.050142];
+		#self.go_to_destiny(29.190093, -81.050142);
 
 		self.challenge_1();
 
@@ -327,6 +327,8 @@ class NavigationThread (threading.Thread):
 				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
 			centroideDegree = math.degrees(orientation) - 90;
 
+			print("centroideDegree", centroideDegree);
+
 			if(centroideDegree != orientationDegree):
 				turn_degrees_needed = centroideDegree;
 				turn_degrees_accum  = 0;
@@ -334,7 +336,6 @@ class NavigationThread (threading.Thread):
 				#clean angle;
 				imu.get_delta_theta();
 				orientationDegree = centroideDegree;
-
 
 			imu_angle = imu.get_delta_theta()['z']%360;
 
@@ -353,20 +354,20 @@ class NavigationThread (threading.Thread):
 				turn_degrees_needed = turn_degrees_needed - 360;
 			elif (turn_degrees_needed < -180):
 				turn_degrees_needed = turn_degrees_needed + 360;
-			
-			#print("grados a voltear: ", turn_degrees_needed);
+
+			print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
-				motors.move(70, 70);
+				#motors.move(70, 70);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
 					print("Going to move left")
-					motors.move(50, -50);
+					#motors.move(50, -50);
 				else: 
 					print("Going to move right")
-					motors.move(-50, 50);
+					#motors.move(-50, 50);
 
 			#recorrer 2 metros
 			foundRed,foundGreen, x, y = autonomous.get_destination(frame[1]);
