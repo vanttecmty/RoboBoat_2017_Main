@@ -89,11 +89,12 @@ class MapThread (threading.Thread):
 			frame = capture.read();
 			#cv2.imshow('cam', frame[1]);
 			date=str(datetime.datetime.now())
-			name='dataset/'+date[:10]+'-'+date[11:19]
+			name=date[:10]+'-'+date[11:19]
 			print(name)
-			cv2.imwrite(name+'.png',frame[1])
-			cv2.waitKey(5);
-			
+			cv2.imwrite('dataset/'+name+'.png',frame[1])
+
+			foundRed,foundGreen,x,y,returned_image=autonomous.get_destination(image)
+			cv2.imwrite('dataset_autonomous/'+name+'.png',returned_image)
 			coordenadas=imu.get_gps_coords();
 			yaw=imu.get_yaw_orientation();
 			magnetic=imu.get_magnetic_measurments();
@@ -105,9 +106,7 @@ class MapThread (threading.Thread):
 					myfile.write(str(coordenadas['longitud'])+','+str(coordenadas['latitude'])+'\n')
 
 			#cv2.imwrite(name+'-map.png',routeMap)
-			
 			cv2.waitKey(500)
-
 
 
 def init():

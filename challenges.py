@@ -18,7 +18,7 @@ class Autonomous_Navigation:
 		content = [x.strip('\n') for x in content]	
 		for line in content:
 			split=line.split(',')
-			print(split)
+			#print(split)
 			if (len(split)>1):
 				self.red_lower_bounds.append(np.array([float(split[0]),float(split[1]),float(split[2])]))
 				self.red_upper_bounds.append(np.array([float(split[3]),float(split[4]),float(split[5])]))
@@ -53,7 +53,7 @@ class Autonomous_Navigation:
 		for i,lower in enumerate(self.red_lower_bounds):
 			#print(lower)
 			#print(self.red_upper_bounds[i])
-			red_hsv_filtered=cv2.inRange(hsv,lower,self.red_upper_bounds[i])
+			red_hsv_filtered=cv2.inRange(image,lower,self.red_upper_bounds[i])
 			red1 = cv2.morphologyEx(red_hsv_filtered, cv2.MORPH_OPEN, kernel)
 			red_binary=np.bitwise_or(red_binary,red1)
 
@@ -70,8 +70,9 @@ class Autonomous_Navigation:
 			for contorno in red_contours[1]:
 				#print('Contour len:',len(contorno))
 				area=cv2.contourArea(contorno)
+				x1,y1,dx1,dy1 = cv2.boundingRect(contorno)
 				#print('Area:',area)
-				if area>2:
+				if area>2 and y1>120:
 					if area>red_area_max:
 						red_area_max=area
 						biggest_red=contorno
@@ -109,7 +110,7 @@ class Autonomous_Navigation:
 			y=int((y1+y2)/2)
 			cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 			cv2.imshow('image2',image2)
-			return foundRed,foundGreen,x,y
+			return foundRed,foundGreen,x,y,image2
 		else:
 			if foundRed:
 				x=x1
@@ -121,11 +122,11 @@ class Autonomous_Navigation:
 				y=y2
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 				cv2.imshow('image2',image2)
-				return foundRed,foundGreen,x,y
+				return foundRed,foundGreen,x,y,image2
 
 				
 
-		return False,False,0,0
+		return False,False,0,0,image2
 		
 class Speed_Challenge:
 
@@ -197,37 +198,46 @@ class Find_The_Path:
 
 			return ruta
 
-class Follow_the_Leader:
+class Automated_Docking:
+
 
 	def __init__(self):
 		#Load the hu moments of the numbers.
 		self.number1=[]
 		self.number2=[]
 		self.number3=[]
-		self.number4=[]
+		self.white_image=np.array(255)
 
-	def find_challenge(self,image):
-		#Filter by color to find white pixels.
-		white_pixels==cv2.inrange(image,[240,240,240],[255,255,255])
+	def search_number(self,image,number):
+		gauss_blur = cv2.GaussianBlur(image,(5,5),0)
+		median_blur = cv2.medianBlur(image,5)
+		gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+		gray_gauss=cv2.cvtColor(gauss_blur,cv2.COLOR_BGR2GRAY)
+		gray_median=cv2.cvtColor(median_blur,cv2.COLOR_BGR2GRAY)
+		minVal=50
+		maxVal=100
+		canny=cv2.Canny(gray,minVal,maxVal,True)
+		canny_gauss=cv2.Canny(gray_gauss,minVal,maxVal,True)
+		canny_median=cv2.Canny(gray_median,minVal,maxVal,True)
+		cv2.imshow('Canny',canny)
+		cv2.imshow('Canny gauss',canny_gauss)
+		cv2.imshow('Canny median',canny_median)
+		contours=cv2.findContours(canny,cv2.RETR_TREE ,cv2.CHAIN_APPROX_SIMPLE)
+		#print(contours[1])
+		if len(contours[1])>1:
+			for contorno in contours[1]:
+				epsilon = 0.1*cv2.arcLength(contorno,True)
+				approx = cv2.approxPolyDP(contorno,epsilon,True)
+				#print(len(approx))
+				area=cv2.contourArea(contorno)
+				if area>50:
+					copy=np.full(image.shape,255,dtype=np.uint8)
+					cv2.drawContours(copy, contorno, -1, (0,0,255), 3)
+					cv2.imshow('copy',copy)
+					cv2.waitKey(0)
 
-	def find_number(self,image,numero1,numbero2):
-		#Filter by color to find black pixels.
-		black_pixels==cv2.inrange(image,[0,0,0],[10,10,10])
-		#Find contours in image.
-		contornos=cv2.findContours(array,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-		#
-		#Compare contours
-		for contorno in contornos:
-			pass
-			match=cv2.matchshape(contorno,self.number1,1,0.0)
-			if (match<0.1):
-				print('Found number 1')
-			match=cv2.matchshape(contorno,self.number2,1,0.0)
-			if (match<0.1):
-				print('Found number 1')
-			match=cv2.matchshape(contorno,self.number3,1,0.0)
-			if (match<0.1):
-				print('Found number 1')
-			match=cv2.matchshape(contorno,self.number4,1,0.0)
-			if (match<0.1):
-				print('Found number 1')
+
+		cv2.imshow('image',image)
+		cv2.waitKey(0)
+
+
