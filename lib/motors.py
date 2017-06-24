@@ -42,8 +42,9 @@ def move(powerR=0,powerL=0):
 		realPowerValueR = round(powerR + 1500);
 		realPowerValueL = round(powerL + 1500);
 		
-		while(var.previousLeftMotorValue != powerL or var.previousRightMotorValue != powerR):
-			checkDifference(powerR, powerL);
+		move_thrusters(realPowerValueR,realPowerValueL);
+		#while(var.previousLeftMotorValue != powerL or var.previousRightMotorValue != powerR):
+		#	checkDifference(powerR, powerL);
 		
 '''
 def powerControl(power):

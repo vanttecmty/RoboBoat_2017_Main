@@ -1,8 +1,10 @@
 #include <SoftwareSerial.h>
 #define pinRX 2
 #define pinTX 3
-SoftwareSerial XBee(pinRX, pinTX);
+
 int ledM1 = 13;
+
+SoftwareSerial XBee(pinRX, pinTX);
 String incomingByte;
 String message;
 

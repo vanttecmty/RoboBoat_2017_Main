@@ -15,6 +15,7 @@ import lib.variables as var
 import lib.motors as motors
 import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
+import xbee
 
 #Navigation class
 MAP_WIDTH       = 200;#400
@@ -42,6 +43,36 @@ routePoints       = [];
 lidarObstacles    = [];
 orientationDegree = 0;
 pixelsGoal        = [0,0];
+
+#Xbee Variables
+drone_takeoff = 0
+drone_flying = 0
+xbeeArduino = '/dev/ttyUSB0'
+endOfTasks = 0
+
+class sendXbeeThread(threading.Thread):
+	def __init__(self, threadID, name):
+		threading.Thread.__init__(self);
+		self.threadID = threadID;
+		self.name = name;
+	def run(self):
+		while(1):
+			xbeeTransmission();
+			time.sleep(0.25);
+			
+	def xbeeTransmission(self):
+		x = xbee.xbee(xbeeArduino)
+		status = x.receive_from_station();
+		if(status == '1'):
+			cord = imu.get_gps_coords()
+			x.set_latlong(cord['latitude'], cord['longitude'])
+			x.set_takeoff(str(drone_takeoff))
+			x.set_flying(str(drone_flying))
+			x.send2station()
+		elif(status == '0'):
+			endOfTasks = 1 ;
+
+
 
 class LidarSocketThread (threading.Thread):
 	def __init__(self, threadID, name):
@@ -294,17 +325,22 @@ def init():
 ' Inicio del programa
 '''
 init();
+
 # Create new threads
 thread1 = LidarSocketThread(1, "LidarSocketThread");
 thread2 = MapThread(2, "MapThread");
 thread3 = NavigationThread(3, "NavigationThread");
+thread4 = sendXbeeThread(4, "sendXbeeThread");
 
 # Start new Threads
 thread1.start();
 thread2.start();
 thread3.start();
+thread4.start();
+
 thread1.join();
 thread2.join();
 thread3.join();
+thread4.join();
 
 print ("Exiting Main Thread");

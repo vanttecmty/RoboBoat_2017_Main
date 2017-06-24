@@ -67,8 +67,6 @@ while  x != chr(27) :
 		if(x == 'w' or x == 'W'):
 			#print("Forward");
 			motors.move(100,100)
-			time.sleep(10);
-			motors.move(0,0)
 		# 1100 Reversa
 		if(x == 's' or x == 'S'):
 			#print("Backward");
