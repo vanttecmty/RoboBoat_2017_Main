@@ -234,10 +234,10 @@ class Automated_Docking:
 					copy=np.full(image.shape,255,dtype=np.uint8)
 					cv2.drawContours(copy, contorno, -1, (0,0,255), 3)
 					cv2.imshow('copy',copy)
-					cv2.waitKey(0)
+					#cv2.waitKey(0)
 
 
 		cv2.imshow('image',image)
-		cv2.waitKey(0)
+		#cv2.waitKey(0)
 
 

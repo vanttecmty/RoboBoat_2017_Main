@@ -128,6 +128,8 @@ class MapThread (threading.Thread):
 			frame = capture.read();
 			#cv2.imshow('cam', frame[1]);
 			#cv2.waitKey(0);
+			if not frame[0]:
+				break
 			values = dbscan.get_obstacles(frame[1],'yg', False);
 			camObstacles = values[1];
 
@@ -232,8 +234,8 @@ class NavigationThread (threading.Thread):
 
 		self.challenge_1();
 
-		destinyCoords = [29.189981, -81.050218];
-		self.go_to_destiny(29.189981, -81.050218);
+		#destinyCoords = [29.189981, -81.050218];
+		#self.go_to_destiny(29.189981, -81.050218);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
@@ -305,37 +307,36 @@ class NavigationThread (threading.Thread):
 	
 	def challenge_1(self):
 		global destiny, runProgram;
-
+		ch1_image = capture.read();		
+		cv2.imshow('frame', ch1_image[1]);
+		cv2.waitKey(10);
 		autonomous = challenge.Autonomous_Navigation();
-		foundRed,foundGreen, centroideX, centroideY = autonomous.get_destination(frame[1]);
-		centroideDegree = 0;
-		turn_degrees_needed   = orientationDegree;
-		turn_degrees_accum    = 0;
+		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
+		lastCentroideDegree = 0;
+		centroideDegree = lastCentroideDegree;
+		turn_degrees_needed = 0;
+		turn_degrees_accum = 0;
 		#clean angle;
 		imu.get_delta_theta();
+		LastCentroideY = centroideY;
 
 		while foundRed or foundGreen:
+			centroideDegree = centroideX * 69.0/680.0 - 35;
+
 			if(foundRed and not foundGreen):
-				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
-				centroideDegree = math.degrees(orientation) - 90;
 				centroideDegree = centroideDegree - 45;
 			elif(not foundRed and foundGreen):
-				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
-				centroideDegree = math.degrees(orientation) - 90;
 				centroideDegree = centroideDegree + 45;
-			elif(foundRed and foundGreen):
-				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
-			centroideDegree = math.degrees(orientation) - 90;
 
 			print("centroideDegree", centroideDegree);
 
-			if(centroideDegree != orientationDegree):
+			if(centroideDegree != lastCentroideDegree):
 				turn_degrees_needed = centroideDegree;
 				turn_degrees_accum  = 0;
 
 				#clean angle;
 				imu.get_delta_theta();
-				orientationDegree = centroideDegree;
+				lastCentroideDegree = centroideDegree;
 
 			imu_angle = imu.get_delta_theta()['z']%360;
 
@@ -348,14 +349,14 @@ class NavigationThread (threading.Thread):
 				turn_degrees_accum += imu_angle;
 
 			#print("grados acc: ", turn_degrees_accum);
-			turn_degrees_needed = (orientationDegree + turn_degrees_accum)%360;
+			turn_degrees_needed = (lastCentroideDegree + turn_degrees_accum)%360;
 
 			if(turn_degrees_needed > 180): 
 				turn_degrees_needed = turn_degrees_needed - 360;
 			elif (turn_degrees_needed < -180):
 				turn_degrees_needed = turn_degrees_needed + 360;
 
-			print("grados a voltear: ", turn_degrees_needed);
+			#print("grados a voltear: ", turn_degrees_needed);
 
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
@@ -368,13 +369,19 @@ class NavigationThread (threading.Thread):
 				else: 
 					print("Going to move right")
 					#motors.move(-50, 50);
-
+			
 			#recorrer 2 metros
-			foundRed,foundGreen, x, y = autonomous.get_destination(frame[1]);
+			ch1_image = capture.read();
+			cv2.imshow('frame', ch1_image[1]);
+			cv2.waitKey(500);
+			if(LastCentroideY != centroideY):
+				LastCentroideY = centroideY;
+			foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
+			
 
-		motors.move(50, 50);
-		time.sleep(4);
-		motors.move(0, 0);
+		#motors.move(50, 50);
+		#time.sleep(4);
+		#motors.move(0, 0);
 
 
 class TestThread (threading.Thread):
