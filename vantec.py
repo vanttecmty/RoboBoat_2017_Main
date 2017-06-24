@@ -15,7 +15,7 @@ import lib.variables as var
 import lib.motors as motors
 import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
-import xbee
+import challenges as challenge
 
 #Navigation class
 MAP_WIDTH       = 200;#400
@@ -30,7 +30,13 @@ BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
 LIDAR_COORD_X   = 100;#200
 LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
 
+
+#   courseDelta = 
+#   courseAlfa  = 
+#   cpurse
+courseId          = 0;
 runProgram        = True;
+frame             = None;
 capture           = None;
 emptyMap          = None;
 routeMap          = None;
@@ -109,8 +115,19 @@ class MapThread (threading.Thread):
 		threading.Thread.__init__(self);
 		self.threadID = threadID;
 		self.name = name;
+		self.previous_map=np.array((MAP_HEIGHT,MAP_WIDTH),dtype=np.uint8)
+
+
+	def join_maps(self):
+		routeMap=np.bitwise_or(routeMap,self.previous_map)
+
+	def translate_previous(self,dx,dy):
+		cols,rows,ch=self.previous_map.shape
+		M=np.float32([[1,0,dx],[0,1,dy]])
+		self.previous_map=cv2.warpAffine(self.previous_map,M,(cols,rows))
+
 	def run(self):
-		global routeMap, orientationDegree;
+		global routeMap, orientationDegree, frame;
 
 		emptyMap = self.new_map(MAP_WIDTH, MAP_HEIGHT);
 		routeMap = emptyMap.copy();
@@ -140,7 +157,9 @@ class MapThread (threading.Thread):
 			'''
 			frame = capture.read();
 			#cv2.imshow('cam', frame[1]);
-			cv2.waitKey(5);
+			#cv2.waitKey(0);
+			if not frame[0]:
+				break
 			values = dbscan.get_obstacles(frame[1],'yg', False);
 			camObstacles = values[1];
 
@@ -195,7 +214,7 @@ class MapThread (threading.Thread):
 					destinyPixelX    = int(MAP_WIDTH/2 + destinyDistanceX);
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 
-			print("destiny pixel: ", destinyPixel);
+			#print("destiny pixel: ", destinyPixel);
 			cv2.imshow('Route', routeMap);
 			#cv2.imwrite('route_test.png',routeMap)
 			#Todo: check if destiny is inside obstacle;
@@ -206,19 +225,23 @@ class MapThread (threading.Thread):
 				routeMap[point[0]][point[1]] = [0, 0, 255];
 				pass;
 
+
 			if(routeLength > 40):
 				pixelX = routePoints[-40][1];
 				pixelY = routePoints[-40][0];
 				#print("y=", pixelY, " x=", pixelX);
+				cv2.circle(routeMap, (pixelX, pixelY), 2, (255, 255 , 255), -1, 8);
+				#print("yy= ", MAP_HEIGHT / 2 - pixelY, "xx= ", pixelX - MAP_WIDTH / 2);
 				orientation = math.atan2(MAP_HEIGHT / 2 - pixelY, pixelX - MAP_WIDTH / 2);
-				orientationDegree = math.degrees(orientation) - 90;
-			else: 
-				orientationDegree = 0;
-			print("orientation degree mapa: ", orientationDegree);
+				#print("orientation= ", orientation);
+				#orientationDegree = math.degrees(orientation) - 90;
+			#else: 
+				#orientationDegree = 0;
+			#print("orientation degree mapa: ", orientationDegree);
 
 			self.add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
-		time.sleep(1)
+			#time.sleep(1)
 
 		print("End thread Map");
 
@@ -235,9 +258,14 @@ class NavigationThread (threading.Thread):
 		self.threadID = threadID;
 		self.name     = name;
 	def run(self):
-		global orientationDegree, destinyCoords;
-		destinyCoords = [25.649529, -100.290430];
-		self.go_to_destiny(25.649529, -100.290430);
+		global orientationDegree, destinyCoords, frame;
+		#destinyCoords = [29.190093, -81.050142];
+		#self.go_to_destiny(29.190093, -81.050142);
+
+		self.challenge_1();
+
+		#destinyCoords = [29.189981, -81.050218];
+		#self.go_to_destiny(29.189981, -81.050218);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
@@ -251,6 +279,9 @@ class NavigationThread (threading.Thread):
 
 		#Condition distance more than 2 meters. 
 		while destiny['distance'] > 2 and runProgram:
+			#print("degrees: ", imu.NORTH_YAW);
+			#print("coords: ", imu.get_gps_coords());
+			print("destiny: ", destiny);
 			#print("orientation degrees", orientationDegree);
 			if(lastOrientationDegree != orientationDegree):
 				turn_degrees_needed = orientationDegree;
@@ -267,36 +298,122 @@ class NavigationThread (threading.Thread):
 			if(imu_angle > 180):
 				imu_angle = imu_angle -360;
 			#print("grados imu: ", imu_angle);
-			turn_degrees_accum += imu_angle;
+
+			#threshold
+			if(math.fabs(imu_angle) > 1):
+				turn_degrees_accum += imu_angle;
+
 			#print("grados acc: ", turn_degrees_accum);
 			turn_degrees_needed = (orientationDegree + turn_degrees_accum)%360;
 
 			if(turn_degrees_needed > 180): 
 				turn_degrees_needed = turn_degrees_needed - 360;
-			elif (turn_degrees_needed < 180):
+			elif (turn_degrees_needed < -180):
 				turn_degrees_needed = turn_degrees_needed + 360;
 			
-			print("grados a voltear: ", turn_degrees_needed);
+			#print("grados a voltear: ", turn_degrees_needed);
 
-			if(math.fabs(turn_degrees_needed) < 5): 
-				print("Tengo un margen menor a 5 grados");
-				motors.move(100,100);
+			if(math.fabs(turn_degrees_needed) < 10): 
+				print("Tengo un margen menor a 10 grados");
+				velocity = destiny['distance'] * 10;
+				motors.move(velocity, velocity);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
-					#print("Going to move left")
-					motors.move(-50,50);
+					print("Going to move left")
+					motors.move(50, -50);
 				else: 
-					#print("Going to move right")
-					motors.move(50,-50);
+					print("Going to move right")
+					motors.move(-50, 50);
 			#ir derecho;
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
 			runProgram = cv2.waitKey(1) != 27;
-			time.sleep(1);
+			#time.sleep(1);
 
+
+		motors.move(0,0);
 		print("End thread Navigation");
-		
+	
+	def challenge_1(self):
+		global destiny, runProgram;
+		ch1_image = capture.read();		
+		cv2.imshow('frame', ch1_image[1]);
+		cv2.waitKey(10);
+		autonomous = challenge.Autonomous_Navigation();
+		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
+		lastCentroideDegree = 0;
+		centroideDegree = lastCentroideDegree;
+		turn_degrees_needed = 0;
+		turn_degrees_accum = 0;
+		#clean angle;
+		imu.get_delta_theta();
+		LastCentroideY = centroideY;
+
+		while foundRed or foundGreen:
+			centroideDegree = centroideX * 69.0/680.0 - 35;
+
+			if(foundRed and not foundGreen):
+				centroideDegree = centroideDegree - 45;
+			elif(not foundRed and foundGreen):
+				centroideDegree = centroideDegree + 45;
+
+			print("centroideDegree", centroideDegree);
+
+			if(centroideDegree != lastCentroideDegree):
+				turn_degrees_needed = centroideDegree;
+				turn_degrees_accum  = 0;
+
+				#clean angle;
+				imu.get_delta_theta();
+				lastCentroideDegree = centroideDegree;
+
+			imu_angle = imu.get_delta_theta()['z']%360;
+
+			if(imu_angle > 180):
+				imu_angle = imu_angle -360;
+			#print("grados imu: ", imu_angle);
+
+			#threshold
+			if(math.fabs(imu_angle) > 1):
+				turn_degrees_accum += imu_angle;
+
+			#print("grados acc: ", turn_degrees_accum);
+			turn_degrees_needed = (lastCentroideDegree + turn_degrees_accum)%360;
+
+			if(turn_degrees_needed > 180): 
+				turn_degrees_needed = turn_degrees_needed - 360;
+			elif (turn_degrees_needed < -180):
+				turn_degrees_needed = turn_degrees_needed + 360;
+
+			#print("grados a voltear: ", turn_degrees_needed);
+
+			if(math.fabs(turn_degrees_needed) < 10): 
+				print("Tengo un margen menor a 10 grados");
+				#motors.move(70, 70);
+			else:
+				#girar
+				if(turn_degrees_needed > 0):
+					print("Going to move left")
+					#motors.move(50, -50);
+				else: 
+					print("Going to move right")
+					#motors.move(-50, 50);
+			
+			#recorrer 2 metros
+			ch1_image = capture.read();
+			cv2.imshow('frame', ch1_image[1]);
+			cv2.waitKey(500);
+			if(LastCentroideY != centroideY):
+				LastCentroideY = centroideY;
+			foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
+			
+
+		#motors.move(50, 50);
+		#time.sleep(4);
+		#motors.move(0, 0);
+
+
 class TestThread (threading.Thread):
 	def __init__(self, threadID, name):
 		threading.Thread.__init__(self);
@@ -313,7 +430,8 @@ def init():
 	global capture;
 
 	imu.init();
-	capture = cv2.VideoCapture(1);
+	imu.NORTH_YAW = imu.get_yaw_orientation();
+	capture = cv2.VideoCapture(0);
 
 	if(capture.isOpened() == False):
 		print("No hay cámara");
