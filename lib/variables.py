@@ -40,6 +40,8 @@ maxSpeed = 9.8
 
 boatWeight = 25 #Kg
 
+currChallenge = 'N'
+
 pts = list(ports.comports());
 
 if not pts:
@@ -61,7 +63,7 @@ else:
 
 #ser = serial.Serial('/dev/ttyACM1', baudRateArduino);
 
-ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
+#ser = serial.Serial('/dev/ttyACM0', baudRateArduino);
  
 '''
 if(arduinoMega != ''):

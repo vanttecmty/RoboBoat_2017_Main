@@ -17,6 +17,13 @@ import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
 import challenges as challenge
 
+##############ADDED BY JC NEED TO BE TESTED#############
+import lib.boat as boat
+#Variable que se usará para poder cambiar los challenges
+#Posibles valores : 'd','s','N','r','e','p','f','a'
+var.currChallenge = 'N'
+##############ADDED BY JC NEED TO BE TESTED#############
+
 #Navigation class
 MAP_WIDTH       = 200;#400
 MAP_HEIGHT      = 200;
@@ -53,32 +60,17 @@ pixelsGoal        = [0,0];
 #Xbee Variables
 drone_takeoff = 0
 drone_flying = 0
-xbeeArduino = '/dev/ttyUSB0'
 endOfTasks = 0
 
+##############ADDED BY JC NEED TO BE TESTED#############
 class sendXbeeThread(threading.Thread):
 	def __init__(self, threadID, name):
 		threading.Thread.__init__(self);
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		while(1):
-			xbeeTransmission();
-			time.sleep(0.25);
-			
-	def xbeeTransmission(self):
-		x = xbee.xbee(xbeeArduino)
-		status = x.receive_from_station();
-		if(status == '1'):
-			cord = imu.get_gps_coords()
-			x.set_latlong(cord['latitude'], cord['longitude'])
-			x.set_takeoff(str(drone_takeoff))
-			x.set_flying(str(drone_flying))
-			x.send2station()
-		elif(status == '0'):
-			endOfTasks = 1 ;
-
-
+		boat.start_mission()
+##############ADDED BY JC NEED TO BE TESTED#############
 
 class LidarSocketThread (threading.Thread):
 	def __init__(self, threadID, name):
