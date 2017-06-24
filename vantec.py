@@ -21,7 +21,15 @@ import datetime
 ##############ADDED BY JC NEED TO BE TESTED#############
 import lib.boat as boat
 #Variable que se usará para poder cambiar los challenges
-#Posibles valores : 'd','s','N','r','e','p','f','a'
+#Posibles valores : 
+#'a' = "Autonomous"
+#'d' = "Docking"
+#'s' = "Speed"
+#'N' = "Transitions"
+#'r' = "Return"
+#'e' = "End"
+#'p' = "Path"
+#'f' = "Follow"
 var.currChallenge = 'N'
 ##############ADDED BY JC NEED TO BE TESTED#############
 
