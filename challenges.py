@@ -96,11 +96,15 @@ class Autonomous_Navigation:
 
 		if foundRed:
 			x1,y1,dx1,dy1 = cv2.boundingRect(biggest_red)
+			if  float(dy1)/dx1<1.2:
+				foundRed=False
 			#print(x1+dx1,y1+dy1)
 			cv2.rectangle(image2,(x1,y1),(x1+dx1,y1+dy1),(0,0,255),-1,8)
 			
 		if foundGreen:
 			x2,y2,dx2,dy2=cv2.boundingRect(biggest_green)
+			if  float(dy2)/dx2<1.2:
+				foundGreen=False
 			#print(x2+dx2,y2+dy2)
 			cv2.rectangle(image2,(x2,y2),(x2+dx2,y2+dy2),(0,255,0),-1,8)
 
@@ -117,6 +121,7 @@ class Autonomous_Navigation:
 				y=y1
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 				cv2.imshow('image2',image2)
+				return foundRed,foundGreen,x,y,image2
 			elif foundGreen:
 				x=x2
 				y=y2

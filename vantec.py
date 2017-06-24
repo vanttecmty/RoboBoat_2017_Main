@@ -255,9 +255,9 @@ class NavigationThread (threading.Thread):
 		#self.go_to_destiny(29.190093, -81.050142);
 
 		self.challenge_1();
-
+		print("challenge 1")
 		#destinyCoords = [29.189981, -81.050218];
-		#self.go_to_destiny(29.189981, -81.050218);
+		self.go_to_destiny(29.189981, -81.050218);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
@@ -331,7 +331,7 @@ class NavigationThread (threading.Thread):
 		global destiny, runProgram;
 		ch1_image = capture.read();		
 		cv2.imshow('frame', ch1_image[1]);
-		cv2.waitKey(10);
+		cv2.waitKey(1);
 		autonomous = challenge.Autonomous_Navigation();
 		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
 		lastCentroideDegree = 0;
@@ -341,13 +341,21 @@ class NavigationThread (threading.Thread):
 		#clean angle;
 		imu.get_delta_theta();
 		LastCentroideY = centroideY;
+		counter = 0;
 
-		while foundRed or foundGreen:
-			centroideDegree = centroideX * 69.0/680.0 - 35;
+		myFirstCoords = imu.get_gps_coords();
+		ch1_destiny = {};
+		ch1_destiny['distance'] = 0;
+
+		while foundRed or foundGreen or counter < 100 or math.fabs(ch1_destiny['distance']) < 15:
+			print("rojo ", foundRed, "verde ", foundGreen, "counter ", counter);
+			centroideDegree = (centroideX * 69.0/680.0 - 35) * -1;
 
 			if(foundRed and not foundGreen):
+				print("solo rojo");
 				centroideDegree = centroideDegree - 45;
 			elif(not foundRed and foundGreen):
+				print("solo  verde");
 				centroideDegree = centroideDegree + 45;
 
 			print("centroideDegree", centroideDegree);
@@ -382,28 +390,31 @@ class NavigationThread (threading.Thread):
 
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
-				#motors.move(70, 70);
+				motors.move(70, 70);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
 					print("Going to move left")
-					#motors.move(50, -50);
+					motors.move(50, -50);
 				else: 
 					print("Going to move right")
-					#motors.move(-50, 50);
+					motors.move(-50, 50);
 			
 			#recorrer 2 metros
 			ch1_image = capture.read();
 			cv2.imshow('frame', ch1_image[1]);
-			cv2.waitKey(500);
+			cv2.waitKey(1);
+
 			if(LastCentroideY != centroideY):
 				LastCentroideY = centroideY;
-			foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
-			
 
-		#motors.move(50, 50);
-		#time.sleep(4);
-		#motors.move(0, 0);
+			foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
+			counter = (counter + 1)%1000000;
+			ch1_destiny = imu.get_degrees_and_distance_to_gps_coords(myFirstCoords['latitude'], myFirstCoords['longitud']);
+		
+		motors.move(100, 100);
+		time.sleep(2);
+		motors.move(0, 0);
 
 
 class TestThread (threading.Thread):
