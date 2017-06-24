@@ -30,6 +30,11 @@ BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
 LIDAR_COORD_X   = 100;#200
 LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
 
+
+#   courseDelta = 
+#   courseAlfa  = 
+#   cpurse
+courseId          = 0;
 runProgram        = True;
 frame             = None;
 capture           = None;
@@ -225,33 +230,8 @@ class NavigationThread (threading.Thread):
 		destinyCoords = [29.190093, -81.050142];
 		self.go_to_destiny(29.190093, -81.050142);
 
-		autonomous = challenge.Autonomous_Navigation();
-		foundRed,foundGreen, centroideX, centroideY = autonomous.get_destination(frame[1]);
-		centroideDegree = 0;
+		self.challenge_1();
 
-		#orientation
-		'''while foundRed or foundGreen:
-			if(foundRed and not foundGreen):
-				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
-				centroideDegree = math.degrees(orientation) - 90;
-				centroideDegree = centroideDegree - 45;
-			elif(not foundRed and foundGreen):
-				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
-				centroideDegree = math.degrees(orientation) - 90;
-				centroideDegree = centroideDegree + 45;
-			elif(foundRed and foundGreen):
-				orientation = math.atan2(480 / 2 - centroideY, centroideX - 640 / 2);
-				centroideDegree = math.degrees(orientation) - 90;
-
-			foundRed,foundGreen, x, y = autonomous.get_destination(frame[1]);
-
-		destiny['distance'] = 0;
-		destiny['degree']   = centroideDegree;
-
-		motors.move(50, 50);
-		time.sleep(1);
-		motors.move(0, 0);
-'''
 		destinyCoords = [29.189981, -81.050218];
 		self.go_to_destiny(29.189981, -81.050218);
 
@@ -322,7 +302,80 @@ class NavigationThread (threading.Thread):
 
 		motors.move(0,0);
 		print("End thread Navigation");
-		
+	
+	def challenge_1(self):
+		global destiny, runProgram;
+
+		autonomous = challenge.Autonomous_Navigation();
+		foundRed,foundGreen, centroideX, centroideY = autonomous.get_destination(frame[1]);
+		centroideDegree = 0;
+		turn_degrees_needed   = orientationDegree;
+		turn_degrees_accum    = 0;
+		#clean angle;
+		imu.get_delta_theta();
+
+		while foundRed or foundGreen:
+			if(foundRed and not foundGreen):
+				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
+				centroideDegree = math.degrees(orientation) - 90;
+				centroideDegree = centroideDegree - 45;
+			elif(not foundRed and foundGreen):
+				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
+				centroideDegree = math.degrees(orientation) - 90;
+				centroideDegree = centroideDegree + 45;
+			elif(foundRed and foundGreen):
+				orientation = math.atan2(480/2 - centroideY, centroideX - 640/2);
+			centroideDegree = math.degrees(orientation) - 90;
+
+			if(centroideDegree != orientationDegree):
+				turn_degrees_needed = centroideDegree;
+				turn_degrees_accum  = 0;
+
+				#clean angle;
+				imu.get_delta_theta();
+				orientationDegree = centroideDegree;
+
+
+			imu_angle = imu.get_delta_theta()['z']%360;
+
+			if(imu_angle > 180):
+				imu_angle = imu_angle -360;
+			#print("grados imu: ", imu_angle);
+
+			#threshold
+			if(math.fabs(imu_angle) > 1):
+				turn_degrees_accum += imu_angle;
+
+			#print("grados acc: ", turn_degrees_accum);
+			turn_degrees_needed = (orientationDegree + turn_degrees_accum)%360;
+
+			if(turn_degrees_needed > 180): 
+				turn_degrees_needed = turn_degrees_needed - 360;
+			elif (turn_degrees_needed < -180):
+				turn_degrees_needed = turn_degrees_needed + 360;
+			
+			#print("grados a voltear: ", turn_degrees_needed);
+
+			if(math.fabs(turn_degrees_needed) < 10): 
+				print("Tengo un margen menor a 10 grados");
+				motors.move(70, 70);
+			else:
+				#girar
+				if(turn_degrees_needed > 0):
+					print("Going to move left")
+					motors.move(50, -50);
+				else: 
+					print("Going to move right")
+					motors.move(-50, 50);
+
+			#recorrer 2 metros
+			foundRed,foundGreen, x, y = autonomous.get_destination(frame[1]);
+
+		motors.move(50, 50);
+		time.sleep(4);
+		motors.move(0, 0);
+
+
 class TestThread (threading.Thread):
 	def __init__(self, threadID, name):
 		threading.Thread.__init__(self);

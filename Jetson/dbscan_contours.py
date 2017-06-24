@@ -195,12 +195,15 @@ def DBSCAN(array, epsylon, minPts,return_centroid=False,blu=False):
 cv2.namedWindow('get rectangle')
 cv2.setMouseCallback('get rectangle',draw_rectangle)
 
+gl=np.array([  63.19825178,  116.07564994,   20.93028123])
+gu=np.array([ 130.68950332,  185.5672072,    51.68196367])
 
-gl=np.array([ 58.32762133,  87.85200046,  28.7195858 ]) #color anexo
-gu=np.array([  95.13517359,  146.22341797,   64.02411252])
 
-yl=np.array([  80.3520097,   174.51407643,  191.33034903])
-yu=np.array([ 125.59920982,  219.38139395,  233.45850114])
+
+yl=np.array([   0,         217.08347241,  224.69660809])
+yu=np.array([ 136.29470883,  248.29152759,  249.49089191])
+
+
 
 '''
 gl=np.array([  71.49535277,  150.41099537,    2.82631499])
@@ -209,11 +212,17 @@ gu=np.array([ 144.98700017,  229.38312228,   86.85799873])
 yl=np.array([   0,          185.84549612,  214.80200567])
 yu=np.array([  40.74302368,  247.40295108,  259.97206265])
 '''
-bl=np.array([ 78.12765314,  26.00777318,   0.        ])
-bu=np.array([ 148.10418077,   80.51817838,   53.99514731])
+bl=np.array([ 87.78480687,  35.87107958,  16.34320157])
+bu=np.array([ 197.19246586,  103.6207386,    51.82679843])
 
-rl=np.array([   0,            0,          115.39777469])
-ru=np.array([  43.71792393,   47.60779081,  239.44837916])
+
+
+
+rl=np.array([   0,            0,          85.39777469])
+ru=np.array([  32.33085987,   43.29067253,  181.69263581])
+
+ol=np.array([   0,            0,          234.581390])
+ou=np.array([   95.60577923,   171.50806047,  255])
 
 nl=np.array([   0,            0,          0])
 nu=np.array([  20,   20,  20])
@@ -240,10 +249,10 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	amarillo=cv2.inRange(image,yl, yu)
 	verde=cv2.inRange(image,gl, gu)
 	negro=cv2.inRange(image,nl, nu)
-
+	naranja=cv2.inRange(image,ol, ou)
 	
 	epsy=30
-	size=20
+	size=10
 	#cv2.imshow('get rectangle',image)
 	#cv2.imshow('amarillo',amarillo)
 	#cv2.imshow('verde',verde)
@@ -254,6 +263,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	green=yellow.copy()	
 	blue=green.copy()
 	red=blue.copy()
+	orange=blue.copy()
 	ne=blue.copy()
 
 	'''
@@ -262,9 +272,9 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 	maxVal=47
 	gray=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
 	canny=cv2.Canny(gray,minVal,maxVal,True)
-	contours,_=cv2.findContours(canny,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	contours=cv2.findContours(canny,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	contour_list=[]
-	for contour in contours:
+	for contour in contours[1]:
 		area=cv2.contourArea(contour)
 		#print(area)
 		if (area>50):
@@ -274,7 +284,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 				contour_list.append(contour)
 				#np.save('circle',contour)
 
-	value=np.load('circle.npy')
+	value=np.load('/home/gabriel/Roboboat/RoboBoat_2017_Main/Jetson/circle.npy')
 	image3=np.full(image.shape,255,dtype=np.uint8)
 	circulos=[]
 	for contorno in contour_list:
@@ -304,7 +314,7 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 						cv2.drawContours(dentroCircle,contorno,-1,(0,0,0),2)
 	cont=np.zeros(image.shape,dtype=np.uint8)
 	cont=cv2.bitwise_or(cont,dentroCircle)
-	#cv2.imshow('Boyas',cont)
+	cv2.imshow('Boyas',cont)
 	'''
 
 	#Here ends circle detection and starts color detection
@@ -330,14 +340,22 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 		rindex=np.argwhere(rojo==255)
 		if (len(rindex)>1):
 			red=DBSCAN(rojo,epsy,size,False)
-			obstacles=np.bitwise_or(obstacles,red)
+			if red is not None:
+				obstacles=np.bitwise_or(obstacles,red)
 
+	if 'o' in colors:	
+		oindex=np.argwhere(naranja==255)
+		if (len(oindex)>1):
+			orange=DBSCAN(rojo,epsy,size,False)
+			if orange is not None:
+				obstacles=np.bitwise_or(obstacles,orange)
 
 	image3=np.zeros(image.shape,dtype=np.uint8)
 	dentroCircle=np.zeros(image.shape,dtype=np.uint8)
 
 	if 'b' in colors:
-		bindex=np.nonzero(azul)
+		bindex=np.argwhere(azul==255)
+
 		if (len(bindex>1)):
 			blue=DBSCAN(azul,epsy,size,True)
 			if blue is not None:
@@ -345,8 +363,8 @@ def get_obstacles(image,colors='rgby',return_centroid=False,buoy='A0'):
 				pass
 		
 	if 'n' in colors:
-		nindex=np.nonzero(negro)
-		if (len(nindex>1)):
+		nindex=np.argwhere(negro==255)
+		if (len(bindex>1)):
 			ne=DBSCAN(azul,epsy,size,True)
 			if ne is not None:
 				#obstacles=np.bitwise_or(obstacles,ne)
