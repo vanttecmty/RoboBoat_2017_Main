@@ -92,15 +92,13 @@ class Autonomous_Navigation:
 						green_area_max=area
 						biggest_green=contorno
 						foundGreen=True
-
-		x1=0;
-		x2=0;
+					
 
 		if foundRed:
 			x1,y1,dx1,dy1 = cv2.boundingRect(biggest_red)
 			if  float(dy1)/dx1<1.2:
 				foundRed=False
-			#print(x1+dx1,y1+dy1)y
+			#print(x1+dx1,y1+dy1)
 			cv2.rectangle(image2,(x1,y1),(x1+dx1,y1+dy1),(0,0,255),-1,8)
 			
 		if foundGreen:
@@ -109,9 +107,6 @@ class Autonomous_Navigation:
 				foundGreen=False
 			#print(x2+dx2,y2+dy2)
 			cv2.rectangle(image2,(x2,y2),(x2+dx2,y2+dy2),(0,255,0),-1,8)
-			if x1>x2:
-				print('Rojo a la izquierda, ignorar rojo.')
-				return False, True, x2,y2, image2
 
 		#cv2.waitKey(0)
 		if foundRed and foundGreen:
@@ -119,6 +114,7 @@ class Autonomous_Navigation:
 			y=int((y1+y2)/2)
 			cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 			cv2.imshow('image2',image2)
+			
 			return foundRed,foundGreen,x,y,image2
 		else:
 			if foundRed:
@@ -126,6 +122,7 @@ class Autonomous_Navigation:
 				y=y1
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 				cv2.imshow('image2',image2)
+
 				return foundRed,foundGreen,x,y,image2
 			elif foundGreen:
 				x=x2

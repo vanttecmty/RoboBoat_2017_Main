@@ -23,7 +23,7 @@ status = 2
 course = 3
 challenge_pos = 4
 dock = 5
-
+dockId = 0;
 
 def start_mission():
 	imu.init();
@@ -160,8 +160,9 @@ def send_testing():
 				print("Receiving")
 				s = x.receive_from_station();	
 				resp = s[enable_pos]; 
-				counter += 1
-				print("Go to dock : ", s[dock])
+				counter += 1;
+				dockId = int(s[dock]);
+				print("Go to dock : ", s[dock]);
 
 			if(counter < 5):
 				time.sleep(6-counter);

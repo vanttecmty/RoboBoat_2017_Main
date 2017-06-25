@@ -65,7 +65,12 @@ routePoints       = [];
 lidarObstacles    = [];
 orientationDegree = 0;
 pixelsGoal        = [0,0];
-
+alfaDockingLatitude    =  29.15168;
+alfaDockingLongitud    = -81.01726;
+bravoDockingLatitude   =  29.15208;
+bravoDockingLongitud   = -81.01656;
+charlieDockingLatitude =  29.15137;
+charlieDockingLongitud = -81.01627;
 #Xbee Variables
 drone_takeoff = 0
 drone_flying = 0
@@ -264,16 +269,18 @@ class NavigationThread (threading.Thread):
 		#self.go_to_destiny(29.190093, -81.050142);
 		var.currChallenge = 'a';
 		self.challenge_1();
-		motors.move(50,50);
+		motors.move(50, 50);
 		time.sleep(2);
-		motors.move(0,0);
+		motors.move(0, 0);
 		var.currChallenge = 'N';
 		#curso muelle
-		self.go_to_destiny(29.151485, -81.017215);
-		var.currChallenge = 's';
-		self.challenge_2();
-		self.go_to_destiny(29.151498, -81.017470);
-		self.go_to_destiny(29.15140, -81.01741);
+		self.go_to_destiny(charlieDockingLatitude, charlieDockingLongitud);
+		motors.move(0, 0);
+		time.sleep(10);
+		var.currChallenge = 'd';
+
+		while(boat.dockId == 0):
+			time.sleep(1);
 
 	def go_to_destiny(self, latitude2, longitud2):
 		global destiny, runProgram;
@@ -333,10 +340,10 @@ class NavigationThread (threading.Thread):
 				#girar
 				if(turn_degrees_needed > 0):
 					print("Going to move left")
-					motors.move(50, -50);
+					motors.move(70, -70);
 				else: 
 					print("Going to move right")
-					motors.move(-50, 50);
+					motors.move(-70, 70);
 			#ir derecho;
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
@@ -447,7 +454,7 @@ class NavigationThread (threading.Thread):
 	def challenge_1(self):
 		global destiny, runProgram;
 		ch1_image = capture.read();		
-		cv2.imshow('frame', ch1_image[1]);
+		#cv2.imshow('frame', ch1_image[1]);
 		cv2.waitKey(1);
 		autonomous = challenge.Autonomous_Navigation();
 		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
@@ -467,16 +474,16 @@ class NavigationThread (threading.Thread):
 		ch1_destiny = {};
 		ch1_destiny['distance'] = 0;
 
-		while foundRed or foundGreen or counter < 100 or math.fabs(ch1_destiny['distance']) < 15:
+		while foundRed or foundGreen or counter < 100 or math.fabs(ch1_destiny['distance']) < 10:
 			print("rojo ", foundRed, "verde ", foundGreen, "counter ", counter);
 			centroideDegree = (centroideX * 69.0/680.0 - 35) * -1;
 
 			if(foundRed and not foundGreen):
 				print("solo rojo");
-				centroideDegree = centroideDegree - 45;
+				centroideDegree = centroideDegree - 20;
 			elif(not foundRed and foundGreen):
 				print("solo  verde");
-				centroideDegree = centroideDegree + 45;
+				centroideDegree = centroideDegree + 20;
 
 			print("centroideDegree", centroideDegree);
 
@@ -510,19 +517,19 @@ class NavigationThread (threading.Thread):
 
 			if(math.fabs(turn_degrees_needed) < 10): 
 				print("Tengo un margen menor a 10 grados");
-				motors.move(70, 70);
+				motors.move(100, 100);
 			else:
 				#girar
 				if(turn_degrees_needed > 0):
 					print("Going to move left")
-					motors.move(25, -25);
+					motors.move(50, -50);
 				else: 
 					print("Going to move right")
-					motors.move(-25, 25);
+					motors.move(-50, 50);
 			
 			#recorrer 2 metros
 			ch1_image = capture.read();
-			cv2.imshow('frame', ch1_image[1]);
+			#cv2.imshow('frame', ch1_image[1]);
 			cv2.waitKey(1);
 
 			if(LastCentroideY != centroideY):
