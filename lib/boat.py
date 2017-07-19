@@ -5,7 +5,7 @@ import time
 import lib.imu as imu
 import lib.variables as var
 
-x = xbee.xbee("/dev/ttyUSB1")
+x = xbee.xbee("/dev/ttyUSB0")
 
 challenges = ['autonomous','speed', 'follow', 'path', 'docking', 'return']
 
