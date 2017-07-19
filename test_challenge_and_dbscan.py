@@ -85,7 +85,7 @@ cv2.setMouseCallback('image',draw_rectangle)
 
 
 #path='/home/naoitesm/RoboBoat_2017_Main/dataset/'
-path='/home/gabriel/Roboboat/RoboBoat_2017_Main/numeros/'
+path='/home/naoitesm/RoboBoat_2017_Main/postes/'
 files=os.listdir(path)
 
 autonomous=challenge.Autonomous_Navigation()
@@ -99,9 +99,9 @@ for image_file in files:
 	
 	tecla=-1
 	while(tecla==-1):
-		#foundRed,foundGreen,x,y,returned_image=autonomous.get_destination(image)
+		foundRed,foundGreen,x,y,returned_image=autonomous.get_destination(image)
 		
-		docking.search_number(image,1)
+		#docking.search_number(image,1)
 		cv2.imshow("image",image)
 		
 		#print(foundRed,foundGreen,x,y)

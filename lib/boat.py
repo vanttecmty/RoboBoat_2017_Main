@@ -1,7 +1,7 @@
 import sys
 import os
-import xbee
 import time
+import lib.xbee as xbee
 import lib.imu as imu
 import lib.variables as var
 
@@ -23,14 +23,14 @@ status = 2
 course = 3
 challenge_pos = 4
 dock = 5
-
+dockId = 0;
 
 def start_mission():
 	imu.init();
 	for i in range(1,5):
 		send_start(lat_long)
 
-	while(var.challenge != 'd'):
+	while(var.currChallenge != 'd'):
 		send_heartbeat()
 
 	# Aqui esta haciendo el docking
@@ -52,15 +52,17 @@ def start_mission():
 	# To Do: Mover el barco hacia s[dock]
 
 	# Espera a que se mande la 'e' de fin de mision
-	while(var.challenge != 'e'):
+	while(var.currChallenge != 'e'):
 		send_heartbeat()
 
 
 def send_heartbeat():
 	# To Do: Obtener coordenadas y cambiar en la siguiente linea
 	coords = imu.get_gps_coords();
-	x.set_latlong(coords['latitude'],coords['longitude']);
-	x.set_challenge(var.challenge)
+	la = str(round(coords['latitude'],6)).zfill(10)
+	lo = str(round(coords['longitud'],6)).zfill(10)
+	x.set_latlong(la,lo);
+	x.set_challenge(var.currChallenge)
 	x.send2station()
 	time.sleep(1.05)
 
@@ -158,8 +160,9 @@ def send_testing():
 				print("Receiving")
 				s = x.receive_from_station();	
 				resp = s[enable_pos]; 
-				counter += 1
-				print("Go to dock : ", s[dock])
+				counter += 1;
+				dockId = int(s[dock]);
+				print("Go to dock : ", s[dock]);
 
 			if(counter < 5):
 				time.sleep(6-counter);

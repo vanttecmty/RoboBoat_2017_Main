@@ -114,6 +114,7 @@ class Autonomous_Navigation:
 			y=int((y1+y2)/2)
 			cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 			cv2.imshow('image2',image2)
+			
 			return foundRed,foundGreen,x,y,image2
 		else:
 			if foundRed:
@@ -121,6 +122,7 @@ class Autonomous_Navigation:
 				y=y1
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
 				cv2.imshow('image2',image2)
+
 				return foundRed,foundGreen,x,y,image2
 			elif foundGreen:
 				x=x2
