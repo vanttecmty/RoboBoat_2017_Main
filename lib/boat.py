@@ -1,3 +1,6 @@
+'''
+	@author Juan
+'''
 import sys
 import os
 import time
@@ -5,11 +8,11 @@ import lib.xbee as xbee
 import lib.imu as imu
 import lib.variables as var
 
-x = xbee.xbee("/dev/ttyUSB1")
+x = xbee.xbee("/dev/ttyUSB1");
 
-challenges = ['autonomous','speed', 'follow', 'path', 'docking', 'return']
+challenges = ['autonomous','speed', 'follow', 'path', 'docking', 'return'];
 
-courses = ['courseA', 'courseB', 'courseC']
+courses = ['courseA', 'courseB', 'courseC'];
 
 #To do: Sacar coordenadas de la imu
 lat_long = ["29.151098","-81.016505"];

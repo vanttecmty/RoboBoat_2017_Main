@@ -1,3 +1,6 @@
+'''
+	@author Juan
+'''
 import sys
 import time
 import serial

@@ -1,3 +1,6 @@
+'''
+	@author Gabriel
+'''
 import cv2
 import numpy as np
 import os
@@ -8,7 +11,7 @@ tecla=-1
 minRadius=30
 buoy_diameter=20.32 #cm
 global_image=None
-
+'''
 def draw_rectangle(event,x,y,flags,param):
 	global x1,x2,y1,y2,primera
 	if event==cv2.EVENT_LBUTTONDOWN:
@@ -59,7 +62,7 @@ def area_stats(sourceImage):
 
 	return np.mean(promedio[0]),np.std(promedio[0]),np.mean(promedio[1]),np.std(promedio[1]),np.mean(promedio[2]),np.std(promedio[2])
 	
-	
+'''	
 	#yrgb
 def DBSCAN(array, epsylon, minPts,return_centroid=False,blu=False):
 	start_time = time.time()
@@ -191,10 +194,10 @@ def DBSCAN(array, epsylon, minPts,return_centroid=False,blu=False):
 	return obstacles
 	
 
-
+'''
 cv2.namedWindow('get rectangle')
 cv2.setMouseCallback('get rectangle',draw_rectangle)
-
+'''
 gl=np.array([  63.19825178,  116.07564994,   20.93028123])
 gu=np.array([ 130.68950332,  185.5672072,    51.68196367])
 

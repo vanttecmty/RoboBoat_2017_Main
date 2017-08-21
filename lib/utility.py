@@ -1,3 +1,6 @@
+'''
+	@author Juan
+'''
 import sys
 import os
 import lib.variables as var

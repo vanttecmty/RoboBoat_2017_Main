@@ -1,3 +1,6 @@
+'''
+	@author Gabriel
+'''
 import pathfinding as path
 import pathfindingv2 as pathv2
 import pathfindingv3 as pathv3

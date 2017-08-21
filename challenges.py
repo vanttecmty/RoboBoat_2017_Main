@@ -1,3 +1,7 @@
+'''
+	@author Gabriel
+'''
+
 import Jetson.dbscan_contours
 import math
 import pathfindingv2 as pathfinding
@@ -113,22 +117,21 @@ class Autonomous_Navigation:
 			x=int((x1+x2)/2)
 			y=int((y1+y2)/2)
 			cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
-			cv2.imshow('image2',image2)
-			
+			#cv2.imshow('image2',image2)
 			return foundRed,foundGreen,x,y,image2
 		else:
 			if foundRed:
 				x=x1
 				y=y1
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
-				cv2.imshow('image2',image2)
+				#cv2.imshow('image2',image2)
 
 				return foundRed,foundGreen,x,y,image2
 			elif foundGreen:
 				x=x2
 				y=y2
 				cv2.circle(image2,(x,y),10,(255,255,255),-1,8)
-				cv2.imshow('image2',image2)
+				#cv2.imshow('image2',image2)
 				return foundRed,foundGreen,x,y,image2
 
 				

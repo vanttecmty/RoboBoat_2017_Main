@@ -1,3 +1,7 @@
+'''
+	@author Juan Carlos Aguilera
+'''
+
 import os
 import sys
 import threading

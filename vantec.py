@@ -1,3 +1,16 @@
+'''
+	vantec.py
+    @desc 		Principal file for RoboBoat competition
+   				Here are the principals threads to make the boat work.
+	@author 	Marcopolo Gil Melchor marcogil93@gmail.com
+	@created_at 2017-06-05
+	@updated_at 2017-08-21
+	@requires	python3
+'''
+
+'''
+	Required python libraries 
+'''
 import os
 import sys
 sys.path.append('/usr/local/lib/python3.4/site-packages/')
@@ -7,16 +20,21 @@ import math
 import numpy as np
 import cv2
 import random
-import pathfindingv2 as pathfinding
 import socket  
 from scipy import misc
 from scipy.ndimage import rotate
+import datetime
+
+'''
+	Required project python libraries 
+'''
+import pathfindingv2 as pathfinding
 import lib.variables as var
 import lib.motors as motors
 import lib.imu as imu
 import Jetson.dbscan_contours as dbscan
 import challenges as challenge
-import datetime
+
 
 ##############ADDED BY JC NEED TO BE TESTED#############
 import lib.boat as boat
@@ -33,17 +51,20 @@ import lib.boat as boat
 var.currChallenge = 'N'
 ##############ADDED BY JC NEED TO BE TESTED#############
 
-#Navigation class
-MAP_WIDTH       = 200;#400
-MAP_HEIGHT      = 200;
-BOUY_RADIOUS    = 3;#6
-BOAT_HEIGHT     = 58/2;#58
-BOAT_WIDTH      = 34/2;#34
+'''
+	RADAR DIMENSION, OBJECTS SCALED SIZE, COORDENATES OF OBJECT CENTROIDES
+	@desc The resolution of the radar is 10 meters.
+'''
+MAP_WIDTH       = 400;
+MAP_HEIGHT      = 400;
+BOUY_RADIOUS    = 6;
+BOAT_HEIGHT     = 58;
+BOAT_WIDTH      = 34;
 BOAT_X1         = int(MAP_WIDTH/2 - BOAT_WIDTH/2);
 BOAT_Y1         = int(MAP_HEIGHT/2 - BOAT_HEIGHT/2);
 BOAT_X2         = int(MAP_WIDTH/2 + BOAT_WIDTH/2);
 BOAT_Y2         = int(MAP_HEIGHT/2 + BOAT_HEIGHT/2);
-LIDAR_COORD_X   = 100;#200
+LIDAR_COORD_X   = 100;
 LIDAR_COORD_Y   = int(100 - BOAT_HEIGHT / 2);#200
 
 
@@ -92,7 +113,7 @@ class LidarSocketThread (threading.Thread):
 		self.threadID = threadID;
 		self.name = name;
 	def run(self):
-		global lidarObstacles;
+		global lidarObstacles, runProgram;
 		s = socket.socket();
 		s.bind(("localhost", 8895));
 		s.listen(1);
@@ -111,6 +132,8 @@ class LidarSocketThread (threading.Thread):
 		    if(len(arrMeasures) > 0):
 		    	lidarObstacles = arrMeasures;
 		    	lidarObstacles.pop();
+
+		    runProgram = cv2.waitKey(1) != 27;
 
 		sc.close();  
 		s.close();
@@ -150,7 +173,7 @@ class MapThread (threading.Thread):
 				degree = int(data[0]);
 				distance = int(data[1]);
 
-				if( (degree > 0 and degree < 90) or (degree > 270 and degree < 360) and distance > 1000):
+				if (degree > 0 and degree < 90) or (degree > 270 and degree < 360):
 					#pasar de milimetros a centimetros -> dividir entre 10
 					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(degree - 90)) * float(distance/10) / 5);
 					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(degree - 90)) * float(distance/10) / 5);
@@ -161,27 +184,28 @@ class MapThread (threading.Thread):
 			'''
 			'Set camera obstacles in the map 
 			'''
+			'''
 			frame = capture.read();
 			#cv2.imshow('cam', frame[1]);
-			#cv2.waitKey(0);
-			if not frame[0]:
-				break
-			values = dbscan.get_obstacles(frame[1],'yg', False);
-			camObstacles = values[1];
+			cv2.waitKey(100);
+			if frame[0]:
+				values = dbscan.get_obstacles(frame[1],'yg', False);
+				camObstacles = values[1];
 
-			for obstacle in camObstacles:
-				#obstacle is [distance, degree]
-				#print("cam obstacles");
-				pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
-				pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
-				cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
-				cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
-				pass;
-
+				for obstacle in camObstacles:
+					#obstacle is [distance, degree]
+					#print("cam obstacles");
+					pixelX = LIDAR_COORD_X + int (math.cos(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
+					pixelY = LIDAR_COORD_Y + int (math.sin(math.radians(obstacle[1] - 90)) * float(obstacle[0]) / 5);
+					cv2.circle(routeMap, (pixelX, pixelY), int(BOUY_RADIOUS + BOAT_WIDTH * 0.8), (255, 255 , 255), -1, 8);
+					cv2.circle(routeMap, (pixelX, pixelY), BOUY_RADIOUS, (0, 0, 255), -1, 8);
+					pass;
+			'''
 			#print("destiny", destiny);
 			
 			#print(destiny);
 			#locate destiny pixels if is less than 8 meters.
+			'''
 			if(destiny['distance'] < 8):
 				#escalar medidad de metros a centimetro -> multiplicar entre 100 
 				destinyPixelX = LIDAR_COORD_X + int (math.cos(math.radians(destiny['degree'] + 90)) * float(destiny['distance'] *100) / 5);
@@ -221,9 +245,12 @@ class MapThread (threading.Thread):
 					destinyPixel     = [destinyPixelY, destinyPixelX];
 
 			#print("destiny pixel: ", destinyPixel);
+			
 			cv2.imshow('Route', routeMap);
+			#cv2.waitKey(100);
 			#cv2.imwrite('route_test.png',routeMap)
 			#Todo: check if destiny is inside obstacle;
+			
 			routePoints = pathfinding.a_star([int(MAP_WIDTH/2), int(MAP_HEIGHT/2)], destinyPixel, routeMap);
 			routeLength = len(routePoints);
 
@@ -244,11 +271,12 @@ class MapThread (threading.Thread):
 			#else: 
 				#orientationDegree = 0;
 			#print("orientation degree mapa: ", orientationDegree);
-
+			'''
 			self.add_boat(routeMap);	
 			cv2.imshow('Route', routeMap);
+			cv2.waitKey(100);
 			#time.sleep(1)
-
+			#print("run5 ", runProgram);
 		print("End thread Map");
 
 	def new_map(self, rows, cols):
@@ -268,22 +296,23 @@ class NavigationThread (threading.Thread):
 		#destinyCoords = [29.190093, -81.050142];
 		#self.go_to_destiny(29.190093, -81.050142);
 		var.currChallenge = 'a';
-		self.challenge_1();
-		motors.move(50, 50);
-		time.sleep(2);
-		motors.move(0, 0);
+		#self.challenge_1();
+		#motors.move(50, 50);
+		#time.sleep(2);
+		#motors.move(0, 0);
 		var.currChallenge = 'N';
 		#curso muelle
-		self.go_to_destiny(charlieDockingLatitude, charlieDockingLongitud);
-		motors.move(0, 0);
+		#self.go_to_destiny(29.15168, -81.017377);
 		time.sleep(10);
 		var.currChallenge = 'd';
+		time.sleep(120);
+		self.go_to_destiny(29.151322, -81.017508);
 
 		while(boat.dockId == 0):
 			time.sleep(1);
 
 	def go_to_destiny(self, latitude2, longitud2):
-		global destiny, runProgram;
+		global destiny;
 		destiny               = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
 		orientationDegree     = destiny['degree'];
 		lastOrientationDegree = orientationDegree;
@@ -347,13 +376,13 @@ class NavigationThread (threading.Thread):
 			#ir derecho;
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(latitude2, longitud2);
-			runProgram = cv2.waitKey(1) != 27;
 			#time.sleep(1);
 
 
 		motors.move(0,0);
 		print("End thread Navigation");
 	
+	'''
 	def challenge_2(self):
 		global destiny, runProgram;
 		ch1_image = capture.read();		
@@ -449,13 +478,13 @@ class NavigationThread (threading.Thread):
 		motors.move(100, 100);
 		time.sleep(2);
 		motors.move(0, 0);
-
+	'''
 
 	def challenge_1(self):
 		global destiny, runProgram;
 		ch1_image = capture.read();		
 		#cv2.imshow('frame', ch1_image[1]);
-		cv2.waitKey(1);
+		cv2.waitKey(100);
 		autonomous = challenge.Autonomous_Navigation();
 		foundRed,foundGreen, centroideX, centroideY, image2 = autonomous.get_destination(ch1_image[1]);
 		date=str(datetime.datetime.now())
@@ -490,7 +519,6 @@ class NavigationThread (threading.Thread):
 			if(centroideDegree != lastCentroideDegree):
 				turn_degrees_needed = centroideDegree;
 				turn_degrees_accum  = 0;
-
 				#clean angle;
 				imu.get_delta_theta();
 				lastCentroideDegree = centroideDegree;
@@ -530,7 +558,7 @@ class NavigationThread (threading.Thread):
 			#recorrer 2 metros
 			ch1_image = capture.read();
 			#cv2.imshow('frame', ch1_image[1]);
-			cv2.waitKey(1);
+			cv2.waitKey(200);
 
 			if(LastCentroideY != centroideY):
 				LastCentroideY = centroideY;
@@ -542,7 +570,7 @@ class NavigationThread (threading.Thread):
 			counter = (counter + 1)%1000000;
 			ch1_destiny = imu.get_degrees_and_distance_to_gps_coords(myFirstCoords['latitude'], myFirstCoords['longitud']);
 		
-		motors.move(100, 100);
+		#motors.move(100, 100);
 		time.sleep(2);
 		motors.move(0, 0);
 
@@ -564,7 +592,7 @@ def init():
 
 	imu.init();
 	imu.NORTH_YAW = imu.get_yaw_orientation();
-	capture = cv2.VideoCapture(0);
+	capture = cv2.VideoCapture(1);
 
 	if(capture.isOpened() == False):
 		print("No hay cámara");
@@ -584,13 +612,13 @@ thread3 = NavigationThread(3, "NavigationThread");
 thread4 = sendXbeeThread(4, "sendXbeeThread");
 
 # Start new Threads
-thread1.start();
-thread2.start();
+#thread1.start();
+#thread2.start();
 thread3.start();
 thread4.start();
 
-thread1.join();
-thread2.join();
+#thread1.join();
+#thread2.join();
 thread3.join();
 thread4.join();
 

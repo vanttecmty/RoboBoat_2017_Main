@@ -1,3 +1,6 @@
+'''
+	@author Juan Carlos Aguilera
+'''
 import os
 import io
 import sys

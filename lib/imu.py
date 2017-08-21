@@ -1,3 +1,6 @@
+'''
+	@author Marcopolo
+'''
 import math
 import time
 import sys

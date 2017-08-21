@@ -1,3 +1,6 @@
+'''
+	@author Juan Carlos Aguilera
+'''
 #Estación
 
 #Comunicación del Serial independiende a la de Variable

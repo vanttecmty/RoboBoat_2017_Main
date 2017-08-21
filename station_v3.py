@@ -1,3 +1,6 @@
+'''
+	@author Juan Carlos Aguilera
+'''
 import sys
 import os
 import xbee

@@ -1,3 +1,7 @@
+'''
+	@author Juan Carlos Aguilera
+'''
+
 import serial
 import serial.tools.list_ports as ports
 

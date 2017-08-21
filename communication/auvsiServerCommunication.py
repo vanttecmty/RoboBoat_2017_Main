@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+'''
+	@author Juan Carlos Aguilera
+'''
+
 import sys
 import json
 import requests

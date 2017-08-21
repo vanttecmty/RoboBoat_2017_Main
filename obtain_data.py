@@ -1,3 +1,7 @@
+'''
+	@author Gabriel Sahagún
+'''
+
 import os
 import sys
 sys.path.append('/usr/local/lib/python3.4/site-packages/')

@@ -1,3 +1,7 @@
+'''
+	@author Gabriel Sahagún
+'''
+
 import numpy as np
 import math
 import cv2
